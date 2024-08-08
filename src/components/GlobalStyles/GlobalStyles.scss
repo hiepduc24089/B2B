@@ -1,17 +1,51 @@
 @import 'normalize.css';
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
 :root {
-  --primary: #fe2c55;
+  --primary: #fa5a00;
+  --black: #000000;
+  --white: #ffffff;
+  --green: #03a500;
+  --grey: #a9a9a9;
+  --grey-black: #424242;
+  --grey-dark: #929292;
 }
-
+a {
+  text-decoration: none !important;
+}
 html {
   font-size: 62.5%;
 }
 
 body {
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Inter', sans-serif !important;
   font-size: 1.6rem;
-  line-height: 1.5;
+  line-height: 1.2 !important;
   text-rendering: optimizespeed;
+}
+
+//Custom slick
+.slick-dots {
+  position: absolute;
+  bottom: 2%;
+}
+.slick-dots li button:before {
+  font-size: 18px !important;
+}
+.slick-arrow {
+  display: none !important;
+}
+
+@media screen and (max-width: 992px) {
+  .slick-dots li {
+    margin: 0;
+  }
+  .slick-dots li button:before {
+    font-size: 15px !important;
+  }
+}
+@media screen and (max-width: 475px) {
+  .slick-dots li button:before {
+    font-size: 12px !important;
+  }
 }
