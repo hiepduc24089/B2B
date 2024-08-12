@@ -1,0 +1,23 @@
+.supplier{
+    .supplier-title{
+        color: var(--black);
+        text-align: center;
+        font-size: 32px;
+        font-weight: 600;
+        line-height: normal;
+    }
+    .post-news{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        margin-top: 24px;
+        padding: 8px 80px;
+        color: var(--white);
+        font-size: 16px;
+        font-weight: 600;
+        background-color: var(--primary);
+        border: none;
+        border-radius: 63px;
+    }
+}
