@@ -7,6 +7,7 @@ const routes = {
   hot_deal: '/hot-deal',
   category: '/category',
   supplier: '/supplier',
+  foryou: '/for-you',
 };
 
 export default routes;

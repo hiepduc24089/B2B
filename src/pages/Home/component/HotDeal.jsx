@@ -1,11 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, memo } from 'react';
 import Slider from 'react-slick';
 import classNames from 'classnames/bind';
 import styles from '../Home.module.scss';
 import { imagesHome } from '~/assets/images';
 import { Link } from 'react-router-dom';
 import routesConfig from '~/config/routes';
-import { dataHotDeal } from '../data/hotdeal';
+import { dataProduct } from '~/pages/Home/data/product';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import LoadingIndicator from '~/components/Loading';
@@ -15,27 +15,28 @@ const cx = classNames.bind(styles);
 function HotDeal() {
   const [state, setState] = React.useState({
     loading: true,
-    dataListHotDeal: [],
+    dataListProduct: [],
   });
-  const { loading, dataListHotDeal } = state;
+  const { loading, dataListProduct } = state;
   useEffect(() => {
-    fetchDataListHotDealAPI();
+    fetchDataListProductAPI();
     return () => {};
   }, []);
 
-  const fetchDataListHotDealAPI = async () => {
+  const fetchDataListProductAPI = async () => {
     setTimeout(() => {
       setState((prevState) => ({
         ...prevState,
         loading: false,
-        dataListHotDeal: dataHotDeal,
+        dataListProduct: dataProduct,
       }));
-    }, 3000);
+    }, 1000);
   };
 
   const settings = {
     dots: false,
     infinite: false,
+    arrows: false,
     speed: 500,
     slidesToShow: 5,
     slidesToScroll: 1,
@@ -64,6 +65,10 @@ function HotDeal() {
     ],
   };
 
+  function formatPrice(price) {
+    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  }
+
   const renderContent = () => {
     if (loading) {
       return <LoadingIndicator />;
@@ -71,17 +76,17 @@ function HotDeal() {
       return (
         <div className={cx('hot-deal-wrapper')}>
           <Slider {...settings}>
-            {dataListHotDeal.map((hotdeal, index) => (
+            {dataListProduct.slice(0, 5).map((hotdeal, index) => (
               <div key={index} className={cx('list-item')}>
                 <img src={hotdeal.image} alt="Product" />
                 <h3>
-                  {hotdeal.price}đ<span>/Hộp</span>
+                  {formatPrice(hotdeal.price)}đ<span>/Hộp</span>
                 </h3>
-                <h4>{hotdeal.sale_price}đ</h4>
+                <h4>{formatPrice(hotdeal.sale_price)}đ</h4>
                 <h5>
                   Mua sỉ từ <span>{hotdeal.wholesaleitem}</span>
                 </h5>
-                <p>{hotdeal.description}</p>
+                <p>{hotdeal.title}</p>
               </div>
             ))}
           </Slider>
@@ -117,4 +122,4 @@ function HotDeal() {
   );
 }
 
-export default HotDeal;
+export default memo(HotDeal);

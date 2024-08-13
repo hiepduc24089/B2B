@@ -1,0 +1,16 @@
+.sub-title {
+  color: var(--black);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: normal;
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  margin-top: -15px;
+  a {
+    color: var(--black);
+  }
+  .next-icon {
+    margin: 0 8px;
+  }
+}

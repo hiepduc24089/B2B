@@ -25,6 +25,7 @@
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {
+    "@welldone-software/why-did-you-render": "^8.0.3",
     "babel-plugin-module-resolver": "^5.0.2",
     "customize-cra": "^1.0.0",
     "react-app-rewired": "^2.2.1",

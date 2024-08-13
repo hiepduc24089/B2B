@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import Slider from 'react-slick';
 import classNames from 'classnames/bind';
 import styles from '../Home.module.scss';
@@ -12,6 +12,7 @@ function Banner() {
   const settings = {
     dots: true,
     infinite: true,
+    arrows: false,
     speed: 500,
     slidesToShow: 1,
     slidesToScroll: 1,
@@ -43,4 +44,4 @@ function Banner() {
   );
 }
 
-export default Banner;
+export default memo(Banner);

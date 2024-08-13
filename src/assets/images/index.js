@@ -16,6 +16,24 @@ import image_product from './home/hotdeal/image-product.png';
 import cate_img from './home/category/cate-img.png';
 import supplier_img from './home/supplier/supplier-image.png';
 import supplier_location from './home/supplier/location.svg';
+import brand_icon from './home/brand/brand-icon.svg';
+import brand_logo from './home/brand/brand-logo.png';
+import product from './home/foryou/product.png';
+import circle from './footer/circle.png';
+import COD from './footer/COD.png';
+import JCB from './footer/JCB.png';
+import tragop from './footer/tragop.png';
+import visa from './footer/visa.png';
+import apple from './footer/apple.svg';
+import facebook from './footer/facebook.svg';
+import google from './footer/google.svg';
+import twitter from './footer/twitter.svg';
+import check from './hotdeal/check.svg';
+import change from './hotdeal/change.svg';
+import filter from './hotdeal/filter.svg';
+import close_icon from './hotdeal/close.svg';
+import post_news from './supplier/post-news.svg';
+import seller_avatar from './seller/seller-avatar.png';
 
 export const images = {
   logo,
@@ -39,4 +57,34 @@ export const imagesHome = {
   cate_img,
   supplier_img,
   supplier_location,
+  brand_icon,
+  brand_logo,
+  product,
+};
+
+export const imagesFooter = {
+  circle,
+  COD,
+  JCB,
+  tragop,
+  visa,
+  apple,
+  google,
+  facebook,
+  twitter,
+};
+
+export const imagesHotDeal = {
+  check,
+  change,
+  filter,
+  close_icon,
+};
+
+export const imagesSupplier = {
+  post_news,
+};
+
+export const imagesSeller = {
+  seller_avatar,
 };

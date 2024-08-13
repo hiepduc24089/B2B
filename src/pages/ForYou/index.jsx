@@ -3,7 +3,7 @@ import { Layout } from 'antd';
 import FilterSearch from '~/components/Layout/FilterSearch';
 import Product from './component/Product';
 import classNames from 'classnames/bind';
-import styles from './HotDeal.module.scss';
+import styles from './ForYou.module.scss';
 import SubTitle from '~/components/Layout/SubTitle/SubTitle';
 import { imagesHotDeal } from '~/assets/images';
 
@@ -11,7 +11,7 @@ const cx = classNames.bind(styles);
 
 const { Header, Content } = Layout;
 
-function HotDeal() {
+function ForYou() {
   return (
     <>
       <SubTitle />
@@ -36,4 +36,4 @@ function HotDeal() {
   );
 }
 
-export default memo(HotDeal);
+export default memo(ForYou);

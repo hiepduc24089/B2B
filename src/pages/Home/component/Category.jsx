@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, memo } from 'react';
 import classNames from 'classnames/bind';
 import styles from '../Home.module.scss';
 import { imagesHome } from '~/assets/images';
@@ -27,7 +27,7 @@ function Category() {
         loading: false,
         dataListCategory: dataCategory,
       }));
-    }, 3000);
+    }, 1000);
   };
 
   const renderContent = () => {
@@ -65,4 +65,4 @@ function Category() {
   );
 }
 
-export default Category;
+export default memo(Category);

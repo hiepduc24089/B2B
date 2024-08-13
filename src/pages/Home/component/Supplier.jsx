@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, memo } from 'react';
 import classNames from 'classnames/bind';
 import styles from '../Home.module.scss';
 import { imagesHome } from '~/assets/images';
@@ -15,20 +15,37 @@ function Supplier() {
     dataListSupplier: [],
   });
   const { loading, dataListSupplier } = state;
-  useEffect(() => {
-    fetchDataListSupplierAPI();
-    return () => {};
-  }, []);
+
+  const getNumberOfItems = () => {
+    return window.innerWidth > 768 ? 14 : 5;
+  };
 
   const fetchDataListSupplierAPI = async () => {
     setTimeout(() => {
       setState((prevState) => ({
         ...prevState,
         loading: false,
-        dataListSupplier: dataSupplier,
+        dataListSupplier: dataSupplier.slice(0, getNumberOfItems()),
       }));
-    }, 3000);
+    }, 1000);
   };
+
+  useEffect(() => {
+    fetchDataListSupplierAPI();
+
+    const handleResize = () => {
+      setState((prevState) => ({
+        ...prevState,
+        dataListSupplier: dataSupplier.slice(0, getNumberOfItems()),
+      }));
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   const renderContent = () => {
     if (loading) {
@@ -36,21 +53,23 @@ function Supplier() {
     } else {
       return (
         <div className={cx('supplier-wrapper')}>
-          <div className={cx('supplier-item')}>
-            {dataListSupplier.map((supplier, index) => (
-              <div key={index} className={cx('d-flex', 'align-items-center')}>
-                <img src={supplier.image} alt="Supplier Image" />
+          {dataListSupplier.map((supplier, index) => (
+            <div key={index} className={cx('supplier-item')}>
+              <div className={cx('d-flex', 'align-items-center')}>
+                <img src={supplier.image} alt="Supplier Image" className={cx('supplier-image')} />
                 <div className={cx('supplier-text')}>
                   <h3>{supplier.title}</h3>
-                  <p>{supplier.description}</p>
-                  <span className={cx('d-flex', 'align-items-center')}>
+                  <Link to={'#'} className={cx('find-supplier')}>
+                    {supplier.description}
+                  </Link>
+                  <span className={cx('d-flex', 'align-items-center', 'supplier-location')}>
                     <img src={imagesHome.supplier_location} alt="Location" />
                     {supplier.location}
                   </span>
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       );
     }
@@ -73,4 +92,4 @@ function Supplier() {
   );
 }
 
-export default Supplier;
+export default memo(Supplier);
