@@ -34,6 +34,7 @@ import filter from './hotdeal/filter.svg';
 import close_icon from './hotdeal/close.svg';
 import post_news from './supplier/post-news.svg';
 import seller_avatar from './seller/seller-avatar.png';
+import infor from './all/infor.svg';
 
 export const images = {
   logo,
@@ -41,6 +42,7 @@ export const images = {
   noti,
   shopping,
   user,
+  infor,
 };
 
 export const imagesHome = {

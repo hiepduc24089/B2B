@@ -8,6 +8,7 @@ const routes = {
   category: '/category',
   supplier: '/supplier',
   foryou: '/for-you',
+  product_details: '/product/:slug/:id',
 };
 
 export default routes;

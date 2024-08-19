@@ -8,6 +8,7 @@ import ShoppingCart from '~/pages/ShoppingCart';
 import Category from '~/pages/Category';
 import Supplier from '~/pages/Supplier';
 import ForYou from '~/pages/ForYou';
+import ProductDetails from '~/pages/ProductDetails';
 
 // Routes accessible without login
 const publicRoutes = [
@@ -19,6 +20,7 @@ const publicRoutes = [
   { path: routesConfig.category, component: Category },
   { path: routesConfig.supplier, component: Supplier },
   { path: routesConfig.foryou, component: ForYou },
+  { path: routesConfig.product_details, component: ProductDetails },
 ];
 
 // Routes accessible only after login

@@ -33,6 +33,19 @@ body {
   font-size: 18px !important;
 }
 
+//custom ant design
+.ant-input-number {
+  border-radius: 32px;
+  width: 140px;
+}
+.ant-input-number-handler-wrap {
+  display: none !important;
+}
+.ant-input-number-input {
+  border: none;
+  text-align: center !important;
+  padding: 0;
+}
 @media screen and (max-width: 992px) {
   .slick-dots li {
     margin: 0;
