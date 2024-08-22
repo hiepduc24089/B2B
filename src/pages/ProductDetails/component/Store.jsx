@@ -1,12 +1,17 @@
-import React, { memo, useEffect, useState } from 'react';
+import React, { memo, useState } from 'react';
 import classNames from 'classnames/bind';
 import styles from '../ProductDetails.module.scss';
-
+import { Modal, Button } from 'react-bootstrap';
 import LoadingIndicator from '~/components/Loading';
 
 const cx = classNames.bind(styles);
 
-function Store({ seller, loading }) {
+function Store({ seller, product, loading }) {
+  const [showModal, setShowModal] = useState(false);
+
+  const handleShowModal = () => setShowModal(true);
+  const handleCloseModal = () => setShowModal(false);
+
   const renderContent = () => {
     if (loading) {
       return <LoadingIndicator />;
@@ -46,9 +51,31 @@ function Store({ seller, loading }) {
     <>
       <div className={cx('store-contact')}>
         <p>Để hỏi về giá sản phẩm, sản phẩm liên quan hoặc các thông tin khác:</p>
-        <button>Liên hệ ngay</button>
+        <button onClick={handleShowModal}>Liên hệ ngay</button>
       </div>
       <div className={cx('store-wrapper')}>{renderContent()}</div>
+
+      {/* Modal */}
+      <Modal show={showModal} onHide={handleCloseModal} className={cx('store-modal')}>
+        <Modal.Header closeButton>
+          <Modal.Title className={cx('modal-title')}>Hỏi mua hàng</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {product ? (
+            <div className={cx('d-flex', 'flex-wrap')}>
+              <span>Sản phẩm</span>
+              <h5>{product.title}</h5>
+            </div>
+          ) : (
+            <div>Loading product details...</div>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={handleCloseModal}>
+            Hỏi mua hàng
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 }

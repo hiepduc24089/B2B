@@ -1,0 +1,296 @@
+.payment-wrapper {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 30px;
+}
+.box-wrapper {
+  border-radius: 8px;
+  background: var(--white);
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  padding: 16px;
+}
+.text-primary {
+  color: var(--primary);
+}
+.text-black {
+  color: var(--black);
+}
+.cart-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 20px;
+  height: 20px;
+  margin-right: 16px;
+  background-color: var(--white);
+  border: 2px solid var(--grey);
+  border-radius: 50%;
+  position: relative;
+  cursor: pointer;
+
+  &:checked {
+    background-color: var(--white);
+    border: 2px solid var(--primary);
+  }
+
+  &:checked::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 8px;
+    height: 8px;
+    background-color: var(--primary);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
+.payment-details {
+  .my-cart {
+    h3 {
+      color: var(--black);
+      font-size: 32px;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+    .select-location-text {
+      color: var(--black);
+      font-size: 18px;
+      font-weight: 600;
+    }
+    .add-new {
+      color: var(--primary);
+      font-size: 18px;
+      font-weight: 600;
+      margin-left: 16px;
+    }
+  }
+}
+.box-infor-wrapper {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-top: 40px;
+  .box-infor {
+    width: 48%;
+    border-radius: 16px;
+    border: 1px solid var(--grey-light);
+    background: var(--white);
+    padding: 16px;
+
+    h5 {
+      color: var(--black);
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .location-details {
+      color: var(--grey-black);
+      font-size: 14px;
+      font-weight: 400;
+      margin-top: 12px;
+      margin-bottom: 24px;
+    }
+
+    .select-location {
+      border-radius: 63px;
+      border: 1px solid var(--primary);
+      background: #fdf1e7;
+      color: var(--primary);
+      font-size: 16px;
+      font-weight: 600;
+      padding: 4px 16px;
+    }
+
+    .action-icon {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+  }
+}
+
+.shopping-cart-payment {
+  height: fit-content;
+
+  .submit-payment {
+    border-radius: 63px;
+    background: var(--primary);
+    width: 100%;
+    padding: 8px 0;
+    color: var(--white);
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+  }
+}
+.payment-wrapper-details {
+  .border-btm {
+    border-bottom: 1px solid var(--grey);
+  }
+  .border-btm-dark {
+    border-bottom: 1px solid var(--black);
+  }
+  .items {
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    .use-point {
+      margin-right: 8px;
+    }
+    .title {
+      color: var(--black);
+      font-size: 16px;
+      font-weight: 400;
+    }
+    .details {
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .total-price {
+      color: var(--primary);
+      font-size: 20px;
+      font-weight: 600;
+    }
+  }
+  /* The toggle switch container */
+  .toggle-switch {
+    position: relative;
+    width: 32px;
+    height: 16px;
+  }
+
+  /* The invisible checkbox that triggers the toggle */
+  .toggle-switch input[type='checkbox'] {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  /* The track of the toggle */
+  .toggle-switch label {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.4s;
+    border-radius: 34px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+  }
+
+  /* The circle (knob) inside the toggle */
+  .toggle-switch label:before {
+    position: absolute;
+    content: '';
+    height: 12px;
+    width: 12px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Toggle switch - When the checkbox is checked, move the knob */
+  .toggle-switch input:checked + label:before {
+    transform: translateX(17px);
+  }
+
+  /* Toggle switch - When the checkbox is checked, change the background color */
+  .toggle-switch input:checked + label {
+    background-color: #4caf50;
+  }
+}
+
+.store-product-details {
+  margin-top: 16px;
+  .store-header {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    h5 {
+      color: var(--black);
+      font-size: 16px;
+      font-weight: 600;
+    }
+  }
+  .product-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    margin-bottom: 24px;
+    .product-names {
+      .product-image {
+        width: 100px;
+        height: 100px;
+      }
+      h5 {
+        color: var(--black);
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 24px;
+      }
+      .order-price {
+        color: var(--black);
+        font-size: 16px;
+        font-weight: 400;
+      }
+    }
+    .quantity {
+      border-radius: 37px;
+      padding: 4px 10px;
+      background: var(--primary);
+      color: var(--white);
+      font-size: 18px;
+      font-weight: 600;
+    }
+  }
+}
+
+.shipping-wrapper {
+  .shipping-details {
+    margin-bottom: 24px;
+  }
+  h5 {
+    color: var(--black);
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 40px;
+  }
+  .shipping-title {
+    color: var(--black);
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+  .information {
+    p {
+      color: var(--black);
+      font-size: 16px;
+      font-weight: 400;
+      margin-bottom: 8px;
+    }
+    .shipping-price {
+      color: var(--black);
+      font-size: 16px;
+      font-weight: 400;
+    }
+  }
+}
+@media screen and (max-width: 992px) {
+  .payment-wrapper {
+    grid-template-columns: (1fr);
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .box-infor-wrapper {
+    row-gap: 10px;
+    .box-infor {
+      width: 100%;
+    }
+  }
+}

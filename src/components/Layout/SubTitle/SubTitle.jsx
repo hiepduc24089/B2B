@@ -13,6 +13,8 @@ function SubTitle({ title }) {
     [routesConfig.hot_deal]: 'Deal Hot hôm nay',
     [routesConfig.foryou]: 'Dành cho bạn',
     [routesConfig.supplier]: 'Tìm nhà cung cấp',
+    [routesConfig.shopping_cart]: 'Giỏ hàng',
+    [routesConfig.store_management]: 'Quản lý gian hàng',
   };
 
   const subtitle = pathToSubTitleMap[location.pathname];

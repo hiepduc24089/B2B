@@ -6,7 +6,7 @@ export const dataProduct = [
     image: imagesHome.product,
     title:
       'Tinh Nghệ Nano Curcumin OIC NEW (3 Vỉ x 10 viên) giảm Đau Viêm loét Dạ dày TPCN Thực phẩm chức năng giá sỉ - giá bán buôn',
-    price: '396000',
+    price: 100000,
     sale: 20,
     sale_price: 320000,
     wholesaleitem: '5 Hộp',
@@ -35,7 +35,7 @@ export const dataProduct = [
     image: imagesHome.product,
     title:
       'Tinh Nghệ Nano Curcumin OIC NEW (3 Vỉ x 10 viên) giảm Đau Viêm loét Dạ dày TPCN Thực phẩm chức năng giá sỉ - giá bán buôn',
-    price: '396000',
+    price: 200000,
     sale: 10,
     sale_price: 356400,
     wholesaleitem: '10 Hộp',

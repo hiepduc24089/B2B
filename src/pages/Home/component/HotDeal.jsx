@@ -77,17 +77,22 @@ function HotDeal() {
         <div className={cx('hot-deal-wrapper')}>
           <Slider {...settings}>
             {dataListProduct.slice(0, 5).map((hotdeal, index) => (
-              <div key={index} className={cx('list-item')}>
-                <img src={hotdeal.image} alt="Product" />
-                <h3>
-                  {formatPrice(hotdeal.price)}đ<span>/Hộp</span>
-                </h3>
-                <h4>{formatPrice(hotdeal.sale_price)}đ</h4>
-                <h5>
-                  Mua sỉ từ <span>{hotdeal.wholesaleitem}</span>
-                </h5>
-                <p>{hotdeal.title}</p>
-              </div>
+              <Link
+                key={index}
+                to={`${routesConfig.product_details.replace(':slug', hotdeal.slug).replace(':id', hotdeal.id)}`}
+              >
+                <div className={cx('list-item')}>
+                  <img src={hotdeal.image} alt="Product" />
+                  <h3>
+                    {formatPrice(hotdeal.price)}đ<span>/Hộp</span>
+                  </h3>
+                  <h4>{formatPrice(hotdeal.sale_price)}đ</h4>
+                  <h5>
+                    Mua sỉ từ <span>{hotdeal.wholesaleitem}</span>
+                  </h5>
+                  <p>{hotdeal.title}</p>
+                </div>
+              </Link>
             ))}
           </Slider>
         </div>

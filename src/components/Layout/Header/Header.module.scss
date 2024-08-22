@@ -20,11 +20,30 @@
   color: var(--black);
   font-weight: 500;
 }
-
+.information-form {
+  position: relative;
+}
+.sell-with {
+  position: absolute;
+  right: 0;
+  bottom: -30px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 27px;
+  border: 1px solid var(--primary);
+  padding: 4px 8px;
+  span {
+    color: var(--primary);
+    font-size: 12px;
+    font-weight: 400;
+  }
+}
 @media screen and (max-width: 768px) {
   .search-form,
   .notification,
-  .shopping-cart {
+  .shopping-cart,
+  .sell-with {
     display: none !important;
   }
 }

@@ -5,12 +5,15 @@ import reportWebVitals from './reportWebVitals';
 import GlobalStyles from '~/components/GlobalStyles';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { AuthProvider } from '~/context/AuthContext';
+import { CartProvider } from './context/CartContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   // <React.StrictMode>
   <AuthProvider>
-    <App />
+    <CartProvider>
+      <App />
+    </CartProvider>
   </AuthProvider>,
   // </React.StrictMode>,
 );

@@ -24,7 +24,7 @@ function Header() {
           <div className={cx('col-6', 'search-form')}>
             <Search />
           </div>
-          <div className={cx('col-3')}>
+          <div className={cx('col-3', 'information-form')}>
             <div className={cx('icon-wrapper', 'd-flex', 'justify-content-between')}>
               <div className={cx('text-center', 'notification')}>
                 <img src={images.noti} alt="Notification" />
@@ -55,6 +55,10 @@ function Header() {
                 )}
               </div>
             </div>
+            <Link to={routesConfig.store_management} className={cx('sell-with')}>
+              <img src={cx(images.sell_with)} alt="Sell" />
+              <span>Bán hàng cùng krmedi</span>
+            </Link>
           </div>
         </div>
       </div>

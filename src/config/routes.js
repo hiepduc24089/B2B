@@ -9,6 +9,8 @@ const routes = {
   supplier: '/supplier',
   foryou: '/for-you',
   product_details: '/product/:slug/:id',
+  payment: '/payment',
+  store_management: '/store-management',
 };
 
 export default routes;

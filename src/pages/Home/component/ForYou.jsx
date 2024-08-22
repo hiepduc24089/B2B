@@ -58,19 +58,24 @@ function ForYou() {
       return (
         <div className={cx('for-you-wrapper')}>
           {dataListProduct.map((foryou, index) => (
-            <div key={index} className={cx('for-you-item')}>
-              <img src={foryou.image} alt="Product" />
-              <h1>{foryou.title}</h1>
-              <h3>
-                <span>{formatPrice(foryou.price)}đ</span>/Hộp
-              </h3>
-              <span className={cx('negotiate')}>{foryou.negotiable}</span>
-              <p className={cx('buy-at-least')}>Mua ít nhất: {foryou.minimum_order} cái</p>
-              <div className={cx('d-flex', 'justify-content-between')}>
-                <span className={cx('location')}>{foryou.location}</span>
-                <span className={cx('contact')}>{foryou.contact} lượt liên hệ</span>
+            <Link
+              key={index}
+              to={`${routesConfig.product_details.replace(':slug', foryou.slug).replace(':id', foryou.id)}`}
+            >
+              <div className={cx('for-you-item')}>
+                <img src={foryou.image} alt="Product" />
+                <h1>{foryou.title}</h1>
+                <h3>
+                  <span>{formatPrice(foryou.price)}đ</span>/Hộp
+                </h3>
+                <span className={cx('negotiate')}>{foryou.negotiable}</span>
+                <p className={cx('buy-at-least')}>Mua ít nhất: {foryou.minimum_order} cái</p>
+                <div className={cx('d-flex', 'justify-content-between')}>
+                  <span className={cx('location')}>{foryou.location}</span>
+                  <span className={cx('contact')}>{foryou.contact} lượt liên hệ</span>
+                </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       );

@@ -9,6 +9,8 @@ import Category from '~/pages/Category';
 import Supplier from '~/pages/Supplier';
 import ForYou from '~/pages/ForYou';
 import ProductDetails from '~/pages/ProductDetails';
+import Payment from '~/pages/Payment';
+import StoreManagement from '~/pages/StoreManagement';
 
 // Routes accessible without login
 const publicRoutes = [
@@ -24,6 +26,10 @@ const publicRoutes = [
 ];
 
 // Routes accessible only after login
-const privateRoutes = [{ path: routesConfig.profile, component: Profile }];
+const privateRoutes = [
+  { path: routesConfig.profile, component: Profile },
+  { path: routesConfig.payment, component: Payment },
+  { path: routesConfig.store_management, component: StoreManagement },
+];
 
 export { publicRoutes, privateRoutes };

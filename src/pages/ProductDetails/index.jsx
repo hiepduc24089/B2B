@@ -52,7 +52,7 @@ function ProductDetails() {
           <Details product={product} loading={loading} />
         </div>
         <div className={cx('store-details')}>
-          <Store seller={seller} loading={loading} />
+          <Store seller={seller} product={product} loading={loading} />
         </div>
       </div>
       <div className={cx('related-information')}>

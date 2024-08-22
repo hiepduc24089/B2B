@@ -1,28 +1,13 @@
-import React, { memo, useEffect, useState } from 'react';
+import React, { memo } from 'react';
 import classNames from 'classnames/bind';
 import styles from '../ProductDetails.module.scss';
-import { dataProduct } from '~/pages/Home/data/product';
 import LoadingIndicator from '~/components/Loading';
-import { InputNumber } from 'antd';
+import CustomInputNumber from '~/components/Layout/CustomInputNumber';
 import { imagesHotDeal } from '~/assets/images';
 
 const cx = classNames.bind(styles);
 
 function Details({ product, loading }) {
-  const [value, setValue] = useState(1);
-
-  const increment = () => {
-    if (value < product.remaining) {
-      setValue(value + 1);
-    }
-  };
-
-  const decrement = () => {
-    if (value > 1) {
-      setValue(value - 1);
-    }
-  };
-
   function formatPrice(price) {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   }
@@ -65,21 +50,7 @@ function Details({ product, loading }) {
             <div className={cx('product-order')}>
               <div className={cx('product-remaining', 'd-flex', 'align-items-center')}>
                 <span>Tồn kho {product.remaining}</span>
-                <div className={cx('custom-input-number')}>
-                  <button onClick={decrement} className={cx('custom-button', 'minus')}>
-                    -
-                  </button>
-                  <InputNumber
-                    min={1}
-                    max={product.remaining}
-                    value={value}
-                    onChange={setValue}
-                    className={cx('text-center')}
-                  />
-                  <button onClick={increment} className={cx('custom-button', 'plus')}>
-                    +
-                  </button>
-                </div>
+                <CustomInputNumber min={1} max={product.remaining} />
               </div>
               <div className={cx('d-flex', 'justify-content-between', 'product-btn')}>
                 <button className={cx('order')}>Đặt hàng ngay</button>
