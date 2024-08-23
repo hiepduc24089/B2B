@@ -53,6 +53,7 @@ import store_product from './storemanagement/store_product.svg';
 import new_cover_icon from './storemanagement/new_cover_icon.svg';
 import new_avatar from './storemanagement/new_avatar.svg';
 import new_avatar_icon from './storemanagement/new_avatar-icon.svg';
+import new_introduce_image from './storemanagement/new_introduce_image.svg';
 
 export const images = {
   logo,
@@ -134,4 +135,5 @@ export const imagesStore = {
   new_cover_icon,
   new_avatar,
   new_avatar_icon,
+  new_introduce_image,
 };
