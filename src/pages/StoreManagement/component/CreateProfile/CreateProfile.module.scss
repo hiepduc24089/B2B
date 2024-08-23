@@ -1,0 +1,232 @@
+.box-wrapper {
+  border-radius: 8px;
+  border: 1px solid var(--light);
+  background: var(--white);
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  padding: 24px 16px;
+}
+.wrapper {
+  display: grid;
+  grid-template-columns: 1fr 4fr;
+}
+.cover {
+  position: relative;
+  height: 220px;
+  width: 100%;
+  background: var(--light);
+
+  .new-cover {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    border-radius: 4px;
+    background: var(--grey-black);
+    width: fit-content;
+    padding: 4px 8px;
+    span {
+      color: var(--white);
+      font-size: 14px;
+      font-weight: 500;
+    }
+  }
+
+  .new-avatar {
+    position: absolute;
+    left: 5%;
+    bottom: -25%;
+    .avater-wrapper {
+      position: relative;
+      .new_avatar_icon {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        padding: 5px;
+        background-color: var(--white);
+        border-radius: 50%;
+      }
+    }
+  }
+}
+
+.content {
+  margin-top: 100px;
+}
+
+.basic-information {
+  margin-bottom: 40px;
+  .title {
+    color: var(--black);
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .basic-information-details {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    .details {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      .names {
+        color: var(--black);
+        font-size: 16px;
+        font-weight: 400;
+      }
+      .input-field {
+        border-radius: 8px;
+        border: 0.5px solid var(--grey-light);
+        background: var(--white);
+        width: 65%;
+        height: 20px;
+        padding: 20px;
+        padding-left: 16px;
+        font-size: 14px;
+        font-weight: 400;
+        color: var(--grey-dark);
+      }
+      .select-field {
+        height: 40px;
+        padding: 0;
+        padding-left: 10px;
+      }
+      .address-fields {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        width: 65%;
+      }
+      .field-group {
+        position: relative;
+      }
+      .field-label {
+        position: absolute;
+        color: var(--grey-dark);
+        font-size: 12px;
+        font-weight: 400;
+        top: -7px;
+        left: 10px;
+        z-index: 1;
+        background: white;
+        padding: 0 3px;
+      }
+      .address-select-field {
+        width: 100%;
+        border-radius: 8px;
+        border: 0.5px solid var(--grey-light);
+        background: var(--white);
+        height: 40px;
+        padding-left: 10px;
+        font-size: 14px;
+        font-weight: 400;
+        color: var(--grey-dark);
+      }
+    }
+  }
+}
+.introduce-post {
+  margin-bottom: 40px;
+  .title {
+    color: var(--black);
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .introduce-post-details {
+    .names {
+      width: 100%;
+      color: var(--black);
+      font-size: 16px;
+      font-weight: 400;
+      margin-bottom: 8px;
+    }
+    .content-field {
+      width: 100%;
+      border-radius: 8px;
+      border: 0.5px solid var(--grey-light);
+      background: var(--white);
+      padding: 16px;
+      color: var(--grey-dark);
+      font-size: 16px;
+      font-weight: 600;
+    }
+  }
+}
+.introduce-image {
+  .title {
+    color: var(--black);
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .introduce-image-details {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .image-preview-wrapper {
+    position: relative;
+    height: 100px;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .image-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .file-input-label {
+    display: inline-block;
+    width: 100px;
+    height: 100px;
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  .file-input {
+    display: none;
+  }
+
+  .file-icon {
+    width: 50px;
+    height: 50px;
+  }
+
+  .file-input-label:hover {
+    border-color: #007bff;
+  }
+
+  .image-preview-wrapper + .file-input-label {
+    margin-left: 10px;
+  }
+}
+.save-profile {
+  border-radius: 63px;
+  background: var(--primary);
+  color: var(--white);
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  padding: 8px 16px;
+  width: 200px;
+  margin-top: 40px;
+}
+
+@media screen and (max-width: 768px) {
+  .wrapper {
+    grid-template-columns: 1fr;
+  }
+  .basic-information .title,
+  .introduce-post .title,
+  .introduce-image .title {
+    margin-bottom: 24px;
+  }
+}

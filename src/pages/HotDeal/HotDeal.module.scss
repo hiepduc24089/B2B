@@ -1,0 +1,121 @@
+.layout-right {
+  padding-left: 15px;
+  background-color: var(--white);
+  header {
+    height: auto;
+    margin-bottom: 24px;
+    background-color: var(--white);
+    line-height: normal;
+    padding: 0;
+  }
+  .product-notes {
+    column-gap: 8px;
+    span {
+      font-size: 16px;
+      font-weight: 400;
+      line-height: normal;
+    }
+  }
+}
+
+.product {
+  .product-wrapper {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    margin: 10px auto;
+    grid-gap: 25px;
+
+    .product-items {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      box-sizing: border-box;
+
+      img {
+        width: 100%;
+        height: auto;
+      }
+
+      .product-title {
+        overflow: hidden;
+        display: -webkit-box;
+        text-overflow: ellipsis;
+        color: var(--black);
+        font-size: 16px;
+        font-weight: 400;
+        margin-bottom: 0;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+      }
+
+      .product-price {
+        color: var(--primary);
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 0;
+        span {
+          color: var(--grey);
+          font-size: 14px;
+          font-weight: 400;
+        }
+      }
+      .sale-price {
+        color: var(--grey-dark);
+        font-size: 14px;
+        font-weight: 400;
+        line-height: normal;
+        text-decoration: line-through;
+      }
+      .negotiate {
+        color: var(--primary);
+        font-size: 12px;
+        font-weight: 400;
+        border-radius: 20px;
+        background: rgba(250, 90, 0, 0.1);
+        padding: 4px 8px;
+        width: fit-content;
+      }
+      .sale {
+        background: var(--primary);
+        border-radius: 37px;
+        border: none;
+        padding: 3px 5px;
+        color: var(--white);
+        font-size: 12px;
+        font-weight: 600;
+        line-height: normal;
+      }
+      .buy-at-least {
+        color: var(--grey-black);
+        font-size: 12px;
+        font-weight: 400;
+        margin-bottom: 0;
+        span {
+          color: var(--black);
+          font-size: 14px;
+          font-weight: 600;
+        }
+      }
+      .location {
+        color: var(--grey-black);
+        font-size: 12px;
+        font-weight: 400;
+      }
+      .contact {
+        color: var(--green);
+        font-size: 12px;
+        font-weight: 400;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .product-wrapper {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important;
+    grid-gap: 20px !important;
+  }
+  .layout-right {
+    padding: 0;
+  }
+}
