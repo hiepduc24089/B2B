@@ -54,6 +54,8 @@ import new_cover_icon from './storemanagement/new_cover_icon.svg';
 import new_avatar from './storemanagement/new_avatar.svg';
 import new_avatar_icon from './storemanagement/new_avatar-icon.svg';
 import new_introduce_image from './storemanagement/new_introduce_image.svg';
+import login_background from './all/login-bg.png';
+import show_password from './all/show-password.svg';
 
 export const images = {
   logo,
@@ -66,6 +68,8 @@ export const images = {
   exclamation,
   edit_icon,
   delete_icon,
+  login_background,
+  show_password,
 };
 
 export const imagesHome = {

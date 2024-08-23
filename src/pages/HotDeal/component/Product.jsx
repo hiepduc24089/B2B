@@ -3,6 +3,8 @@ import { dataProduct } from '~/pages/Home/data/product';
 import LoadingIndicator from '~/components/Loading';
 import classNames from 'classnames/bind';
 import styles from '../HotDeal.module.scss';
+import routesConfig from '~/config/routes';
+import { Link } from 'react-router-dom';
 
 const cx = classNames.bind(styles);
 
@@ -38,27 +40,32 @@ function Product() {
       return (
         <div className={cx('product-wrapper')}>
           {dataListProduct.map((product, index) => (
-            <div key={index} className={cx('product-items')}>
-              <img src={product.image} alt={product.title} />
-              <h1 className={cx('product-title')}>{product.title}</h1>
-              <h3 className={cx('product-price')}>
-                {formatPrice(product.price)}đ<span>/Hộp</span>
-              </h3>
-              <div className={cx('d-flex', 'justify-content-between', 'align-items-center')}>
-                <div>
-                  <h4 className={cx('sale-price')}>{formatPrice(product.sale_price)}đ</h4>
-                  <span className={cx('negotiate')}>{product.negotiable}</span>
+            <Link
+              key={index}
+              to={`${routesConfig.product_details.replace(':slug', product.slug).replace(':id', product.id)}`}
+            >
+              <div className={cx('product-items')}>
+                <img src={product.image} alt={product.title} />
+                <h1 className={cx('product-title')}>{product.title}</h1>
+                <h3 className={cx('product-price')}>
+                  {formatPrice(product.price)}đ<span>/Hộp</span>
+                </h3>
+                <div className={cx('d-flex', 'justify-content-between', 'align-items-center')}>
+                  <div>
+                    <h4 className={cx('sale-price')}>{formatPrice(product.sale_price)}đ</h4>
+                    <span className={cx('negotiate')}>{product.negotiable}</span>
+                  </div>
+                  <button className={cx('sale')}>-{product.sale}%</button>
                 </div>
-                <button className={cx('sale')}>-{product.sale}%</button>
+                <h5 className={cx('buy-at-least')}>
+                  Mua sỉ từ <span>{product.wholesaleitem}</span>
+                </h5>
+                <div className={cx('d-flex', 'justify-content-between')}>
+                  <span className={cx('location')}>{product.location}</span>
+                  <span className={cx('contact')}>{product.contact} lượt liên hệ</span>
+                </div>
               </div>
-              <h5 className={cx('buy-at-least')}>
-                Mua sỉ từ <span>{product.wholesaleitem}</span>
-              </h5>
-              <div className={cx('d-flex', 'justify-content-between')}>
-                <span className={cx('location')}>{product.location}</span>
-                <span className={cx('contact')}>{product.contact} lượt liên hệ</span>
-              </div>
-            </div>
+            </Link>
           ))}
         </div>
       );
