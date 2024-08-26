@@ -1,29 +1,179 @@
-import React, { memo, useEffect } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
 import styles from './ShoppingCart.module.scss';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import SubTitle from '~/components/Layout/SubTitle/SubTitle';
 import { imagesCart } from '~/assets/images';
 import CustomInputNumber from '~/components/Layout/CustomInputNumber';
 import LoadingIndicator from '~/components/Loading';
 import routesConfig from '~/config/routes';
 import { useCart } from '~/context/CartContext';
-import { getShoppingCard } from '~/api/payment';
+import { getShoppingCard, createCheckOut, removeProductByShop, removeStore } from '~/api/payment';
 
 const cx = classNames.bind(styles);
 const BASE_URL = 'https://api-b2b.krmedi.vn';
 
 function ShoppingCart() {
-  const [state, setState] = React.useState({
+  const { quantities, setQuantities } = useCart();
+  const [state, setState] = useState({
     loading: true,
     groupedProducts: {},
-    quantities: {},
-    checkedStores: {},
-    checkedProducts: {},
   });
+  const [checkedState, setCheckedState] = useState({});
+  const navigate = useNavigate(); // useNavigate hook for programmatic navigation
 
-  const { checkedProducts, setCheckedProducts, quantities, setQuantities } = useCart();
-  const { loading, groupedProducts, checkedStores } = state;
+  const { loading, groupedProducts } = state;
+
+  // Handle quantity change
+  const handleQuantityChange = (storeId, productId, newQuantity) => {
+    setQuantities((prevQuantities) => ({
+      ...prevQuantities,
+      [productId]: newQuantity,
+    }));
+
+    // Update groupedProducts state with the new quantity
+    setState((prevState) => {
+      const updatedGroupedProducts = { ...prevState.groupedProducts };
+      const products = updatedGroupedProducts[storeId].products.map((product) =>
+        product.product_id === productId ? { ...product, quantity: newQuantity } : product
+      );
+
+      updatedGroupedProducts[storeId].products = products;
+      return { ...prevState, groupedProducts: updatedGroupedProducts };
+    });
+  };
+
+  // Handle removing a product
+  const handleRemoveProduct = async (storeId, productId) => {
+    const isConfirmed = window.confirm('Bạn có muốn xóa sản phẩm này không?');
+  
+    if (!isConfirmed) {
+      return;
+    }
+    try {
+      const removeProduct = await removeProductByShop({ shop_id: storeId, product_id: productId });
+      console.log(removeProduct);
+      // Update state to remove the product from the UI
+      setState((prevState) => {
+        const updatedGroupedProducts = { ...prevState.groupedProducts };
+        updatedGroupedProducts[storeId].products = updatedGroupedProducts[storeId].products.filter(
+          (product) => product.product_id !== productId
+        );
+
+        // If there are no products left for a store, remove the store entry
+        if (updatedGroupedProducts[storeId].products.length === 0) {
+          delete updatedGroupedProducts[storeId];
+        }
+
+        return { ...prevState, groupedProducts: updatedGroupedProducts };
+      });
+
+      setCheckedState((prevState) => {
+        const updatedCheckedState = { ...prevState };
+        delete updatedCheckedState[storeId]?.productChecked?.[productId];
+
+        // If no products remain checked in the store, uncheck the store itself
+        if (
+          updatedCheckedState[storeId] &&
+          Object.keys(updatedCheckedState[storeId].productChecked).length === 0
+        ) {
+          delete updatedCheckedState[storeId];
+        }
+
+        return updatedCheckedState;
+      });
+    } catch (error) {
+      console.error('Failed to remove product:', error);
+      alert('Failed to remove the product. Please try again.');
+    }
+  };
+
+  // Handle removing a store
+  const handleRemoveStore = async (storeId) => {
+    const isConfirmed = window.confirm('Bạn có muốn xóa cửa hàng này không?');
+  
+    if (!isConfirmed) {
+      return;
+    }
+
+    try {
+      const responseRemoveStore = await removeStore({ shop_id: storeId });
+      console.log(responseRemoveStore);
+      
+      setState((prevState) => {
+        const updatedGroupedProducts = { ...prevState.groupedProducts };
+        delete updatedGroupedProducts[storeId];
+
+        return { ...prevState, groupedProducts: updatedGroupedProducts };
+      });
+
+      setCheckedState((prevState) => {
+        const updatedCheckedState = { ...prevState };
+        delete updatedCheckedState[storeId];
+
+        return updatedCheckedState;
+      });
+    } catch (error) {
+      console.error('Failed to remove store:', error);
+      alert('Failed to remove the store. Please try again.');
+    }
+  };
+
+  // Handle store checkbox change
+  const handleStoreCheckboxChange = (storeId) => {
+    const isStoreChecked = checkedState[storeId]?.isStoreChecked || false;
+
+    const updatedCheckedState = {
+      ...checkedState,
+      [storeId]: {
+        isStoreChecked: !isStoreChecked,
+        productChecked: groupedProducts[storeId].products.reduce((acc, product) => {
+          acc[product.product_id] = !isStoreChecked;
+          return acc;
+        }, {}),
+      },
+    };
+
+    setCheckedState(updatedCheckedState);
+  };
+
+  // Handle product checkbox change
+  const handleProductCheckboxChange = (storeId, productId) => {
+    const storeCheckedState = checkedState[storeId] || { isStoreChecked: false, productChecked: {} };
+    const isProductChecked = storeCheckedState.productChecked[productId] || false;
+
+    const updatedProductChecked = {
+      ...storeCheckedState.productChecked,
+      [productId]: !isProductChecked,
+    };
+
+    const allProductsChecked = Object.values(updatedProductChecked).every((checked) => checked);
+
+    const updatedCheckedState = {
+      ...checkedState,
+      [storeId]: {
+        isStoreChecked: allProductsChecked,
+        productChecked: updatedProductChecked,
+      },
+    };
+
+    setCheckedState(updatedCheckedState);
+  };
+
+  // Calculate total price of all checked products
+  const calculateTotalPrice = () => {
+    let totalPrice = 0;
+
+    Object.entries(groupedProducts).forEach(([storeId, { products }]) => {
+      products.forEach((product) => {
+        if (checkedState[storeId]?.productChecked?.[product.product_id]) {
+          totalPrice += (product.price ?? 0) * (product.quantity ?? 1);
+        }
+      });
+    });
+
+    return totalPrice;
+  };
 
   // Group products by shop_id
   const groupProductsByShopId = (cart) => {
@@ -61,85 +211,40 @@ function ShoppingCart() {
     fetchDataProduct();
   }, []);
 
-  // Handle store checkbox change
-  const handleStoreCheckboxChange = (storeId) => {
-    const isStoreChecked = !checkedStores[storeId];
+  // Handle checkout process
+  const handleCheckout = async () => {
+    const items = Object.entries(groupedProducts).map(([storeId, { products }]) => ({
+      shop_id: parseInt(storeId, 10),
+      products: products
+        .filter((product) => checkedState[storeId]?.productChecked?.[product.product_id])
+        .map((product) => ({
+          product_id: product.product_id,
+          quantity: product.quantity,
+        })),
+    })).filter(item => item.products.length > 0);
 
-    setState((prevState) => {
-      const updatedCheckedStores = {
-        ...prevState.checkedStores,
-        [storeId]: isStoreChecked,
-      };
+    if (items.length === 0) {
+      alert('Vui lòng chọn sản phẩm');
+      return;
+    }
 
-      const updatedCheckedProducts = { ...prevState.checkedProducts };
-      const products = prevState.groupedProducts[storeId]?.products || [];
+    try {
+      const checkoutResponse = await createCheckOut(items);
 
-      products.forEach((product) => {
-        updatedCheckedProducts[product.product_id] = isStoreChecked;
-      });
-
-      return {
-        ...prevState,
-        checkedStores: updatedCheckedStores,
-        checkedProducts: updatedCheckedProducts,
-      };
-    });
-  };
-
-  // Handle product checkbox change
-  const handleProductCheckboxChange = (storeId, productId) => {
-    const isProductChecked = !checkedProducts[productId];
-
-    setState((prevState) => {
-      const updatedCheckedProducts = {
-        ...prevState.checkedProducts,
-        [productId]: isProductChecked,
-      };
-
-      const storeProducts = prevState.groupedProducts[storeId]?.products || [];
-      const allProductsChecked = storeProducts.every((product) => updatedCheckedProducts[product.product_id]);
-
-      const updatedCheckedStores = {
-        ...prevState.checkedStores,
-        [storeId]: allProductsChecked,
-      };
-
-      return {
-        ...prevState,
-        checkedProducts: updatedCheckedProducts,
-        checkedStores: updatedCheckedStores,
-      };
-    });
+      if(!checkoutResponse.status){
+        alert('Mua hàng thất bại, vui lòng thử lại.');
+        return;
+      }
+      navigate(routesConfig.payment, { state: { checkoutData: checkoutResponse.data } });
+    } catch (error) {
+      console.error('Checkout failed:', error);
+      alert('Mua hàng thất bại, vui lòng thử lại.');
+    }
   };
 
   // Format price with thousands separator
   const formatPrice = (price) => {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-  };
-
-  // Calculate total price of selected products
-  const calculateTotalPrice = () => {
-    return Object.values(groupedProducts).reduce((total, group) => {
-      const products = group.products || [];
-      return products.reduce((groupTotal, product) => {
-        const quantity = quantities[product.product_id] || 1;
-        const price = parseFloat(product.price) || 0;
-        const isChecked = checkedProducts[product.product_id];
-
-        if (isChecked) {
-          return groupTotal + price * quantity;
-        }
-        return groupTotal;
-      }, total);
-    }, 0);
-  };
-
-  // Handle quantity change
-  const handleQuantityChange = (productId, newQuantity) => {
-    setQuantities((prevQuantities) => ({
-      ...prevQuantities,
-      [productId]: newQuantity,
-    }));
   };
 
   // Render content
@@ -155,13 +260,18 @@ function ShoppingCart() {
                 type="checkbox"
                 className={cx('cart-checkbox')}
                 id={`store-checkbox-${storeId}`}
-                checked={checkedStores[storeId]} // Ensure checked state is boolean
+                checked={checkedState[storeId]?.isStoreChecked || false}
                 onChange={() => handleStoreCheckboxChange(storeId)}
               />
               <img src={imagesCart.store_icon} alt="Store Icon" />
               <h5>{shop_name || 'N/A'}</h5>
             </div>
-            <img src={imagesCart.trash_icon} alt="Trash Icon" />
+            <img
+                src={imagesCart.trash_icon}
+                alt="Trash Icon"
+                className={cx('trash-icon')}
+                onClick={() => handleRemoveStore(storeId)}
+              />
           </div>
 
           {products.map((product) => (
@@ -172,16 +282,16 @@ function ShoppingCart() {
                     type="checkbox"
                     className={cx('cart-checkbox')}
                     id={`product-checkbox-${product.product_id}`}
-                    checked={checkedProducts[product.product_id]} // Ensure checked state is boolean
+                    checked={checkedState[storeId]?.productChecked?.[product.product_id] || false}
                     onChange={() => handleProductCheckboxChange(storeId, product.product_id)}
                   />
                   <div className={cx('d-flex', 'col-md-10', 'product-names')}>
                     <img src={`${BASE_URL}${product.src[0]}`} alt="Product" className={cx('product-image')} />
-                    <div style={{ marginLeft: '8px' }}>
+                    <div style={{ marginLeft: '8px', minWidth: '250px' }}>
                       <h5>{product.name}</h5>
                       <span className={cx('order-price')}>
                         Đơn giá:
-                        <span className={cx('text-primary')}>{formatPrice(product.price)}đ</span>
+                        <span className={cx('text-primary')}>{formatPrice(product.price ?? 0)}đ</span>
                         <span className={cx('text-grey')}>/ Hộp</span>
                       </span>
                     </div>
@@ -193,9 +303,14 @@ function ShoppingCart() {
                     max={100}
                     initialValue={product.quantity || 1}
                     className={cx('custom-number')}
-                    onValueChange={(newQuantity) => handleQuantityChange(product.product_id, newQuantity)}
+                    onValueChange={(newQuantity) => handleQuantityChange(storeId, product.product_id, newQuantity)}
                   />
-                  <img src={imagesCart.trash_icon} alt="Trash Icon" className={cx('trash-icon')} />
+                  <img
+                    src={imagesCart.trash_icon}
+                    alt="Trash Icon"
+                    className={cx('trash-icon')}
+                    onClick={() => handleRemoveProduct(storeId, product.product_id)}
+                  />
                 </div>
               </div>
             </div>
@@ -225,14 +340,9 @@ function ShoppingCart() {
               <span className={cx('price-payment')}>{formatPrice(calculateTotalPrice())} đ</span>
             </div>
 
-            <Link
-              to={{
-                pathname: routesConfig.payment,
-                state: { checkedProducts, quantities },
-              }}
-            >
-              <button className={cx('submit-payment')}>Mua hàng</button>
-            </Link>
+            <button className={cx('submit-payment')} onClick={handleCheckout}>
+              Mua hàng
+            </button>
           </div>
         </div>
       </div>

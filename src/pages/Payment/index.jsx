@@ -1,172 +1,160 @@
-import React, { memo, useEffect } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
 import styles from './Payment.module.scss';
-import { useCart } from '~/context/CartContext';
-import { dataProduct } from '../Home/data/product';
-import { dataSeller } from '~/data/seller';
+import { useLocation } from 'react-router-dom';
 import LoadingIndicator from '~/components/Loading';
 import { images, imagesCart, imagesFooter, imagesPayment } from '~/assets/images';
 
 const cx = classNames.bind(styles);
+const BASE_URL = 'https://api-b2b.krmedi.vn';
 
 function Payment() {
-  const { checkedProducts, quantities } = useCart();
+  const { state } = useLocation(); // Access the state passed via navigate
+  const { checkoutData } = state || {}; // Destructure checkoutData from state
 
-  const [state, setState] = React.useState({
-    loading: true,
-    dataListProduct: [],
-    selectedShipping: {},
-  });
-  const { dataListProduct, loading, selectedShipping } = state;
-
-  const fetchDataListProductAPI = async () => {
-    setTimeout(() => {
-      setState((prevState) => ({
-        ...prevState,
-        loading: false,
-        dataListProduct: dataProduct,
-      }));
-    }, 1000);
-  };
+  const [loading, setLoading] = useState(true);
+  const [selectedShipping, setSelectedShipping] = useState({}); // State to track selected shipping for each store
 
   useEffect(() => {
-    fetchDataListProductAPI();
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
   }, []);
 
-  const groupProductsByStore = (products) => {
-    return products.reduce((result, product) => {
-      const { store_id } = product;
-      if (!result[store_id]) {
-        result[store_id] = [];
-      }
-      result[store_id].push(product);
-      return result;
-    }, {});
+  const formatPrice = (price) => {
+    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   };
 
-  // Get the products that are checked
-  const checkedProductList = dataListProduct.filter((product) => checkedProducts[product.id]);
-
-  // Group the checked products by store_id
-  const groupedCheckedProducts = groupProductsByStore(checkedProductList);
-
-  //Format Price
-  function formatPrice(price) {
-    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-  }
-
-  // Function to calculate the total price
-  function calculateTotalPrice() {
-    return Object.values(groupedCheckedProducts).reduce((total, products) => {
-      return (
-        total +
-        products.reduce((subTotal, product) => {
-          const quantity = quantities[product.id] || 1; // Default to 1 if no quantity is set
-          return subTotal + product.price * quantity;
-        }, 0)
-      );
-    }, 0);
-  }
-
-  const handleShippingSelection = (storeId, shippingCost) => {
-    setState((prevState) => ({
-      ...prevState,
-      selectedShipping: {
-        ...prevState.selectedShipping,
-        [storeId]: shippingCost, // Store the selected shipping cost per store
-      },
+  // Handle shipping option change for each store
+  const handleShippingChange = (shopId, shippingCost) => {
+    setSelectedShipping((prev) => ({
+      ...prev,
+      [shopId]: shippingCost,
     }));
   };
 
-  function calculateTotalShipping() {
+  // Calculate total for each store (products + shipping)
+  const calculateTotalEachStore = (shopId, products) => {
+    const productTotal = products.reduce((total, product) => {
+      return total + product.price * product.quantity;
+    }, 0);
+
+    const shippingCost = selectedShipping[shopId] || 0;
+    return productTotal + shippingCost;
+  };
+
+  // Calculate total price for all products
+  const calculateTotalPrice = () => {
+    return checkoutData?.reduce((total, shop) => {
+      return (
+        total +
+        shop.products.reduce((subTotal, product) => {
+          return subTotal + product.price * product.quantity;
+        }, 0)
+      );
+    }, 0);
+  };
+
+  const calculateTotalShipping = () => {
+    // Sum up the selected shipping costs for each store
     return Object.values(selectedShipping).reduce((total, shippingCost) => total + shippingCost, 0);
-  }
-  function calculateTotal() {
+  };
+
+  const calculateTotal = () => {
     return calculateTotalPrice() + calculateTotalShipping();
-  }
+  };
+
   function renderContent() {
     if (loading) {
       return <LoadingIndicator />;
+    } else if (!checkoutData) {
+      return <div>No checkout data available.</div>;
     } else {
-      return Object.entries(groupedCheckedProducts).map(([storeId, products]) => {
-        const seller = dataSeller.find((seller) => seller.id === parseInt(storeId));
-        const selectedStoreShipping = selectedShipping[storeId] || 0;
-
-        return (
-          <div key={storeId} className={cx('store-product-details', 'box-wrapper')}>
-            <div className={cx('store-header')}>
-              <img src={imagesCart.store_icon} alt="Store Icon" />
-              <h5>{seller?.name}</h5>
+      return checkoutData.map(({ shop_id, shop_name, products }) => (
+        <div key={shop_id} className={cx('store-product-details', 'box-wrapper')}>
+          <div className={cx('store-header')}>
+            <img src={imagesCart.store_icon} alt="Store Icon" />
+            <h5>{shop_name}</h5>
+          </div>
+          {products.map((product) => (
+            <div key={product.product_id} className={cx('product-wrapper')}>
+              <div className={cx('d-flex', 'col-md-10', 'product-names')}>
+                <img
+                  src={`${BASE_URL}${product.src[0]}`}
+                  alt="Product Image"
+                  className={cx('product-image')}
+                />
+                <div style={{ marginLeft: '8px' }}>
+                  <h5>{product.name}</h5>
+                  <span className={cx('order-price')}>
+                    Đơn giá:
+                    <span className={cx('text-primary')} style={{ fontWeight: '600' }}>
+                      {formatPrice(product.price)}đ
+                    </span>
+                    <span className={cx('text-grey')}>/ {product.unit}</span>
+                  </span>
+                </div>
+              </div>
+              <div className={cx('quantity')}>x{product.quantity}</div>
             </div>
-            {products.map((product) => (
-              <div key={product.id} className={cx('product-wrapper')}>
-                <div className={cx('d-flex', 'col-md-10', 'product-names')}>
-                  <img
-                    src={product.image || imagesCart.store_icon}
-                    alt="Product Image"
-                    className={cx('product-image')}
-                  />
-                  <div style={{ marginLeft: '8px' }}>
-                    <h5>{product.title}</h5>
-                    <span className={cx('order-price')}>
-                      Đơn giá:
-                      <span className={cx('text-primary')} style={{ fontWeight: '600' }}>
-                        {formatPrice(product.price)}đ
-                      </span>
-                      <span className={cx('text-grey')}>/ Hộp</span>
-                    </span>
-                  </div>
-                </div>
-                <div className={cx('quantity')}>x{quantities[product.id]}</div>
-              </div>
-            ))}
-
-            <div className={cx('shipping-wrapper')}>
-              <h5>Đơn vị vận chuyển</h5>
-              <div className={cx('d-flex', 'align-items-center', 'shipping-details')}>
-                <input
-                  type="checkbox"
-                  className={cx('cart-checkbox')}
-                  checked={selectedStoreShipping === 23000}
-                  onChange={() => handleShippingSelection(storeId, 23000)}
-                  id={`shipping-${storeId}-23000`}
-                />
-                <div className={cx('information')}>
-                  <h6 className={cx('shipping-title')}>Giao hàng nhanh - tiêu chuẩn</h6>
-                  <p>Dự kiến nhận hàng vào 7 tháng 6,2024</p>
-                  <span className={cx('shipping-price')}>
-                    Phí vận chuyển:{' '}
-                    <span className={cx('text-primary')} style={{ fontWeight: '600' }}>
-                      {formatPrice(23000)}đ
-                    </span>
+          ))}
+          {/* Shipping Options */}
+          <div className={cx('shipping-wrapper')}>
+            <h5>Đơn vị vận chuyển</h5>
+            <div className={cx('d-flex', 'align-items-center', 'shipping-details')}>
+              <input
+                type="radio"
+                name={`shipping-${shop_id}`}
+                className={cx('cart-checkbox')}
+                checked={selectedShipping[shop_id] === 23000}
+                onChange={() => handleShippingChange(shop_id, 23000)}
+                id={`shipping-${shop_id}-23000`}
+              />
+              <div className={cx('information')}>
+                <h6 className={cx('shipping-title')}>Giao hàng nhanh - tiêu chuẩn</h6>
+                <p>Dự kiến nhận hàng vào 7 tháng 6, 2024</p>
+                <span className={cx('shipping-price')}>
+                  Phí vận chuyển:{' '}
+                  <span className={cx('text-primary')} style={{ fontWeight: '600' }}>
+                    {formatPrice(23000)}đ
                   </span>
-                </div>
+                </span>
               </div>
-              <div className={cx('d-flex', 'align-items-center', 'shipping-details')}>
-                <input
-                  type="checkbox"
-                  className={cx('cart-checkbox')}
-                  checked={selectedStoreShipping === 60000}
-                  onChange={() => handleShippingSelection(storeId, 60000)}
-                  id={`shipping-${storeId}-60000`}
-                />
-                <div className={cx('information')}>
-                  <h6 className={cx('shipping-title')}>Giao Hàng Tiết Kiệm - Nhanh</h6>
-                  <p>Dự kiến nhận hàng vào 7 tháng 6,2024</p>
-                  <span className={cx('shipping-price')}>
-                    Phí vận chuyển:{' '}
-                    <span className={cx('text-primary')} style={{ fontWeight: '600' }}>
-                      {formatPrice(60000)}đ
-                    </span>
+            </div>
+            <div className={cx('d-flex', 'align-items-center', 'shipping-details')}>
+              <input
+                type="radio"
+                name={`shipping-${shop_id}`}
+                className={cx('cart-checkbox')}
+                checked={selectedShipping[shop_id] === 60000}
+                onChange={() => handleShippingChange(shop_id, 60000)}
+                id={`shipping-${shop_id}-60000`}
+              />
+              <div className={cx('information')}>
+                <h6 className={cx('shipping-title')}>Giao Hàng Tiết Kiệm - Nhanh</h6>
+                <p>Dự kiến nhận hàng vào 7 tháng 6, 2024</p>
+                <span className={cx('shipping-price')}>
+                  Phí vận chuyển:{' '}
+                  <span className={cx('text-primary')} style={{ fontWeight: '600' }}>
+                    {formatPrice(60000)}đ
                   </span>
-                </div>
+                </span>
               </div>
+            </div>
+            <span className={cx('notes-title')}>Ghi chú</span>
+            <textarea rows={2} className={cx('notes-area')}></textarea>
+            <div className={cx('d-flex', 'align-items-center', 'justify-content-between', 'total-each-product')}>
+              <span className={cx('title')}>Tổng tiền</span>
+              <span className={cx('price')}>
+                {formatPrice(calculateTotalEachStore(shop_id, products))}đ
+              </span>
             </div>
           </div>
-        );
-      });
+        </div>
+      ));
     }
   }
+
   return (
     <div className={cx('payment-wrapper')}>
       <div className={cx('payment-details')}>
@@ -179,18 +167,7 @@ function Payment() {
           </div>
           <div className={cx('box-infor-wrapper')}>
             <div className={cx('box-infor')}>
-              <h5>Trần đình phi - 0379357213</h5>
-              <p className={cx('location-details')}>90 Hoàng Ngân, Trung Hoà, Cầu Giấy, Hà Nội</p>
-              <div className={cx('d-flex', 'justify-content-between')}>
-                <button className={cx('select-location')}>Giao đến địa chỉ này</button>
-                <div className={cx('action-icon')}>
-                  <img src={images.edit_icon} alt="Edit" />
-                  <img src={images.delete_icon} alt="Delete" />
-                </div>
-              </div>
-            </div>
-            <div className={cx('box-infor')}>
-              <h5>Trần đình phi - 0379357213</h5>
+              <h5>Trần Đình Phi - 0379357213</h5>
               <p className={cx('location-details')}>90 Hoàng Ngân, Trung Hoà, Cầu Giấy, Hà Nội</p>
               <div className={cx('d-flex', 'justify-content-between')}>
                 <button className={cx('select-location')}>Giao đến địa chỉ này</button>
@@ -230,7 +207,7 @@ function Payment() {
             <span className={cx('details')}>
               <div className={cx('toggle-switch')}>
                 <input type="checkbox" id="switch" />
-                <label for="switch"></label>
+                <label htmlFor="switch"></label>
               </div>
             </span>
           </div>
@@ -240,7 +217,12 @@ function Payment() {
           </div>
           <div className={cx('d-flex', 'justify-content-between', 'items')}>
             <span className={cx('title', 'd-flex', 'align-items-center')}>
-              <input type="checkbox" className={cx('cart-checkbox')} id="product-checkbox" />
+              <input 
+                type="radio" 
+                name="payment-method" 
+                className={cx('cart-checkbox')} 
+                id="payment-method-transfer" 
+              />
               Chuyển khoản
             </span>
             <span className={cx('details')}>
@@ -249,7 +231,12 @@ function Payment() {
             </span>
           </div>
           <div className={cx('items', 'd-flex', 'align-items-center')}>
-            <input type="checkbox" className={cx('cart-checkbox')} id="product-checkbox" />
+            <input 
+              type="radio" 
+              name="payment-method" 
+              className={cx('cart-checkbox')} 
+              id="payment-method-cod" 
+            />
             <span className={cx('title')}>Thanh toán khi nhận hàng</span>
           </div>
         </div>
