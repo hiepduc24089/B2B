@@ -13,6 +13,7 @@ const routes = {
   product_details: '/product/:slug/:id',
   payment: '/payment',
   store_management: '/store-management',
+  store_details: '/store-details/:id',
 };
 
 export default routes;

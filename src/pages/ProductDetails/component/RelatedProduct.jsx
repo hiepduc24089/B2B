@@ -1,20 +1,14 @@
-import React, { memo, useEffect } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
 import styles from '../RelatedProduct.module.scss';
-import { dataProduct } from '~/pages/Home/data/product';
-import LoadingIndicator from '~/components/Loading';
 import { Link } from 'react-router-dom';
 import routesConfig from '~/config/routes';
 
 const cx = classNames.bind(styles);
 
-function RelatedProduct() {
-  const [state, setState] = React.useState({
-    loading: true,
-    dataListProduct: [],
-  });
-  const { loading, dataListProduct } = state;
+const BASE_URL = 'https://api-b2b.krmedi.vn';
 
+function RelatedProduct({ recommendedProduct, relatedProduct, viewedProduct }) {
   const getNumberOfItems = () => {
     const width = window.innerWidth;
 
@@ -25,24 +19,11 @@ function RelatedProduct() {
     return 4;
   };
 
-  const fetchDataListProductAPI = async () => {
-    setTimeout(() => {
-      setState((prevState) => ({
-        ...prevState,
-        loading: false,
-        dataListProduct: dataProduct.slice(0, getNumberOfItems()),
-      }));
-    }, 1000);
-  };
+  const [numberOfItems, setNumberOfItems] = useState(getNumberOfItems());
 
   useEffect(() => {
-    fetchDataListProductAPI();
-
     const handleResize = () => {
-      setState((prevState) => ({
-        ...prevState,
-        dataListProduct: dataProduct.slice(0, getNumberOfItems()),
-      }));
+      setNumberOfItems(getNumberOfItems());
     };
 
     window.addEventListener('resize', handleResize);
@@ -56,54 +37,60 @@ function RelatedProduct() {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   }
 
-  function renderContent() {
-    if (loading) {
-      return <LoadingIndicator />;
-    } else {
-      return (
-        <div className={cx('product-wrapper')}>
-          {dataListProduct.map((foryou, index) => (
-            <Link
-              key={index}
-              to={`${routesConfig.product_details.replace(':slug', foryou.slug).replace(':id', foryou.id)}`}
-            >
-              <div className={cx('product-item')}>
-                <img src={foryou.image} alt="Product" />
-                <h1>{foryou.title}</h1>
-                <h3>
-                  <span>{formatPrice(foryou.price)}đ</span>/Hộp
-                </h3>
-                <span className={cx('negotiate')}>{foryou.negotiable}</span>
-                <p className={cx('buy-at-least')}>Mua ít nhất: {foryou.minimum_order} cái</p>
-                <div className={cx('d-flex', 'justify-content-between')}>
-                  <span className={cx('location')}>{foryou.location}</span>
-                  <span className={cx('contact')}>{foryou.contact} lượt liên hệ</span>
-                </div>
+  // Function to render product list based on provided data
+  function renderProductList(products) {
+    return (
+      <div className={cx('product-wrapper')}>
+        {products.slice(0, numberOfItems).map((product, index) => (
+          <Link
+            key={index}
+            to={`${routesConfig.product_details.replace(':slug', product.slug).replace(':id', product.id)}`}
+          >
+            <div className={cx('product-item')}>
+              <img src={`${BASE_URL}${product.src[0]}`} alt={product.name} />
+              <h1>{product.name}</h1>
+              <h3>
+                <span>{formatPrice(product.price)}đ</span>/Hộp
+              </h3>
+              <span className={cx('negotiate')}>Có thể thương lượng</span>
+              <p className={cx('buy-at-least')}>
+                Mua ít nhất: {product.min_quantity} {product.unit}
+              </p>
+              <div className={cx('d-flex', 'justify-content-between')}>
+                <span className={cx('location')}>{product.province_name}</span>
+                <span className={cx('contact')}>2 lượt liên hệ</span>
               </div>
-            </Link>
-          ))}
-        </div>
-      );
-    }
+            </div>
+          </Link>
+        ))}
+      </div>
+    );
   }
 
   return (
     <>
+      {/* Render recommended products */}
       <div className={cx('related-product-wrapper')}>
         <h3>Đề xuất từ cửa hàng</h3>
-        {renderContent()}
+        {renderProductList(recommendedProduct)}
       </div>
+
+      {/* Render related products */}
       <div className={cx('related-product-wrapper')}>
         <h3>Sản phẩm tương tự</h3>
-        {renderContent()}
+        {renderProductList(relatedProduct)}
       </div>
+
+      {/* Render products you might like (same as relatedProduct for demonstration) */}
       <div className={cx('related-product-wrapper')}>
         <h3>Bạn cũng có thể thích</h3>
-        {renderContent()}
+        {renderProductList(relatedProduct)}
       </div>
+
+      {/* Render viewed products */}
       <div className={cx('related-product-wrapper')}>
         <h3>Sản phẩm đã xem</h3>
-        {renderContent()}
+        {renderProductList(viewedProduct)}
       </div>
     </>
   );

@@ -6,8 +6,11 @@ import { Link } from 'react-router-dom';
 import { dataCategory } from '../data/category';
 import routesConfig from '~/config/routes';
 import LoadingIndicator from '~/components/Loading';
+import { fetchCategory } from '~/api/home';
 
 const cx = classNames.bind(styles);
+
+const BASE_URL = 'https://api-b2b.krmedi.vn';
 
 function Category() {
   const [state, setState] = React.useState({
@@ -15,19 +18,26 @@ function Category() {
     dataListCategory: [],
   });
   const { loading, dataListCategory } = state;
+
   useEffect(() => {
     fetchDataListCategoryAPI();
-    return () => {};
   }, []);
 
   const fetchDataListCategoryAPI = async () => {
-    setTimeout(() => {
+    try {
+      const data = await fetchCategory();
+
+      setState({
+        loading: false,
+        dataListCategory: data.data.data,
+      });
+    } catch (error) {
+      console.error('Error fetching category data:', error);
       setState((prevState) => ({
         ...prevState,
         loading: false,
-        dataListCategory: dataCategory,
       }));
-    }, 1000);
+    }
   };
 
   const renderContent = () => {
@@ -38,9 +48,9 @@ function Category() {
         <div className={cx('category-wrapper')}>
           {dataListCategory.map((category, index) => (
             <div key={index} className={cx('category-item')}>
-              <img src={category.image} alt={category.category_name} />
-              <h3>{category.category_name}</h3>
-              <p>{category.category_quantity} sản phẩm</p>
+              <img src={`${BASE_URL}${category.src}`} alt={category.name} />
+              <h3>{category.name}</h3>
+              <p>{category.product_count} sản phẩm</p>
             </div>
           ))}
         </div>

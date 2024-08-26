@@ -6,8 +6,7 @@ import Store from './component/Store';
 import { useParams } from 'react-router-dom';
 import RelatedProduct from './component/RelatedProduct';
 import RelatedInformation from './component/RelatedInformation';
-import { dataProduct } from '~/pages/Home/data/product';
-import { dataSeller } from '~/data/seller';
+import { fetchProductDetails, fetchShopDetails } from '~/api/product';
 
 const cx = classNames.bind(styles);
 
@@ -18,38 +17,64 @@ function ProductDetails() {
     loading: true,
     seller: null,
     product: null,
+    recommendProduct: [],
+    relatedProduct: [],
+    viewedProduct: [],
   });
 
-  const { loading, seller, product } = state;
+  const { loading, seller, product, recommendProduct, relatedProduct, viewedProduct } = state;
 
   useEffect(() => {
     fetchData();
   }, [slug, id]);
 
   const fetchData = async () => {
-    setTimeout(() => {
-      // Fetch product details
-      const selectedProduct = dataProduct.find((product) => product.id === parseInt(id) && product.slug === slug);
+    try {
+      const selectedProduct = await fetchProductDetails(slug);
 
-      // Fetch seller details if the product exists
-      const selectedSeller = selectedProduct
-        ? dataSeller.find((seller) => seller.id === selectedProduct.store_id)
-        : null;
+      if (selectedProduct && selectedProduct.product) {
+        const shopId = selectedProduct.product.shop_id;
 
-      // Update state with product and seller details
+        // Fetch shop details using shop_id
+        const shopDetails = await fetchShopDetails(shopId);
+
+        // Update state with product and shop details
+        setState({
+          loading: false,
+          product: selectedProduct.product,
+          seller: shopDetails,
+          recommendProduct: selectedProduct.products_recommended || [],
+          relatedProduct: selectedProduct.products_similar || [],
+          viewedProduct: selectedProduct.products_viewed || [],
+        });
+      } else {
+        setState({
+          loading: false,
+          product: null,
+          seller: null,
+          recommendProduct: [],
+          relatedProduct: [],
+          viewedProduct: [],
+        });
+      }
+    } catch (error) {
+      console.error('Failed to fetch product or shop details:', error);
       setState({
         loading: false,
-        product: selectedProduct,
-        seller: selectedSeller,
+        product: null,
+        seller: null,
+        recommendProduct: [],
+        relatedProduct: [],
+        viewedProduct: [],
       });
-    }, 1000);
+    }
   };
 
   return (
     <>
       <div className={cx('product-wrapper')}>
         <div className={cx('product-details')}>
-          <Details product={product} loading={loading} />
+          <Details product={product} loading={loading} seller={seller} />
         </div>
         <div className={cx('store-details')}>
           <Store seller={seller} product={product} loading={loading} />
@@ -57,13 +82,19 @@ function ProductDetails() {
       </div>
       <div className={cx('related-information')}>
         <RelatedInformation
-          productOverview={product ? product.overview : ''}
-          storeOverview={seller ? seller.overview : ''}
+          productOverview={product ? product.describe : ''}
+          storeOverview={product ? product.shop_content : ''}
         />
       </div>
-      <div className={cx('related-product')}>
-        <RelatedProduct />
-      </div>
+      {!loading && (
+        <div className={cx('related-product')}>
+          <RelatedProduct
+            recommendedProduct={recommendProduct}
+            relatedProduct={relatedProduct}
+            viewedProduct={viewedProduct}
+          />
+        </div>
+      )}
     </>
   );
 }

@@ -13,6 +13,7 @@ import ForYou from '~/pages/ForYou';
 import ProductDetails from '~/pages/ProductDetails';
 import Payment from '~/pages/Payment';
 import StoreManagement from '~/pages/StoreManagement';
+import StoreDetails from '~/pages/StoreDetails';
 
 // Routes accessible without login
 const publicRoutes = [
@@ -27,6 +28,7 @@ const publicRoutes = [
   { path: routesConfig.supplier, component: Supplier },
   { path: routesConfig.foryou, component: ForYou },
   { path: routesConfig.product_details, component: ProductDetails },
+  { path: routesConfig.store_details, component: StoreDetails },
 ];
 
 // Routes accessible only after login

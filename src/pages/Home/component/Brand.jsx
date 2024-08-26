@@ -2,13 +2,15 @@ import React, { useEffect, memo, useState } from 'react';
 import classNames from 'classnames/bind';
 import styles from '../Home.module.scss';
 import { imagesHome } from '~/assets/images';
-import { dataBrand } from '../data/brand';
 import LoadingIndicator from '~/components/Loading';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
+import { fetchBrand } from '~/api/home';
 
 const cx = classNames.bind(styles);
+
+const BASE_URL = 'https://api-b2b.krmedi.vn';
 
 function Brand() {
   const [state, setState] = useState({
@@ -19,17 +21,24 @@ function Brand() {
 
   useEffect(() => {
     fetchDataListBrandAPI();
-    return () => {};
   }, []);
 
   const fetchDataListBrandAPI = async () => {
-    setTimeout(() => {
+    try {
+      const data = await fetchBrand();
+      const filteredData = data.filter((brand) => brand.display === 1);
+
+      setState({
+        loading: false,
+        dataListBrand: filteredData,
+      });
+    } catch (error) {
+      console.error('Error fetching brand data:', error);
       setState((prevState) => ({
         ...prevState,
         loading: false,
-        dataListBrand: dataBrand,
       }));
-    }, 1000);
+    }
   };
 
   const settings = {
@@ -71,9 +80,9 @@ function Brand() {
       return (
         <div className={cx('brand-wrapper')}>
           <Slider {...settings}>
-            {dataListBrand.map((brand, index) => (
-              <div key={index} className={cx('brand-item')}>
-                <img src={brand.image} alt="Brand Name" className={cx('brand-img')} />
+            {dataListBrand.map((brand) => (
+              <div key={brand.id} className={cx('brand-item')}>
+                <img src={`${BASE_URL}${brand.src}`} alt="Brand Name" className={cx('brand-img')} />
               </div>
             ))}
           </Slider>
