@@ -4,16 +4,20 @@ import styles from './Payment.module.scss';
 import { useLocation } from 'react-router-dom';
 import LoadingIndicator from '~/components/Loading';
 import { images, imagesCart, imagesFooter, imagesPayment } from '~/assets/images';
+import { createPayment } from '~/api/payment';
 
 const cx = classNames.bind(styles);
 const BASE_URL = 'https://api-b2b.krmedi.vn';
 
 function Payment() {
-  const { state } = useLocation(); // Access the state passed via navigate
-  const { checkoutData } = state || {}; // Destructure checkoutData from state
-
+  const { state } = useLocation();
+  const { checkoutData } = state || {};
   const [loading, setLoading] = useState(true);
-  const [selectedShipping, setSelectedShipping] = useState({}); // State to track selected shipping for each store
+  const [selectedShipping, setSelectedShipping] = useState({});
+  const [paymentType, setPaymentType] = useState(1);
+  const [usePoints, setUsePoints] = useState(false);
+  const [deliveryAddress, setDeliveryAddress] = useState(1);
+  const [exchangePoints, setExchangePoints] = useState(0);
 
   useEffect(() => {
     setTimeout(() => {
@@ -31,6 +35,36 @@ function Payment() {
       ...prev,
       [shopId]: shippingCost,
     }));
+  };
+
+  const handleSubmitPayment = async () => {
+    // Construct items payload for API
+    const shopItems = checkoutData.map(({ shop_id, products }) => ({
+      shop_id,
+      note: 'alo',
+      shipping_unit: selectedShipping[shop_id] === 23000 ? 'GHN' : 'GHTK',
+      shipping_fee: selectedShipping[shop_id] || 0,
+      products: products.map(({ product_id, quantity, price }) => ({
+        product_id,
+        quantity,
+        price,
+      })),
+    }));
+
+    const items = {
+      deliver_address: deliveryAddress,
+      shop_items: shopItems,
+      type_payment: paymentType,
+      exchange_points: usePoints ? exchangePoints : 50,
+    };
+
+    try {
+      const response = await createPayment(items);
+      console.log('Payment successful:', response);
+    } catch (error) {
+      console.error('Payment failed:', error);
+      alert('Failed to process payment. Please try again.');
+    }
   };
 
   // Calculate total for each store (products + shipping)
@@ -56,7 +90,6 @@ function Payment() {
   };
 
   const calculateTotalShipping = () => {
-    // Sum up the selected shipping costs for each store
     return Object.values(selectedShipping).reduce((total, shippingCost) => total + shippingCost, 0);
   };
 
@@ -79,11 +112,7 @@ function Payment() {
           {products.map((product) => (
             <div key={product.product_id} className={cx('product-wrapper')}>
               <div className={cx('d-flex', 'col-md-10', 'product-names')}>
-                <img
-                  src={`${BASE_URL}${product.src[0]}`}
-                  alt="Product Image"
-                  className={cx('product-image')}
-                />
+                <img src={`${BASE_URL}${product.src[0]}`} alt="Product Image" className={cx('product-image')} />
                 <div style={{ marginLeft: '8px' }}>
                   <h5>{product.name}</h5>
                   <span className={cx('order-price')}>
@@ -145,9 +174,7 @@ function Payment() {
             <textarea rows={2} className={cx('notes-area')}></textarea>
             <div className={cx('d-flex', 'align-items-center', 'justify-content-between', 'total-each-product')}>
               <span className={cx('title')}>Tổng tiền</span>
-              <span className={cx('price')}>
-                {formatPrice(calculateTotalEachStore(shop_id, products))}đ
-              </span>
+              <span className={cx('price')}>{formatPrice(calculateTotalEachStore(shop_id, products))}đ</span>
             </div>
           </div>
         </div>
@@ -206,7 +233,7 @@ function Payment() {
             </div>
             <span className={cx('details')}>
               <div className={cx('toggle-switch')}>
-                <input type="checkbox" id="switch" />
+                <input type="checkbox" id="switch" checked={usePoints} onChange={() => setUsePoints(!usePoints)} />
                 <label htmlFor="switch"></label>
               </div>
             </span>
@@ -217,11 +244,13 @@ function Payment() {
           </div>
           <div className={cx('d-flex', 'justify-content-between', 'items')}>
             <span className={cx('title', 'd-flex', 'align-items-center')}>
-              <input 
-                type="radio" 
-                name="payment-method" 
-                className={cx('cart-checkbox')} 
-                id="payment-method-transfer" 
+              <input
+                type="radio"
+                name="payment-method"
+                className={cx('cart-checkbox')}
+                id="payment-method-transfer"
+                checked={paymentType === 1}
+                onChange={() => setPaymentType(1)}
               />
               Chuyển khoản
             </span>
@@ -231,16 +260,20 @@ function Payment() {
             </span>
           </div>
           <div className={cx('items', 'd-flex', 'align-items-center')}>
-            <input 
-              type="radio" 
-              name="payment-method" 
-              className={cx('cart-checkbox')} 
-              id="payment-method-cod" 
+            <input
+              type="radio"
+              name="payment-method"
+              className={cx('cart-checkbox')}
+              id="payment-method-cod"
+              checked={paymentType === 2}
+              onChange={() => setPaymentType(2)}
             />
             <span className={cx('title')}>Thanh toán khi nhận hàng</span>
           </div>
         </div>
-        <button className={cx('submit-payment')}>Đặt Mua</button>
+        <button className={cx('submit-payment')} onClick={handleSubmitPayment}>
+          Đặt Mua
+        </button>
       </div>
     </div>
   );

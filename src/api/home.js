@@ -2,9 +2,11 @@ import axios from 'axios';
 
 const API_HOST = 'https://api-b2b.krmedi.vn';
 
-export const fetchHotDeal = async () => {
+export const fetchHotDeal = async (page = 1) => {
   try {
-    const response = await axios.get(`${API_HOST}/api/deal-hot-today`);
+    const response = await axios.get(`${API_HOST}/api/deal-hot-today`, {
+      params: { page },
+    });
     return response.data.data;
   } catch (error) {
     console.error('Error fetching hot deal product:', error);

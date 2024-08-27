@@ -4,7 +4,6 @@ import styles from '../Home.module.scss';
 import { imagesHome } from '~/assets/images';
 import { Link } from 'react-router-dom';
 import routesConfig from '~/config/routes';
-import { dataProduct } from '../data/product';
 import LoadingIndicator from '~/components/Loading';
 import { fetchForYou } from '~/api/home';
 
@@ -47,7 +46,7 @@ function ForYou() {
     const handleResize = () => {
       setState((prevState) => ({
         ...prevState,
-        dataListProduct: dataListProduct.slice(0, getNumberOfItems()),
+        dataListProduct: prevState.dataListProduct.slice(0, getNumberOfItems()),
       }));
     };
 

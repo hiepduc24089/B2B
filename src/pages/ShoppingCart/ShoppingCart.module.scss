@@ -115,6 +115,14 @@
             font-size: 16px;
             font-weight: 400;
           }
+          .remaining {
+            display: flex;
+            gap: 4px;
+            margin-top: 12px;
+            width: 100%;
+            font-size: 14px;
+            font-weight: 400;
+          }
           .quantity-trash {
             display: flex;
             justify-content: space-between;

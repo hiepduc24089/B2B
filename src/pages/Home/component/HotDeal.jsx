@@ -92,7 +92,7 @@ function HotDeal() {
                 to={`${routesConfig.product_details.replace(':slug', hotdeal.slug).replace(':id', hotdeal.id)}`}
               >
                 <div className={cx('list-item')}>
-                  <img src={`${BASE_URL}${hotdeal.src[0]}`} alt="Product" />
+                  <img src={`${BASE_URL}${hotdeal.src[0]}`} alt={hotdeal.name} />
                   <h3>
                     {formatPrice(hotdeal.price)}đ<span>/{hotdeal.unit}</span>
                   </h3>

@@ -5,7 +5,7 @@ import styles from '../ProductDetails.module.scss';
 import LoadingIndicator from '~/components/Loading';
 import CustomInputNumber from '~/components/Layout/CustomInputNumber';
 import { imagesHotDeal } from '~/assets/images';
-import { createShoppingCard, getShoppingCard } from '~/api/payment';
+import { createShoppingCard, createBuyNow } from '~/api/payment';
 import routesConfig from '~/config/routes';
 
 const cx = classNames.bind(styles);
@@ -35,6 +35,25 @@ function Details({ product, loading, seller }) {
       alert(response.message);
 
       navigate(routesConfig.shopping_cart);
+    } catch (error) {
+      console.error('Failed to create cart:', error);
+    }
+  };
+
+  const handleCheckout = async () => {
+    try {
+      const response = await createBuyNow({
+        product_id: product.id,
+        quantity: quantity,
+      });
+
+      if (!response.status) {
+        alert('Đặt hàng thất bại, vui lòng thử lại');
+        return;
+      }
+      alert('Đặt hành thành công!');
+
+      navigate(routesConfig.payment, { state: { checkoutData: response.data } });
     } catch (error) {
       console.error('Failed to create cart:', error);
     }
@@ -88,10 +107,16 @@ function Details({ product, loading, seller }) {
             <div className={cx('product-order')}>
               <div className={cx('product-remaining', 'd-flex', 'align-items-center')}>
                 <span>Tồn kho {product.quantity}</span>
-                <CustomInputNumber min={1} max={product.quantity} onValueChange={setQuantity} />
+                <CustomInputNumber
+                  min={product.attributes[0].quantity}
+                  max={product.quantity}
+                  onValueChange={setQuantity}
+                />
               </div>
               <div className={cx('d-flex', 'justify-content-between', 'product-btn')}>
-                <button className={cx('order')}>Đặt hàng ngay</button>
+                <button className={cx('order')} onClick={handleCheckout}>
+                  Đặt hàng ngay
+                </button>
                 <button className={cx('add-to-cart')} onClick={handleCreateCart}>
                   Thêm vào giỏ hàng
                 </button>

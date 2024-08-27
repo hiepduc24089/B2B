@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useState } from 'react';
+import React, { memo, useEffect, useState, useRef } from 'react';
 import classNames from 'classnames/bind';
 import styles from './ShoppingCart.module.scss';
 import { useNavigate } from 'react-router-dom';
@@ -8,7 +8,7 @@ import CustomInputNumber from '~/components/Layout/CustomInputNumber';
 import LoadingIndicator from '~/components/Loading';
 import routesConfig from '~/config/routes';
 import { useCart } from '~/context/CartContext';
-import { getShoppingCard, createCheckOut, removeProductByShop, removeStore } from '~/api/payment';
+import { getShoppingCard, createCheckOut, removeProductByShop, removeStore, updateCart } from '~/api/payment';
 
 const cx = classNames.bind(styles);
 const BASE_URL = 'https://api-b2b.krmedi.vn';
@@ -24,8 +24,12 @@ function ShoppingCart() {
 
   const { loading, groupedProducts } = state;
 
-  // Handle quantity change
+  // Debounce timeout ref to store the timer
+  const debounceTimeout = useRef(null);
+
+  // Handle quantity change with debouncing
   const handleQuantityChange = (storeId, productId, newQuantity) => {
+    // Update the local state first
     setQuantities((prevQuantities) => ({
       ...prevQuantities,
       [productId]: newQuantity,
@@ -35,29 +39,91 @@ function ShoppingCart() {
     setState((prevState) => {
       const updatedGroupedProducts = { ...prevState.groupedProducts };
       const products = updatedGroupedProducts[storeId].products.map((product) =>
-        product.product_id === productId ? { ...product, quantity: newQuantity } : product
+        product.product_id === productId ? { ...product, quantity: newQuantity } : product,
       );
 
       updatedGroupedProducts[storeId].products = products;
       return { ...prevState, groupedProducts: updatedGroupedProducts };
     });
+
+    // Clear the previous timeout
+    if (debounceTimeout.current) {
+      clearTimeout(debounceTimeout.current);
+    }
+
+    // Set a new timeout to call the API after 1 second
+    debounceTimeout.current = setTimeout(async () => {
+      try {
+        const response = await updateCart({
+          shop_id: storeId,
+          product_id: productId,
+          quantity: newQuantity,
+        });
+
+        if (!response.status) {
+          alert('Cập nhật giỏ hàng thất bại, vui lòng thử lại.');
+
+          // Revert the quantity change in the state if the update fails
+          setQuantities((prevQuantities) => ({
+            ...prevQuantities,
+            [productId]: quantities[productId], // revert to the previous quantity
+          }));
+
+          setState((prevState) => {
+            const revertedGroupedProducts = { ...prevState.groupedProducts };
+            const revertedProducts = revertedGroupedProducts[storeId].products.map((product) =>
+              product.product_id === productId ? { ...product, quantity: quantities[productId] } : product,
+            );
+
+            revertedGroupedProducts[storeId].products = revertedProducts;
+            return { ...prevState, groupedProducts: revertedGroupedProducts };
+          });
+        }
+      } catch (error) {
+        console.error('Failed to update product quantity:', error);
+        alert('Failed to update product quantity. Please try again.');
+
+        // Revert the quantity change in the state if the update fails
+        setQuantities((prevQuantities) => ({
+          ...prevQuantities,
+          [productId]: quantities[productId], // revert to the previous quantity
+        }));
+
+        setState((prevState) => {
+          const revertedGroupedProducts = { ...prevState.groupedProducts };
+          const revertedProducts = revertedGroupedProducts[storeId].products.map((product) =>
+            product.product_id === productId ? { ...product, quantity: quantities[productId] } : product,
+          );
+
+          revertedGroupedProducts[storeId].products = revertedProducts;
+          return { ...prevState, groupedProducts: revertedGroupedProducts };
+        });
+      }
+    }, 1000);
   };
 
   // Handle removing a product
-  const handleRemoveProduct = async (storeId, productId) => {
+  const handleRemoveProduct = async (storeId, productId, quantity) => {
     const isConfirmed = window.confirm('Bạn có muốn xóa sản phẩm này không?');
-  
+
     if (!isConfirmed) {
       return;
     }
     try {
-      const removeProduct = await removeProductByShop({ shop_id: storeId, product_id: productId });
-      console.log(removeProduct);
+      const removeProduct = await removeProductByShop({
+        shop_id: storeId,
+        product_id: productId,
+        quantity: quantity,
+      });
+      if (!removeProduct.status) {
+        alert('Xoá sản phẩm thất bại, vui lòng thử lại');
+        return;
+      }
       // Update state to remove the product from the UI
       setState((prevState) => {
         const updatedGroupedProducts = { ...prevState.groupedProducts };
         updatedGroupedProducts[storeId].products = updatedGroupedProducts[storeId].products.filter(
-          (product) => product.product_id !== productId
+          (product) => product.product_id !== productId,
         );
 
         // If there are no products left for a store, remove the store entry
@@ -73,10 +139,7 @@ function ShoppingCart() {
         delete updatedCheckedState[storeId]?.productChecked?.[productId];
 
         // If no products remain checked in the store, uncheck the store itself
-        if (
-          updatedCheckedState[storeId] &&
-          Object.keys(updatedCheckedState[storeId].productChecked).length === 0
-        ) {
+        if (updatedCheckedState[storeId] && Object.keys(updatedCheckedState[storeId].productChecked).length === 0) {
           delete updatedCheckedState[storeId];
         }
 
@@ -91,15 +154,18 @@ function ShoppingCart() {
   // Handle removing a store
   const handleRemoveStore = async (storeId) => {
     const isConfirmed = window.confirm('Bạn có muốn xóa cửa hàng này không?');
-  
     if (!isConfirmed) {
       return;
     }
 
     try {
       const responseRemoveStore = await removeStore({ shop_id: storeId });
-      console.log(responseRemoveStore);
-      
+
+      if (!responseRemoveStore.status) {
+        alert('Xoá thất bại, vui lòng thử lại');
+        return;
+      }
+
       setState((prevState) => {
         const updatedGroupedProducts = { ...prevState.groupedProducts };
         delete updatedGroupedProducts[storeId];
@@ -209,19 +275,27 @@ function ShoppingCart() {
 
   useEffect(() => {
     fetchDataProduct();
+
+    return () => {
+      if (debounceTimeout.current) {
+        clearTimeout(debounceTimeout.current);
+      }
+    };
   }, []);
 
   // Handle checkout process
   const handleCheckout = async () => {
-    const items = Object.entries(groupedProducts).map(([storeId, { products }]) => ({
-      shop_id: parseInt(storeId, 10),
-      products: products
-        .filter((product) => checkedState[storeId]?.productChecked?.[product.product_id])
-        .map((product) => ({
-          product_id: product.product_id,
-          quantity: product.quantity,
-        })),
-    })).filter(item => item.products.length > 0);
+    const items = Object.entries(groupedProducts)
+      .map(([storeId, { products }]) => ({
+        shop_id: parseInt(storeId, 10),
+        products: products
+          .filter((product) => checkedState[storeId]?.productChecked?.[product.product_id])
+          .map((product) => ({
+            product_id: product.product_id,
+            quantity: product.quantity,
+          })),
+      }))
+      .filter((item) => item.products.length > 0);
 
     if (items.length === 0) {
       alert('Vui lòng chọn sản phẩm');
@@ -231,7 +305,7 @@ function ShoppingCart() {
     try {
       const checkoutResponse = await createCheckOut(items);
 
-      if(!checkoutResponse.status){
+      if (!checkoutResponse.status) {
         alert('Mua hàng thất bại, vui lòng thử lại.');
         return;
       }
@@ -267,11 +341,11 @@ function ShoppingCart() {
               <h5>{shop_name || 'N/A'}</h5>
             </div>
             <img
-                src={imagesCart.trash_icon}
-                alt="Trash Icon"
-                className={cx('trash-icon')}
-                onClick={() => handleRemoveStore(storeId)}
-              />
+              src={imagesCart.trash_icon}
+              alt="Trash Icon"
+              className={cx('trash-icon')}
+              onClick={() => handleRemoveStore(storeId)}
+            />
           </div>
 
           {products.map((product) => (
@@ -294,13 +368,16 @@ function ShoppingCart() {
                         <span className={cx('text-primary')}>{formatPrice(product.price ?? 0)}đ</span>
                         <span className={cx('text-grey')}>/ Hộp</span>
                       </span>
+                      <span className={cx('remaining', 'text-grey')}>
+                        Tồn kho: <span className={cx('text-primary')}>{product.inventory_quantity ?? 0}</span>
+                      </span>
                     </div>
                   </div>
                 </div>
                 <div className={cx('text-right', 'quantity-trash')}>
                   <CustomInputNumber
                     min={1}
-                    max={100}
+                    max={product.inventory_quantity}
                     initialValue={product.quantity || 1}
                     className={cx('custom-number')}
                     onValueChange={(newQuantity) => handleQuantityChange(storeId, product.product_id, newQuantity)}
@@ -309,7 +386,7 @@ function ShoppingCart() {
                     src={imagesCart.trash_icon}
                     alt="Trash Icon"
                     className={cx('trash-icon')}
-                    onClick={() => handleRemoveProduct(storeId, product.product_id)}
+                    onClick={() => handleRemoveProduct(storeId, product.product_id, product.quantity)}
                   />
                 </div>
               </div>
