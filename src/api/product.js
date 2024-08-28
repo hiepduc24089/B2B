@@ -1,7 +1,6 @@
 // src/api/product.js
 import axios from 'axios';
-
-const API_HOST = 'https://api-b2b.krmedi.vn';
+import { API_HOST } from '~/config/host';
 
 export const fetchProductDetails = async (slug) => {
   try {

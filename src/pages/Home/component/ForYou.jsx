@@ -6,10 +6,9 @@ import { Link } from 'react-router-dom';
 import routesConfig from '~/config/routes';
 import LoadingIndicator from '~/components/Loading';
 import { fetchForYou } from '~/api/home';
+import { API_HOST } from '~/config/host';
 
 const cx = classNames.bind(styles);
-
-const BASE_URL = 'https://api-b2b.krmedi.vn';
 
 function ForYou() {
   const [state, setState] = React.useState({
@@ -73,7 +72,7 @@ function ForYou() {
               to={`${routesConfig.product_details.replace(':slug', foryou.slug).replace(':id', foryou.id)}`}
             >
               <div className={cx('for-you-item')}>
-                <img src={`${BASE_URL}${foryou.src[0]}`} alt="Product" />
+                <img src={`${API_HOST}${foryou.src[0]}`} alt="Product" />
                 <h1>{foryou.name}</h1>
                 <h3>
                   <span>{formatPrice(foryou.price)}đ</span>/Hộp

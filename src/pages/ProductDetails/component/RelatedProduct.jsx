@@ -3,10 +3,9 @@ import classNames from 'classnames/bind';
 import styles from '../RelatedProduct.module.scss';
 import { Link } from 'react-router-dom';
 import routesConfig from '~/config/routes';
+import { API_HOST } from '~/config/host';
 
 const cx = classNames.bind(styles);
-
-const BASE_URL = 'https://api-b2b.krmedi.vn';
 
 function RelatedProduct({ recommendedProduct, relatedProduct, viewedProduct }) {
   const getNumberOfItems = () => {
@@ -47,7 +46,7 @@ function RelatedProduct({ recommendedProduct, relatedProduct, viewedProduct }) {
             to={`${routesConfig.product_details.replace(':slug', product.slug).replace(':id', product.id)}`}
           >
             <div className={cx('product-item')}>
-              <img src={`${BASE_URL}${product.src[0]}`} alt={product.name} />
+              <img src={`${API_HOST}${product.src[0]}`} alt={product.name} />
               <h1>{product.name}</h1>
               <h3>
                 <span>{formatPrice(product.price)}đ</span>/Hộp

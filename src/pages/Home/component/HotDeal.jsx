@@ -9,10 +9,9 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import LoadingIndicator from '~/components/Loading';
 import { fetchHotDeal } from '~/api/home';
+import { API_HOST } from '~/config/host';
 
 const cx = classNames.bind(styles);
-
-const BASE_URL = 'https://api-b2b.krmedi.vn';
 
 function HotDeal() {
   const [state, setState] = React.useState({
@@ -92,7 +91,7 @@ function HotDeal() {
                 to={`${routesConfig.product_details.replace(':slug', hotdeal.slug).replace(':id', hotdeal.id)}`}
               >
                 <div className={cx('list-item')}>
-                  <img src={`${BASE_URL}${hotdeal.src[0]}`} alt={hotdeal.name} />
+                  <img src={`${API_HOST}${hotdeal.src[0]}`} alt={hotdeal.name} />
                   <h3>
                     {formatPrice(hotdeal.price)}đ<span>/{hotdeal.unit}</span>
                   </h3>

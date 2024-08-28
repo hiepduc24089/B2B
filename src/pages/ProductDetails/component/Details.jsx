@@ -7,10 +7,9 @@ import CustomInputNumber from '~/components/Layout/CustomInputNumber';
 import { imagesHotDeal } from '~/assets/images';
 import { createShoppingCard, createBuyNow } from '~/api/payment';
 import routesConfig from '~/config/routes';
+import { API_HOST } from '~/config/host';
 
 const cx = classNames.bind(styles);
-
-const BASE_URL = 'https://api-b2b.krmedi.vn';
 
 function Details({ product, loading, seller }) {
   const navigate = useNavigate();
@@ -66,12 +65,12 @@ function Details({ product, loading, seller }) {
       return (
         <>
           <div className={cx('product-images')}>
-            <img src={`${BASE_URL}${product.src[0]}`} alt={product.name} className={cx('main-image')} />
+            <img src={`${API_HOST}${product.src[0]}`} alt={product.name} className={cx('main-image')} />
             <div className={cx('sub-images')}>
               {product.src.slice(1).map((image, index) => (
                 <img
                   key={index}
-                  src={`${BASE_URL}${image}`}
+                  src={`${API_HOST}${image}`}
                   alt={`${product.name} ${index + 1}`}
                   className={cx('sub-image')}
                 />
