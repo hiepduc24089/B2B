@@ -14,6 +14,9 @@
   height: 220px;
   width: 100%;
   background: var(--light);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
 
   .new-cover {
     position: absolute;
@@ -39,6 +42,12 @@
     bottom: -25%;
     .avater-wrapper {
       position: relative;
+      .avartar-image {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
       .new_avatar_icon {
         position: absolute;
         bottom: 0;

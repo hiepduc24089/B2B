@@ -4,10 +4,12 @@ import styles from '../Home.module.scss';
 import { imagesHome } from '~/assets/images';
 import { Link } from 'react-router-dom';
 import routesConfig from '~/config/routes';
-import { dataSupplier } from '../data/supplier';
 import LoadingIndicator from '~/components/Loading';
+import { fetchSupplier } from '~/api/home';
 
 const cx = classNames.bind(styles);
+
+const BASE_URL = 'https://api-b2b.krmedi.vn';
 
 function Supplier() {
   const [state, setState] = React.useState({
@@ -21,13 +23,21 @@ function Supplier() {
   };
 
   const fetchDataListSupplierAPI = async () => {
-    setTimeout(() => {
-      setState((prevState) => ({
-        ...prevState,
+    try {
+      const data = await fetchSupplier();
+
+      if (!data.status) {
+        console.log('Lấy dữ liệu thất bại');
+      }
+
+      setState({
         loading: false,
-        dataListSupplier: dataSupplier.slice(0, getNumberOfItems()),
-      }));
-    }, 1000);
+        dataListSupplier: data.data.data.slice(0, getNumberOfItems()),
+      });
+    } catch (error) {
+      console.error('Error fetching supplier data:', error);
+      setState((prevState) => ({ ...prevState, loading: false }));
+    }
   };
 
   useEffect(() => {
@@ -36,7 +46,7 @@ function Supplier() {
     const handleResize = () => {
       setState((prevState) => ({
         ...prevState,
-        dataListSupplier: dataSupplier.slice(0, getNumberOfItems()),
+        dataListSupplier: prevState.dataListSupplier.slice(0, getNumberOfItems()),
       }));
     };
 
@@ -56,15 +66,15 @@ function Supplier() {
           {dataListSupplier.map((supplier, index) => (
             <div key={index} className={cx('supplier-item')}>
               <div className={cx('d-flex', 'align-items-center')}>
-                <img src={supplier.image} alt="Supplier Image" className={cx('supplier-image')} />
+                <img src={`${BASE_URL}${supplier.src[0]}`} alt="Supplier Image" className={cx('supplier-image')} />
                 <div className={cx('supplier-text')}>
-                  <h3>{supplier.title}</h3>
+                  <h3>{supplier.name}</h3>
                   <Link to={'#'} className={cx('find-supplier')}>
-                    {supplier.description}
+                    Tìm nhà cung cấp
                   </Link>
                   <span className={cx('d-flex', 'align-items-center', 'supplier-location')}>
                     <img src={imagesHome.supplier_location} alt="Location" />
-                    {supplier.location}
+                    {supplier.scope_name}
                   </span>
                 </div>
               </div>

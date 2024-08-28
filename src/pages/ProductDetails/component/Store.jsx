@@ -6,6 +6,8 @@ import LoadingIndicator from '~/components/Loading';
 
 const cx = classNames.bind(styles);
 
+const BASE_URL = 'https://api-b2b.krmedi.vn';
+
 function Store({ seller, product, loading }) {
   const [showModal, setShowModal] = useState(false);
 
@@ -19,26 +21,26 @@ function Store({ seller, product, loading }) {
       return (
         <div className={cx('store-details')}>
           <div className={cx('store-header')}>
-            <img src={seller.avatar} alt={seller.name} />
+            <img src={`${BASE_URL}${seller.avatar}`} alt={seller.name} />
             <h3>{seller.name}</h3>
-            <p>{seller.location}</p>
+            <p>{seller.full_address}</p>
           </div>
           <div className={cx('store-information')}>
             <div className={cx('d-flex', 'justify-content-between', 'store-number')}>
               <span className={cx('title')}>Sản phẩm</span>
-              <span className={cx('number')}>{seller.product}</span>
+              <span className={cx('number')}>{product.total_products_shop}</span>
             </div>
             <div className={cx('d-flex', 'justify-content-between', 'store-number')}>
               <span className={cx('title')}>Người theo dõi</span>
-              <span className={cx('number')}>{seller.followers}</span>
+              <span className={cx('number')}>{product.total_followers_shop}</span>
             </div>
             <div className={cx('d-flex', 'justify-content-between', 'store-number')}>
               <span className={cx('title')}>Lượt liên hệ</span>
-              <span className={cx('number')}>{seller.contacts}</span>
+              <span className={cx('number')}>1</span>
             </div>
             <div className={cx('d-flex', 'justify-content-between', 'store-number')}>
               <span className={cx('title')}>Tỷ lệ phản hồi</span>
-              <span className={cx('number')}>{seller.response_rate}</span>
+              <span className={cx('number')}>50%</span>
             </div>
             <button className={cx('follow-btn')}>Theo dõi</button>
             <button className={cx('phone-btn')}>Xem SĐT</button>

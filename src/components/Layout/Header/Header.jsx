@@ -10,7 +10,7 @@ import { useAuth } from '~/context/AuthContext';
 const cx = classNames.bind(styles);
 
 function Header() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user, logout } = useAuth();
 
   return (
     <header className={cx('wrapper')}>
@@ -40,7 +40,7 @@ function Header() {
                 <img src={images.user} alt="User Icon" />
                 {isAuthenticated ? (
                   <Link to={routesConfig.profile} className={cx('icon-link')}>
-                    <p>Nguyễn Văn A</p>
+                    <p>{user.name}</p>
                   </Link>
                 ) : (
                   <p>

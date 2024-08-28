@@ -5,12 +5,14 @@ import styles from '../Home.module.scss';
 import { imagesHome } from '~/assets/images';
 import { Link } from 'react-router-dom';
 import routesConfig from '~/config/routes';
-import { dataProduct } from '~/pages/Home/data/product';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import LoadingIndicator from '~/components/Loading';
+import { fetchHotDeal } from '~/api/home';
 
 const cx = classNames.bind(styles);
+
+const BASE_URL = 'https://api-b2b.krmedi.vn';
 
 function HotDeal() {
   const [state, setState] = React.useState({
@@ -18,20 +20,28 @@ function HotDeal() {
     dataListProduct: [],
   });
   const { loading, dataListProduct } = state;
-  useEffect(() => {
-    fetchDataListProductAPI();
-    return () => {};
-  }, []);
 
-  const fetchDataListProductAPI = async () => {
-    setTimeout(() => {
-      setState((prevState) => ({
-        ...prevState,
-        loading: false,
-        dataListProduct: dataProduct,
-      }));
-    }, 1000);
-  };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await fetchHotDeal();
+
+        setState((prevState) => ({
+          ...prevState,
+          loading: false,
+          dataListProduct: data.data,
+        }));
+      } catch (error) {
+        console.error('Failed to fetch hot deals:', error);
+        setState((prevState) => ({
+          ...prevState,
+          loading: false,
+        }));
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const settings = {
     dots: false,
@@ -82,15 +92,18 @@ function HotDeal() {
                 to={`${routesConfig.product_details.replace(':slug', hotdeal.slug).replace(':id', hotdeal.id)}`}
               >
                 <div className={cx('list-item')}>
-                  <img src={hotdeal.image} alt="Product" />
+                  <img src={`${BASE_URL}${hotdeal.src[0]}`} alt={hotdeal.name} />
                   <h3>
-                    {formatPrice(hotdeal.price)}đ<span>/Hộp</span>
+                    {formatPrice(hotdeal.price)}đ<span>/{hotdeal.unit}</span>
                   </h3>
-                  <h4>{formatPrice(hotdeal.sale_price)}đ</h4>
+                  <h4>{formatPrice(hotdeal.price_original)}đ</h4>
                   <h5>
-                    Mua sỉ từ <span>{hotdeal.wholesaleitem}</span>
+                    Mua sỉ từ{' '}
+                    <span>
+                      {hotdeal.min_quantity} {hotdeal.unit}
+                    </span>
                   </h5>
-                  <p>{hotdeal.title}</p>
+                  <p>{hotdeal.name}</p>
                 </div>
               </Link>
             ))}

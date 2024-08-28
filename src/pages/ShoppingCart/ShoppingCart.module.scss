@@ -59,6 +59,7 @@
   .trash-icon {
     width: 24px;
     height: 24px;
+    cursor: pointer;
   }
 
   .shopping-cart-details {
@@ -112,6 +113,14 @@
           .order-price {
             color: var(--black);
             font-size: 16px;
+            font-weight: 400;
+          }
+          .remaining {
+            display: flex;
+            gap: 4px;
+            margin-top: 12px;
+            width: 100%;
+            font-size: 14px;
             font-weight: 400;
           }
           .quantity-trash {

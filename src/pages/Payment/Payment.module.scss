@@ -241,7 +241,7 @@
     }
     .quantity {
       border-radius: 37px;
-      padding: 4px 10px;
+      padding: 4px 20px;
       background: var(--primary);
       color: var(--white);
       font-size: 18px;
@@ -277,6 +277,37 @@
       color: var(--black);
       font-size: 16px;
       font-weight: 400;
+    }
+  }
+  .notes-title{
+    display: flex;
+    width: 100%;
+    color: var(--black);
+    font-size: 16px;
+    font-weight: 400;
+    margin-bottom: 12px;
+  }
+  .notes-area{
+    width: 100%;
+    padding: 8px 16px 20px 16px;
+    border-radius: 8px;
+    border: 0.5px solid var(--grey-light);
+    background: var(--white);
+    color: var(--black);
+    font-size: 14px;
+    font-weight: 400;
+  }
+  .total-each-product{
+    margin-top: 20px;
+    .title{
+      color: var(--black);
+      font-size: 16px;
+      font-weight: 400;
+    }
+    .price{
+      color: var(--primary);
+      font-size: 20px;
+      font-weight: 600;
     }
   }
 }

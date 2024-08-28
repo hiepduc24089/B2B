@@ -1,10 +1,13 @@
 import React, { useEffect, memo } from 'react';
-import { dataProduct } from '~/pages/Home/data/product';
+import { Link } from 'react-router-dom';
 import LoadingIndicator from '~/components/Loading';
 import classNames from 'classnames/bind';
 import styles from '../ForYou.module.scss';
+import routesConfig from '~/config/routes';
+import { fetchForYou } from '~/api/home';
 
 const cx = classNames.bind(styles);
+const BASE_URL = 'https://api-b2b.krmedi.vn';
 
 function Product() {
   const [state, setState] = React.useState({
@@ -12,19 +15,28 @@ function Product() {
     dataListProduct: [],
   });
   const { loading, dataListProduct } = state;
+
   useEffect(() => {
     fetchDataListProductAPI();
     return () => {};
   }, []);
 
   const fetchDataListProductAPI = async () => {
-    setTimeout(() => {
+    try {
+      const listProductResponse = await fetchForYou();
+
       setState((prevState) => ({
         ...prevState,
         loading: false,
-        dataListProduct: dataProduct,
+        dataListProduct: listProductResponse.data,
       }));
-    }, 1000);
+    } catch (error) {
+      console.error('Failed to fetch for you data:', error);
+      setState((prevState) => ({
+        ...prevState,
+        loading: false,
+      }));
+    }
   };
 
   function formatPrice(price) {
@@ -38,23 +50,35 @@ function Product() {
       return (
         <div className={cx('product-wrapper')}>
           {dataListProduct.map((product, index) => (
-            <div key={index} className={cx('product-items')}>
-              <img src={product.image} alt={product.title} />
-              <h1 className={cx('product-title')}>{product.title}</h1>
-              <h3 className={cx('product-price')}>
-                {formatPrice(product.price)}đ<span>/Hộp</span>
-              </h3>
-              <div className={cx('d-flex', 'justify-content-between', 'align-items-center')}>
-                <span className={cx('negotiate')}>{product.negotiable}</span>
+            <Link
+              key={index}
+              to={`${routesConfig.product_details.replace(':slug', product.slug).replace(':id', product.id)}`}
+            >
+              <div className={cx('product-items')}>
+                <img src={`${BASE_URL}${product.src[0]}`} alt={product.name} />
+                <h1 className={cx('product-title')}>{product.name}</h1>
+                <h3 className={cx('product-price')}>
+                  {formatPrice(product.price)}đ<span>/{product.unit}</span>
+                </h3>
+                <div className={cx('d-flex', 'justify-content-between', 'align-items-center')}>
+                  <div>
+                    <h4 className={cx('sale-price')}>{formatPrice(product.price_original)}đ</h4>
+                    <span className={cx('negotiate')}>Có thể thương lượng</span>
+                  </div>
+                  <button className={cx('sale')}>-{product.discount}%</button>
+                </div>
+                <h5 className={cx('buy-at-least')}>
+                  Mua sỉ từ{' '}
+                  <span>
+                    {product.min_quantity} {product.unit}
+                  </span>
+                </h5>
+                <div className={cx('d-flex', 'justify-content-between')}>
+                  <span className={cx('location')}>{product.province_name}</span>
+                  <span className={cx('contact')}>2 lượt liên hệ</span>
+                </div>
               </div>
-              <h5 className={cx('buy-at-least')}>
-                Mua sỉ từ <span>{product.wholesaleitem}</span>
-              </h5>
-              <div className={cx('d-flex', 'justify-content-between')}>
-                <span className={cx('location')}>{product.location}</span>
-                <span className={cx('contact')}>{product.contact} lượt liên hệ</span>
-              </div>
-            </div>
+            </Link>
           ))}
         </div>
       );

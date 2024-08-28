@@ -4,10 +4,12 @@ import styles from '../Home.module.scss';
 import { imagesHome } from '~/assets/images';
 import { Link } from 'react-router-dom';
 import routesConfig from '~/config/routes';
-import { dataProduct } from '../data/product';
 import LoadingIndicator from '~/components/Loading';
+import { fetchForYou } from '~/api/home';
 
 const cx = classNames.bind(styles);
+
+const BASE_URL = 'https://api-b2b.krmedi.vn';
 
 function ForYou() {
   const [state, setState] = React.useState({
@@ -20,23 +22,31 @@ function ForYou() {
     return window.innerWidth > 768 ? 12 : 4;
   };
 
-  const fetchDataListProductAPI = async () => {
-    setTimeout(() => {
-      setState((prevState) => ({
-        ...prevState,
-        loading: false,
-        dataListProduct: dataProduct.slice(0, getNumberOfItems()),
-      }));
-    }, 1000);
-  };
-
   useEffect(() => {
-    fetchDataListProductAPI();
+    const fetchData = async () => {
+      try {
+        const data = await fetchForYou();
+
+        setState((prevState) => ({
+          ...prevState,
+          loading: false,
+          dataListProduct: data.data.slice(0, getNumberOfItems()),
+        }));
+      } catch (error) {
+        console.error('Failed to fetch products for you:', error);
+        setState((prevState) => ({
+          ...prevState,
+          loading: false,
+        }));
+      }
+    };
+
+    fetchData();
 
     const handleResize = () => {
       setState((prevState) => ({
         ...prevState,
-        dataListProduct: dataProduct.slice(0, getNumberOfItems()),
+        dataListProduct: prevState.dataListProduct.slice(0, getNumberOfItems()),
       }));
     };
 
@@ -63,16 +73,18 @@ function ForYou() {
               to={`${routesConfig.product_details.replace(':slug', foryou.slug).replace(':id', foryou.id)}`}
             >
               <div className={cx('for-you-item')}>
-                <img src={foryou.image} alt="Product" />
-                <h1>{foryou.title}</h1>
+                <img src={`${BASE_URL}${foryou.src[0]}`} alt="Product" />
+                <h1>{foryou.name}</h1>
                 <h3>
                   <span>{formatPrice(foryou.price)}đ</span>/Hộp
                 </h3>
-                <span className={cx('negotiate')}>{foryou.negotiable}</span>
-                <p className={cx('buy-at-least')}>Mua ít nhất: {foryou.minimum_order} cái</p>
+                <span className={cx('negotiate')}>Có thể thương lượng</span>
+                <p className={cx('buy-at-least')}>
+                  Mua ít nhất: {foryou.min_quantity} {foryou.unit}
+                </p>
                 <div className={cx('d-flex', 'justify-content-between')}>
-                  <span className={cx('location')}>{foryou.location}</span>
-                  <span className={cx('contact')}>{foryou.contact} lượt liên hệ</span>
+                  <span className={cx('location')}>{foryou.province_name}</span>
+                  <span className={cx('contact')}>2 lượt liên hệ</span>
                 </div>
               </div>
             </Link>
