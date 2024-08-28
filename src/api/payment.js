@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-const API_HOST = 'https://api-b2b.krmedi.vn';
+import { API_HOST } from '~/config/host';
 
 export const createShoppingCard = async ({ shop_id, product_id, quantity }) => {
   try {

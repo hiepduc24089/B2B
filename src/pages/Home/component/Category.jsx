@@ -4,10 +4,9 @@ import styles from '../Home.module.scss';
 import { imagesHome, imagesHotDeal } from '~/assets/images';
 import LoadingIndicator from '~/components/Loading';
 import { fetchCategory } from '~/api/home';
+import { API_HOST } from '~/config/host';
 
 const cx = classNames.bind(styles);
-
-const BASE_URL = 'https://api-b2b.krmedi.vn';
 
 function Category() {
   const [state, setState] = useState({
@@ -46,7 +45,7 @@ function Category() {
         <div className={cx('category-wrapper')}>
           {dataListCategory.map((category, index) => (
             <div key={index} className={cx('category-item')}>
-              <img src={`${BASE_URL}${category.src}`} alt={category.name} />
+              <img src={`${API_HOST}${category.src}`} alt={category.name} />
               <h3>{category.name}</h3>
               <p>{category.product_count} sản phẩm</p>
             </div>
@@ -73,7 +72,7 @@ function Category() {
       <div className={cx('cate-wrapper')}>
         {dataListCategory.map((category, index) => (
           <div key={index} className={cx('cate-item')}>
-            <img src={`${BASE_URL}${category.src}`} alt={category.name} />
+            <img src={`${API_HOST}${category.src}`} alt={category.name} />
             <h3>{category.name}</h3>
             <p>{category.product_count} sản phẩm</p>
           </div>

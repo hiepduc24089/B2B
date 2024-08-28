@@ -3,10 +3,9 @@ import classNames from 'classnames/bind';
 import styles from '../ProductDetails.module.scss';
 import { Modal, Button } from 'react-bootstrap';
 import LoadingIndicator from '~/components/Loading';
+import { API_HOST } from '~/config/host';
 
 const cx = classNames.bind(styles);
-
-const BASE_URL = 'https://api-b2b.krmedi.vn';
 
 function Store({ seller, product, loading }) {
   const [showModal, setShowModal] = useState(false);
@@ -21,7 +20,7 @@ function Store({ seller, product, loading }) {
       return (
         <div className={cx('store-details')}>
           <div className={cx('store-header')}>
-            <img src={`${BASE_URL}${seller.avatar}`} alt={seller.name} />
+            <img src={`${API_HOST}${seller.avatar}`} alt={seller.name} />
             <h3>{seller.name}</h3>
             <p>{seller.full_address}</p>
           </div>

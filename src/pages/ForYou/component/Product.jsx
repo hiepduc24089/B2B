@@ -5,9 +5,9 @@ import classNames from 'classnames/bind';
 import styles from '../ForYou.module.scss';
 import routesConfig from '~/config/routes';
 import { fetchForYou } from '~/api/home';
+import { API_HOST } from '~/config/host';
 
 const cx = classNames.bind(styles);
-const BASE_URL = 'https://api-b2b.krmedi.vn';
 
 function Product() {
   const [state, setState] = React.useState({
@@ -55,7 +55,7 @@ function Product() {
               to={`${routesConfig.product_details.replace(':slug', product.slug).replace(':id', product.id)}`}
             >
               <div className={cx('product-items')}>
-                <img src={`${BASE_URL}${product.src[0]}`} alt={product.name} />
+                <img src={`${API_HOST}${product.src[0]}`} alt={product.name} />
                 <h1 className={cx('product-title')}>{product.name}</h1>
                 <h3 className={cx('product-price')}>
                   {formatPrice(product.price)}đ<span>/{product.unit}</span>

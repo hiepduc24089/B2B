@@ -7,10 +7,9 @@ import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import { fetchBrand } from '~/api/home';
+import { API_HOST } from '~/config/host';
 
 const cx = classNames.bind(styles);
-
-const BASE_URL = 'https://api-b2b.krmedi.vn';
 
 function Brand() {
   const [state, setState] = useState({
@@ -82,7 +81,7 @@ function Brand() {
           <Slider {...settings}>
             {dataListBrand.map((brand) => (
               <div key={brand.id} className={cx('brand-item')}>
-                <img src={`${BASE_URL}${brand.src}`} alt="Brand Name" className={cx('brand-img')} />
+                <img src={`${API_HOST}${brand.src}`} alt="Brand Name" className={cx('brand-img')} />
               </div>
             ))}
           </Slider>

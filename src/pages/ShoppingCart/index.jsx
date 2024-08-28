@@ -9,9 +9,9 @@ import LoadingIndicator from '~/components/Loading';
 import routesConfig from '~/config/routes';
 import { useCart } from '~/context/CartContext';
 import { getShoppingCard, createCheckOut, removeProductByShop, removeStore, updateCart } from '~/api/payment';
+import { API_HOST } from '~/config/host';
 
 const cx = classNames.bind(styles);
-const BASE_URL = 'https://api-b2b.krmedi.vn';
 
 function ShoppingCart() {
   const { quantities, setQuantities } = useCart();
@@ -360,7 +360,7 @@ function ShoppingCart() {
                     onChange={() => handleProductCheckboxChange(storeId, product.product_id)}
                   />
                   <div className={cx('d-flex', 'col-md-10', 'product-names')}>
-                    <img src={`${BASE_URL}${product.src[0]}`} alt="Product" className={cx('product-image')} />
+                    <img src={`${API_HOST}${product.src[0]}`} alt="Product" className={cx('product-image')} />
                     <div style={{ marginLeft: '8px', minWidth: '250px' }}>
                       <h5>{product.name}</h5>
                       <span className={cx('order-price')}>

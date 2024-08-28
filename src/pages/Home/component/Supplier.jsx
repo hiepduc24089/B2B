@@ -6,10 +6,9 @@ import { Link } from 'react-router-dom';
 import routesConfig from '~/config/routes';
 import LoadingIndicator from '~/components/Loading';
 import { fetchSupplier } from '~/api/home';
+import { API_HOST } from '~/config/host';
 
 const cx = classNames.bind(styles);
-
-const BASE_URL = 'https://api-b2b.krmedi.vn';
 
 function Supplier() {
   const [state, setState] = React.useState({
@@ -66,7 +65,7 @@ function Supplier() {
           {dataListSupplier.map((supplier, index) => (
             <div key={index} className={cx('supplier-item')}>
               <div className={cx('d-flex', 'align-items-center')}>
-                <img src={`${BASE_URL}${supplier.src[0]}`} alt="Supplier Image" className={cx('supplier-image')} />
+                <img src={`${API_HOST}${supplier.src[0]}`} alt="Supplier Image" className={cx('supplier-image')} />
                 <div className={cx('supplier-text')}>
                   <h3>{supplier.name}</h3>
                   <Link to={'#'} className={cx('find-supplier')}>
