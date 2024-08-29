@@ -11,10 +11,10 @@ function RelatedProduct({ recommendedProduct, relatedProduct, viewedProduct }) {
   const getNumberOfItems = () => {
     const width = window.innerWidth;
 
-    if (width > 1400) return 12;
-    if (width > 1200) return 10;
-    if (width > 992) return 8;
-    if (width > 768) return 6;
+    if (width > 1200) return 12;
+    if (width > 992) return 10;
+    if (width > 768) return 8;
+    if (width > 500) return 6;
     return 4;
   };
 

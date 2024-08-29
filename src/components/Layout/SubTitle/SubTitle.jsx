@@ -17,18 +17,16 @@ function SubTitle({ title }) {
     [routesConfig.store_management]: 'Quản lý gian hàng',
   };
 
-  const subtitle = pathToSubTitleMap[location.pathname];
+  const subtitle = pathToSubTitleMap[location.pathname] || title;
 
   return (
-    <>
-      <div className={cx('sub-title')}>
-        <Link to={routesConfig.home}>Trang chủ</Link>
-        <span className={cx('d-flex', 'align-items-center', 'next-icon')}>
-          <img src={imagesHome.see_all} alt="See All" width={10} height={10} />
-        </span>
-        {subtitle}
-      </div>
-    </>
+    <div className={cx('sub-title')}>
+      <Link to={routesConfig.home}>Trang chủ</Link>
+      <span className={cx('d-flex', 'align-items-center', 'next-icon')}>
+        <img src={imagesHome.see_all} alt="See All" width={10} height={10} />
+      </span>
+      {subtitle}
+    </div>
   );
 }
 

@@ -11,7 +11,7 @@ const cx = classNames.bind(styles);
 
 const { Sider } = Layout;
 
-function FilterSearch() {
+function FilterSearch({ category_id }) {
   const [state, setState] = React.useState({
     loading: true,
     dataListCategory: [],
@@ -22,6 +22,7 @@ function FilterSearch() {
   const [maxCitiesCount, setMaxCitiesCount] = useState(0);
   const [visibleCategoriesCount, setVisibleCategoriesCount] = useState(10);
   const [maxCategoriesCount, setMaxCategoriesCount] = useState(0);
+  const [checkedCategories, setCheckedCategories] = useState([]);
 
   const { loading, dataListCategory, dataListCity } = state;
 
@@ -33,14 +34,17 @@ function FilterSearch() {
   const fetchDataListCategoryAPI = async () => {
     try {
       const listProductResponse = await fetchCategory();
-
       setMaxCategoriesCount(listProductResponse.data.data.length);
+
+      const categories = listProductResponse.data.data || [];
+      const checked = categories.filter((category) => category.id === category_id).map((category) => category.name);
 
       setState((prevState) => ({
         ...prevState,
         loading: false,
-        dataListCategory: listProductResponse.data.data || [],
+        dataListCategory: categories,
       }));
+      setCheckedCategories(checked);
     } catch (error) {
       console.error('Error fetching category data:', error);
       setState((prevState) => ({
@@ -69,13 +73,15 @@ function FilterSearch() {
       }));
     }
   };
-
+  const handleCategoryChange = (checkedValues) => {
+    setCheckedCategories(checkedValues);
+  };
   const renderCategory = () => {
     if (loading) {
       return <LoadingIndicator />;
     } else {
       return (
-        <Checkbox.Group className={cx('checkbox-groups')}>
+        <Checkbox.Group className={cx('checkbox-groups')} value={checkedCategories} onChange={handleCategoryChange}>
           {dataListCategory.slice(0, visibleCategoriesCount).map((category, index) => (
             <Checkbox key={index} value={category.name} className={cx('w-100')}>
               {category.name}

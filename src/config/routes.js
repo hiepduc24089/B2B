@@ -7,7 +7,7 @@ const routes = {
   profile: '/profile',
   shopping_cart: '/shopping-cart',
   hot_deal: '/hot-deal',
-  category: '/category',
+  category: '/category/:slug/:id',
   supplier: '/supplier',
   foryou: '/for-you',
   product_details: '/product/:slug/:id',

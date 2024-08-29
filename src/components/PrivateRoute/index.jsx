@@ -10,13 +10,12 @@ function PrivateRoute({ children }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if user is authenticated when the component mounts
     if (!user) {
       setShowPopup(true);
     } else {
       setShowPopup(false);
     }
-  }, [user]); // Dependency array includes 'user'
+  }, [user]);
 
   const handlePopupClose = () => {
     setShowPopup(false);
@@ -24,15 +23,14 @@ function PrivateRoute({ children }) {
 
   const handleBack = () => {
     setShowPopup(false);
-    navigate(-1); // Go back to the previous route
+    navigate(-1);
   };
 
   const handleOk = () => {
     setShowPopup(false);
-    navigate(routesConfig.login); // Navigate to the login route
+    navigate(routesConfig.login);
   };
 
-  // Show the popup if not authenticated
   if (showPopup) {
     return (
       <Popup
@@ -44,7 +42,7 @@ function PrivateRoute({ children }) {
     );
   }
 
-  return children; // Render children if authenticated
+  return children;
 }
 
 export default PrivateRoute;
