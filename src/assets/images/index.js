@@ -58,6 +58,9 @@ import login_background from './all/login-bg.png';
 import show_password from './all/show-password.svg';
 import follow from './all/follow.svg';
 import phone from './all/phone.svg';
+import backIcon from './all/back-icon.svg';
+import locationIcon from './all/location-icon.svg';
+import callIconWhite from './all/call-icon-white.svg';
 
 export const images = {
   logo,
@@ -74,6 +77,9 @@ export const images = {
   show_password,
   follow,
   phone,
+  backIcon,
+  locationIcon,
+  callIconWhite,
 };
 
 export const imagesHome = {

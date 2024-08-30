@@ -1,4 +1,6 @@
 .store-header {
+  margin-top: 120px;
+  margin-bottom: -120px;
   background: var(--white);
   box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
   border-top: 1px solid rgba(0, 0, 0, 0.25);
@@ -7,6 +9,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 8px 0;
 }
 .store-details {
   display: flex;
@@ -15,10 +18,12 @@
   .store-infor {
     display: flex;
     align-items: center;
+    max-width: 260px;
     img {
       width: 48px;
       height: 48px;
       margin-right: 8px;
+      border-radius: 50%;
     }
     .name {
       color: var(--black);
@@ -57,6 +62,7 @@
     border-radius: 63px;
     border: 1px solid var(--primary);
     background: #fdf1e7;
+    padding: 4px 8px;
   }
   button {
     border: none;

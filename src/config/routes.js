@@ -14,6 +14,7 @@ const routes = {
   payment: '/payment',
   store_management: '/store-management',
   store_details: '/store-details/:id',
+  store_information: '/store-information/:id',
 };
 
 export default routes;

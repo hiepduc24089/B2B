@@ -7,10 +7,39 @@ import { useParams } from 'react-router-dom';
 import RelatedProduct from './component/RelatedProduct';
 import RelatedInformation from './component/RelatedInformation';
 import { fetchProductDetails, fetchShopDetails } from '~/api/product';
+import { useStoreHeader } from '~/context/StoreHeaderContext';
 
 const cx = classNames.bind(styles);
 
 function ProductDetails() {
+  const { setStoreHeaderVisibility, setStoreName, setStoreAddress, setStoreAvatar, setStoreID } = useStoreHeader();
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth > 992);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth > 992);
+    };
+
+    window.addEventListener('resize', handleResize);
+    handleResize(); // Check screen width on initial load
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isDesktop) {
+      setStoreHeaderVisibility(true);
+    } else {
+      setStoreHeaderVisibility(false);
+    }
+
+    return () => {
+      setStoreHeaderVisibility(false); // Cleanup to hide StoreHeader when unmounting
+    };
+  }, [isDesktop, setStoreHeaderVisibility]);
+
   const { slug, id } = useParams();
 
   const [state, setState] = useState({
@@ -47,6 +76,11 @@ function ProductDetails() {
           relatedProduct: selectedProduct.products_similar || [],
           viewedProduct: selectedProduct.products_viewed || [],
         });
+
+        setStoreName(shopDetails.name);
+        setStoreAddress(shopDetails.sub_address);
+        setStoreAvatar(shopDetails.avatar);
+        setStoreID(shopDetails.id);
       } else {
         setState({
           loading: false,

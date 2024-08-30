@@ -1,23 +1,36 @@
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import classNames from 'classnames/bind';
 import styles from './StoreHeader.module.scss';
-import { images, imagesSeller } from '~/assets/images';
+import { images } from '~/assets/images';
+import { useStoreHeader } from '~/context/StoreHeaderContext';
+import { API_HOST } from '~/config/host';
+import { Link } from 'react-router-dom';
+import routesConfig from '~/config/routes';
 
 const cx = classNames.bind(styles);
 
 function StoreHeader() {
+  const { storeName, storeAddress, storeAvatar, storeID } = useStoreHeader();
+
   return (
     <div className={cx('store-header')}>
       <div className={cx('container')}>
         <div className={cx('store-wrapper')}>
           <div className={cx('store-details')}>
-            <div className={cx('store-infor')}>
-              <img src={imagesSeller.seller_avatar} alt="Avatar" />
-              <div>
-                <h3 className={cx('name')}>OIC NanoPharma</h3>
-                <p className={cx('location')}>Q. Thanh Xuan, Hà Nội</p>
+            <Link
+              to={{
+                pathname: `${routesConfig.store_information.replace(':id', storeID)}`,
+              }}
+              state={{ shop_id: storeID }}
+            >
+              <div className={cx('store-infor')}>
+                <img src={`${API_HOST}${storeAvatar}`} alt="Avatar" />
+                <div>
+                  <h3 className={cx('name')}>{storeName || 'N/A'}</h3>
+                  <p className={cx('location')}>{storeAddress || 'N/A'}</p>
+                </div>
               </div>
-            </div>
+            </Link>
             <div className={cx('store-followers')}>
               <span>
                 <span className={cx('fw-bold-600')}>38</span> Theo dõi

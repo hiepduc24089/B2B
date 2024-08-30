@@ -76,7 +76,7 @@
   .search-wrapper {
     position: absolute !important;
     right: 0;
-    top: 45px;
+    top: 0;
     display: flex;
     justify-content: right;
     padding: 0;
@@ -105,5 +105,15 @@
 
   .close-btn {
     cursor: pointer;
+  }
+}
+
+@media screen and (max-width: 475px) {
+  .search-wrapper {
+    .filter-group {
+      .button-filter {
+        padding: 3px 10px;
+      }
+    }
   }
 }

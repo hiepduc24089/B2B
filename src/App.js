@@ -7,9 +7,12 @@ import LoginLayout from './components/LoginLayout';
 import routesConfig from '~/config/routes';
 import { setupInterceptors } from '~/axios/config';
 import Popup from '~/components/PrivateRoute/component/Popup/Popup';
+import StoreInformation from '~/pages/StoreInformation';
+import StoreInformationMobile from '~/pages/StoreInformationMobile';
 
 function App() {
   const [showPopup, setShowPopup] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 992);
 
   const handleUnauthorized = () => {
     setShowPopup(true);
@@ -17,6 +20,19 @@ function App() {
 
   useEffect(() => {
     setupInterceptors(handleUnauthorized);
+
+    // Function to update the state based on window size
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 992);
+    };
+
+    // Add event listener for window resize
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup event listener on component unmount
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
   const handlePopupClose = () => {
@@ -37,6 +53,23 @@ function App() {
       const Page = route.component;
       let Layout = route.layout || DefaultLayout;
 
+      // Check if the route is store_information
+      if (route.path === routesConfig.store_information) {
+        const PageComponent = isMobile ? StoreInformationMobile : StoreInformation;
+        const LayoutComponent = isMobile ? LoginLayout : Layout;
+
+        const element = (
+          <LayoutComponent>
+            <PageComponent />
+          </LayoutComponent>
+        );
+
+        return (
+          <Route key={index} path={route.path} element={isPrivate ? <PrivateRoute>{element}</PrivateRoute> : element} />
+        );
+      }
+
+      // Handle other routes
       if (
         route.path === routesConfig.login ||
         route.path === routesConfig.register ||
