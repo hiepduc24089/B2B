@@ -15,6 +15,7 @@ const routes = {
   store_management: '/store-management',
   store_details: '/store-details/:id',
   store_information: '/store-information/:id',
+  order_detail: '/order/:id',
 };
 
 export default routes;

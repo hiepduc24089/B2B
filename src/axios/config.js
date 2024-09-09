@@ -22,9 +22,9 @@ export const setupInterceptors = (onUnauthorized) => {
   );
 };
 
-export const getData = async (endpoint) => {
+export const getData = async (endpoint, options = {}) => {
   try {
-    const response = await apiClient.get(endpoint);
+    const response = await apiClient.get(endpoint, options);
     return response.data;
   } catch (error) {
     console.error('Error fetching data:', error);

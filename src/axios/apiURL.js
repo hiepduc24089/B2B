@@ -20,6 +20,9 @@ export const apiURL = {
   // Product and Shop Details
   productDetails: (slug) => `/api/detail-product/${slug}`,
   shopDetails: (shop_id) => `/api/detail-shop/${shop_id}`,
+  postProduct: '/api/create-product',
+  getProductByShopAtShop: '/api/get-product',
+  updateProductDisplayStatus: (product_id) => `/api/update-product-display/${product_id}`,
 
   //Payment
   addToCart: '/api/add-to-cart',
@@ -38,4 +41,13 @@ export const apiURL = {
 
   //Render Category Product
   getCategoyProduct: '/api/filter-Product',
+
+  //Order
+  getListOrder: '/api/shop-order',
+  getOrderDetail: (order_id) => `/api/detail-user-order/${order_id}`,
+
+  //Request Supplier
+  getListRequestSuppier: '/api/get-request-supplier-user',
+  getListPriceQuote: '/api/get-quotes',
+  getAllListCategory: '/api/category-product',
 };

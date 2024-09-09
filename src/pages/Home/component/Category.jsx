@@ -5,8 +5,8 @@ import { Link } from 'react-router-dom';
 import routesConfig from '~/config/routes';
 import { imagesHome, imagesHotDeal } from '~/assets/images';
 import LoadingIndicator from '~/components/Loading';
-import { fetchCategory } from '~/api/home';
 import { API_HOST } from '~/config/host';
+import { fetchAllListCategory } from '~/api/requestsupplier';
 
 const cx = classNames.bind(styles);
 
@@ -24,11 +24,10 @@ function Category() {
 
   const fetchDataListCategoryAPI = async () => {
     try {
-      const data = await fetchCategory();
-
+      const data = await fetchAllListCategory();
       setState({
         loading: false,
-        dataListCategory: data.data.data,
+        dataListCategory: data.data,
       });
     } catch (error) {
       console.error('Error fetching category data:', error);

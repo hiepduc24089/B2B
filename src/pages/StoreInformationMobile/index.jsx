@@ -31,7 +31,7 @@ function StoreInformationMobile() {
     const fetchShopData = async () => {
       try {
         const data = await getShopByUser(shopID);
-        console.log(data);
+
         setState((prevState) => ({
           ...prevState,
           loading: false,
