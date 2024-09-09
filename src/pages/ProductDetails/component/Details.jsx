@@ -67,7 +67,7 @@ function Details({ product, loading, seller }) {
           <div className={cx('product-images')}>
             <img src={`${API_HOST}${product.src[0]}`} alt={product.name} className={cx('main-image')} />
             <div className={cx('sub-images')}>
-              {product.src.slice(1).map((image, index) => (
+              {product.src.slice(1, 6).map((image, index) => (
                 <img
                   key={index}
                   src={`${API_HOST}${image}`}
@@ -82,18 +82,24 @@ function Details({ product, loading, seller }) {
               <h1 className={cx('product-title')}>{product.name}</h1>
               <span className={cx('contact')}>1 lượt liên hệ</span>
               <div className={cx('price-details', 'd-flex')}>
-                <div className={cx('col-6')}>
-                  <h3 className={cx('product-price')}>{formatPrice(product.attributes[1].price)}đ</h3>
-                  <span>
-                    {product.attributes[0].quantity} - {product.attributes[1].quantity - 1} {product.unit}
-                  </span>
-                </div>
-                <div className={cx('col-6')}>
-                  <h3 className={cx('product-price')}>{formatPrice(product.attributes[2].price)}đ</h3>
-                  <span>
-                    {'>'} {product.attributes[2].quantity} {product.unit}
-                  </span>
-                </div>
+                {product.attributes.map((attribute, index) => {
+                  const colClass =
+                    product.attributes.length === 2 ? 'col-6' : product.attributes.length === 3 ? 'col-4' : 'col-3'; // Defaults to 'col-3' for 4 or more attributes
+                  return (
+                    <div key={index} className={cx(colClass)}>
+                      <h3 className={cx('product-price')}>{formatPrice(attribute.price)}đ</h3>
+                      {index === product.attributes.length - 1 ? (
+                        <span>
+                          {'>'} {attribute.quantity} {product.unit}
+                        </span>
+                      ) : (
+                        <span>
+                          {attribute.quantity} - {product.attributes[index + 1].quantity - 1} {product.unit}
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
               <span className={cx('negotiate')}>Có thể thương lượng</span>
               <h5 className={cx('buy-at-least')}>

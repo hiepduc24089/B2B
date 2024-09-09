@@ -351,7 +351,7 @@ function ShoppingCart() {
           {products.map((product) => (
             <div key={product.product_id} className={cx('product-wrapper')}>
               <div className={cx('product-details', 'align-items-center', 'justify-content-between')}>
-                <div className={cx('d-flex', 'align-items-center')}>
+                <div className={cx('d-flex', 'align-items-center', 'w-100')}>
                   <input
                     type="checkbox"
                     className={cx('cart-checkbox')}

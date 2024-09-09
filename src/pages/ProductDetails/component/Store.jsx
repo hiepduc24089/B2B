@@ -4,6 +4,8 @@ import styles from '../ProductDetails.module.scss';
 import { Modal, Button } from 'react-bootstrap';
 import LoadingIndicator from '~/components/Loading';
 import { API_HOST } from '~/config/host';
+import { Link } from 'react-router-dom';
+import routesConfig from '~/config/routes';
 
 const cx = classNames.bind(styles);
 
@@ -19,11 +21,18 @@ function Store({ seller, product, loading }) {
     } else {
       return (
         <div className={cx('store-details')}>
-          <div className={cx('store-header')}>
-            <img src={`${API_HOST}${seller.avatar}`} alt={seller.name} />
-            <h3>{seller.name}</h3>
-            <p>{seller.full_address}</p>
-          </div>
+          <Link
+            to={{
+              pathname: `${routesConfig.store_information.replace(':id', seller.id)}`,
+            }}
+            state={{ shop_id: seller.id }}
+          >
+            <div className={cx('store-header')}>
+              <img src={`${API_HOST}${seller.avatar}`} alt={seller.name} />
+              <h3>{seller.name}</h3>
+              <p>{seller.full_address}</p>
+            </div>
+          </Link>
           <div className={cx('store-information')}>
             <div className={cx('d-flex', 'justify-content-between', 'store-number')}>
               <span className={cx('title')}>Sản phẩm</span>

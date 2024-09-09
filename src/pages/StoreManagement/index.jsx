@@ -5,39 +5,82 @@ import SubTitle from '~/components/Layout/SubTitle/SubTitle';
 import Home from './component/Home';
 import CreateProfile from './component/CreateProfile';
 import Order from './component/Order';
-import Price from './component/Price';
 import Message from './component/Message';
-import Product from './component/Product';
 import Statistics from './component/Statistics';
 import Customer from './component/Customer';
 import { imagesStore } from '~/assets/images';
+import ProductAll from './subComponent/ProductAll';
+import ProductAdd from './subComponent/ProductAdd';
+import ProductRemaining from './subComponent/ProductRemaining';
+import ProductSale from './subComponent/ProductSale';
+import SupplierAll from './subComponent/SupplierAll';
+import SupplierPrice from './subComponent/SupplierPrice';
+import SupplierPost from './subComponent/SupplierPost';
 
 const cx = classNames.bind(styles);
 
 function StoreManagement() {
   const [activeTab, setActiveTab] = useState('Create Profile');
+  const [isProductDropdownOpen, setProductDropdownOpen] = useState(false);
+  const [isSupplierDropdownOpen, setSupplierDropdownOpen] = useState(false);
+  const [activeSubItem, setActiveSubItem] = useState('');
 
   const renderContent = () => {
-    switch (activeTab) {
+    switch (activeSubItem) {
       case 'Home':
         return <Home />;
       case 'Create Profile':
         return <CreateProfile />;
       case 'Order':
         return <Order />;
-      case 'Price':
-        return <Price />;
       case 'Message':
         return <Message />;
-      case 'Product':
-        return <Product />;
       case 'Statistics':
         return <Statistics />;
       case 'Customer':
         return <Customer />;
+      case 'Product-All':
+        return <ProductAll />;
+      case 'Product-Add':
+        return <ProductAdd />;
+      case 'Product-Remaining':
+        return <ProductRemaining />;
+      case 'Product-Sale':
+        return <ProductSale />;
+      case 'Supplier-All':
+        return <SupplierAll />;
+      case 'Supplier-Price':
+        return <SupplierPrice />;
+      case 'Supplier-Post':
+        return <SupplierPost />;
       default:
-        return null;
+        return <CreateProfile />;
     }
+  };
+
+  const handleMainItemClick = (tab) => {
+    setActiveTab(tab);
+    setProductDropdownOpen(false);
+    setSupplierDropdownOpen(false);
+    setActiveSubItem(tab);
+  };
+
+  const toggleDropdown = (dropdownType) => {
+    if (dropdownType === 'product') {
+      setActiveTab('Product'); // Set active tab to Product
+      setProductDropdownOpen((prevState) => !prevState);
+      setSupplierDropdownOpen(false);
+      setActiveSubItem('Product-All');
+    } else if (dropdownType === 'supplier') {
+      setActiveTab('Supplier'); // Set active tab to Supplier
+      setSupplierDropdownOpen((prevState) => !prevState);
+      setProductDropdownOpen(false);
+      setActiveSubItem('Supplier-All');
+    }
+  };
+
+  const handleSubItemClick = (tab) => {
+    setActiveSubItem(tab);
   };
 
   return (
@@ -45,42 +88,107 @@ function StoreManagement() {
       <SubTitle />
       <div className={cx('store-management')}>
         <div className={cx('side-bar')}>
-          <div className={cx({ active: activeTab === 'Home' }, 'item-wrapper')} onClick={() => setActiveTab('Home')}>
+          <div
+            className={cx({ active: activeTab === 'Home' }, 'item-wrapper')}
+            onClick={() => handleMainItemClick('Home')}
+          >
             <img src={imagesStore.store_home} alt="Trang Chủ" />
             <span className={cx('title')}>Trang chủ</span>
           </div>
-          <div className={cx({ active: activeTab === 'Order' }, 'item-wrapper')} onClick={() => setActiveTab('Order')}>
+          <div
+            className={cx({ active: activeTab === 'Order' }, 'item-wrapper')}
+            onClick={() => handleMainItemClick('Order')}
+          >
             <img src={imagesStore.store_order} alt="Đơn Hàng" />
             <span className={cx('title')}>Đơn hàng</span>
           </div>
-          <div className={cx({ active: activeTab === 'Price' }, 'item-wrapper')} onClick={() => setActiveTab('Price')}>
-            <img src={imagesStore.store_price} alt="Yêu cầu báo giá" />
-            <span className={cx('title')}>Yêu cầu báo giá</span>
+          <div className={cx({ active: activeTab === 'Supplier' }, 'item-with-sub')}>
+            <div className={cx('item-wrapper')}>
+              <img src={imagesStore.store_price} alt="Yêu cầu báo giá" />
+              <span className={cx('title')} onClick={() => toggleDropdown('supplier')}>
+                Yêu cầu nhà cung cấp
+              </span>
+            </div>
+            {/* Submenu for Supplier */}
+            {isSupplierDropdownOpen && (
+              <div className={cx('dropdown')}>
+                <div
+                  className={cx('dropdown-item', { 'sub-item-active': activeSubItem === 'Supplier-All' })}
+                  onClick={() => handleSubItemClick('Supplier-All')}
+                >
+                  Tất cả yêu cầu
+                </div>
+                <div
+                  className={cx('dropdown-item', { 'sub-item-active': activeSubItem === 'Supplier-Price' })}
+                  onClick={() => handleSubItemClick('Supplier-Price')}
+                >
+                  Báo giá đã gửi
+                </div>
+                <div
+                  className={cx('dropdown-item', { 'sub-item-active': activeSubItem === 'Supplier-Post' })}
+                  onClick={() => handleSubItemClick('Supplier-Post')}
+                >
+                  Đăng yêu cầu
+                </div>
+              </div>
+            )}
           </div>
           <div
             className={cx({ active: activeTab === 'Message' }, 'item-wrapper')}
-            onClick={() => setActiveTab('Message')}
+            onClick={() => handleMainItemClick('Message')}
           >
             <img src={imagesStore.store_message} alt="Tin nhắn" />
             <span className={cx('title')}>Tin nhắn</span>
           </div>
-          <div
-            className={cx({ active: activeTab === 'Product' }, 'item-wrapper')}
-            onClick={() => setActiveTab('Product')}
-          >
-            <img src={imagesStore.store_product} alt="Sản phẩm" />
-            <span className={cx('title')}>Sản phẩm</span>
+          <div className={cx({ active: activeTab === 'Product' }, 'item-with-sub')}>
+            <div className={cx('item-wrapper')}>
+              <img src={imagesStore.store_product} alt="Sản phẩm" />
+              <div className={cx('sub-item', 'title-with-sub')}>
+                <span className={cx('title')} onClick={() => toggleDropdown('product')}>
+                  Sản phẩm
+                </span>
+              </div>
+            </div>
+            {/* Submenu for Products */}
+            {isProductDropdownOpen && (
+              <div className={cx('dropdown')}>
+                <div
+                  className={cx('dropdown-item', { 'sub-item-active': activeSubItem === 'Product-All' })}
+                  onClick={() => handleSubItemClick('Product-All')}
+                >
+                  Tất cả Sản phẩm
+                </div>
+                <div
+                  className={cx('dropdown-item', { 'sub-item-active': activeSubItem === 'Product-Add' })}
+                  onClick={() => handleSubItemClick('Product-Add')}
+                >
+                  Thêm sản phẩm
+                </div>
+                <div
+                  className={cx('dropdown-item', { 'sub-item-active': activeSubItem === 'Product-Remaining' })}
+                  onClick={() => handleSubItemClick('Product-Remaining')}
+                >
+                  Tồn kho
+                </div>
+                <div
+                  className={cx('dropdown-item', { 'sub-item-active': activeSubItem === 'Product-Sale' })}
+                  onClick={() => handleSubItemClick('Product-Sale')}
+                >
+                  Giảm giá
+                </div>
+              </div>
+            )}
           </div>
           <div
             className={cx({ active: activeTab === 'Statistics' }, 'item-wrapper')}
-            onClick={() => setActiveTab('Statistics')}
+            onClick={() => handleMainItemClick('Statistics')}
           >
             <img src={imagesStore.store_statistics} alt="Thống kê" />
             <span className={cx('title')}>Thống kê</span>
           </div>
           <div
             className={cx({ active: activeTab === 'Customer' }, 'item-wrapper')}
-            onClick={() => setActiveTab('Customer')}
+            onClick={() => handleMainItemClick('Customer')}
           >
             <img src={imagesStore.store_customer} alt="Khách hàng" />
             <span className={cx('title')}>Khách hàng</span>

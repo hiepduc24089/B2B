@@ -21,7 +21,7 @@
   flex-direction: column;
   gap: 8px;
   box-sizing: border-box;
-  max-width: 200px;
+
   img {
     width: 100%;
     height: auto;
@@ -87,6 +87,13 @@
 }
 @media screen and (max-width: 768px) {
   .product-wrapper {
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 10px;
+  }
+}
+@media screen and (max-width: 500px) {
+  .product-wrapper {
     grid-template-columns: repeat(2, 1fr);
+    grid-gap: 10px;
   }
 }

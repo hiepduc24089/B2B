@@ -6,14 +6,16 @@ import routesConfig from '~/config/routes';
 import { images } from '~/assets/images';
 import Search from '../Search/Search';
 import { useAuth } from '~/context/AuthContext';
+import { useStoreHeader } from '~/context/StoreHeaderContext';
 
 const cx = classNames.bind(styles);
 
 function Header() {
   const { isAuthenticated, user, logout } = useAuth();
+  const { isStoreHeaderVisible } = useStoreHeader();
 
   return (
-    <header className={cx('wrapper')}>
+    <header className={cx('wrapper', { 'no-box-shadow': isStoreHeaderVisible })}>
       <div className={cx('inner', 'container')}>
         <div className={cx('row', 'align-items-center', 'justify-content-between')}>
           <div className={cx('col-2')}>

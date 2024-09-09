@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import routesConfig from '~/config/routes';
 import Home from '~/pages/Home';
 import HotDeal from '~/pages/HotDeal';
@@ -14,6 +15,27 @@ import ProductDetails from '~/pages/ProductDetails';
 import Payment from '~/pages/Payment';
 import StoreManagement from '~/pages/StoreManagement';
 import StoreDetails from '~/pages/StoreDetails';
+import StoreInformation from '~/pages/StoreInformation';
+import StoreInformationMobile from '~/pages/StoreInformationMobile';
+import OrderDetail from '~/pages/OrderDetail';
+
+const useViewport = () => {
+  const [width, setWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleWindowResize = () => setWidth(window.innerWidth);
+    window.addEventListener('resize', handleWindowResize);
+    return () => window.removeEventListener('resize', handleWindowResize);
+  }, []);
+
+  return { width };
+};
+
+function StoreInformationWrapper() {
+  const { width } = useViewport();
+
+  return width > 992 ? <StoreInformation /> : <StoreInformationMobile />;
+}
 
 // Routes accessible without login
 const publicRoutes = [
@@ -29,6 +51,8 @@ const publicRoutes = [
   { path: routesConfig.foryou, component: ForYou },
   { path: routesConfig.product_details, component: ProductDetails },
   { path: routesConfig.store_details, component: StoreDetails },
+  { path: routesConfig.store_information, component: StoreInformationWrapper },
+  { path: routesConfig.order_detail, component: OrderDetail },
 ];
 
 // Routes accessible only after login

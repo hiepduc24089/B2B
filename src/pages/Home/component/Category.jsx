@@ -1,10 +1,12 @@
 import React, { useEffect, memo, useState } from 'react';
 import classNames from 'classnames/bind';
 import styles from '../Home.module.scss';
+import { Link } from 'react-router-dom';
+import routesConfig from '~/config/routes';
 import { imagesHome, imagesHotDeal } from '~/assets/images';
 import LoadingIndicator from '~/components/Loading';
-import { fetchCategory } from '~/api/home';
 import { API_HOST } from '~/config/host';
+import { fetchAllListCategory } from '~/api/requestsupplier';
 
 const cx = classNames.bind(styles);
 
@@ -22,11 +24,10 @@ function Category() {
 
   const fetchDataListCategoryAPI = async () => {
     try {
-      const data = await fetchCategory();
-
+      const data = await fetchAllListCategory();
       setState({
         loading: false,
-        dataListCategory: data.data.data,
+        dataListCategory: data.data,
       });
     } catch (error) {
       console.error('Error fetching category data:', error);
@@ -44,11 +45,17 @@ function Category() {
       return (
         <div className={cx('category-wrapper')}>
           {dataListCategory.map((category, index) => (
-            <div key={index} className={cx('category-item')}>
-              <img src={`${API_HOST}${category.src}`} alt={category.name} />
-              <h3>{category.name}</h3>
-              <p>{category.product_count} sản phẩm</p>
-            </div>
+            <Link
+              key={index}
+              to={`${routesConfig.category.replace(':slug', category.slug).replace(':id', category.id)}`}
+              state={{ category_id: category.id, category_name: category.name }}
+            >
+              <div className={cx('category-item')}>
+                <img src={`${API_HOST}${category.src}`} alt={category.name} />
+                <h3>{category.name}</h3>
+                <p>{category.product_count} sản phẩm</p>
+              </div>
+            </Link>
           ))}
         </div>
       );
@@ -71,11 +78,17 @@ function Category() {
       </div>
       <div className={cx('cate-wrapper')}>
         {dataListCategory.map((category, index) => (
-          <div key={index} className={cx('cate-item')}>
-            <img src={`${API_HOST}${category.src}`} alt={category.name} />
-            <h3>{category.name}</h3>
-            <p>{category.product_count} sản phẩm</p>
-          </div>
+          <Link
+            key={index}
+            to={`${routesConfig.category.replace(':slug', category.slug).replace(':id', category.id)}`}
+            state={{ category_id: category.id }}
+          >
+            <div className={cx('cate-item')}>
+              <img src={`${API_HOST}${category.src}`} alt={category.name} />
+              <h3>{category.name}</h3>
+              <p>{category.product_count} sản phẩm</p>
+            </div>
+          </Link>
         ))}
       </div>
     </div>
