@@ -4,6 +4,7 @@ export const apiURL = {
   verifyCode: '/api/verify-code',
   register: '/api/register',
   login: '/api/login',
+  logout: '/api/logout',
 
   // Location
   provinces: '/api/province',
@@ -23,6 +24,7 @@ export const apiURL = {
   postProduct: '/api/create-product',
   getProductByShopAtShop: '/api/get-product',
   updateProductDisplayStatus: (product_id) => `/api/update-product-display/${product_id}`,
+  postAskToBuy: '/api/save-ask-buy',
 
   //Payment
   addToCart: '/api/add-to-cart',
@@ -49,5 +51,9 @@ export const apiURL = {
   //Request Supplier
   getListRequestSuppier: '/api/get-request-supplier-user',
   getListPriceQuote: '/api/get-quotes',
+  getPriceQuoteDetail: (quote_id) => `/api/detail-quotes/${quote_id}`,
   getAllListCategory: '/api/category-product',
+  postRequestSupplier: '/api/create-request-supplier',
+  getDetailRequest: (request_id) => `/api/edit-request-supplier-user/${request_id}`,
+  postCreateQuote: '/api/create-quotes',
 };

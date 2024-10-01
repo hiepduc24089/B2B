@@ -116,7 +116,12 @@ function ProductAdd() {
 
     try {
       const response = await postProduct(formData);
-      console.log('Product posted successfully:', response);
+
+      if (!response.status) {
+        alert('Đăng sản phẩm thất bại.');
+        return;
+      }
+
       alert('Sản phẩm đã được đăng thành công!');
     } catch (error) {
       console.error('Failed to post product:', error);

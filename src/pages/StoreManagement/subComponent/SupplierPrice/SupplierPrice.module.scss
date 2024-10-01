@@ -55,6 +55,100 @@
     }
   }
 }
+.overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: flex-end;
+  z-index: 9999;
+}
+
+.sidebar {
+  width: 50%;
+  height: fit-content;
+  background-color: var(--white);
+  transition: transform 0.3s ease-in-out;
+  transform: translateX(0);
+  position: relative;
+  top: 25%;
+  left: -25%;
+}
+.quote-wrapper {
+  padding: 16px;
+  .double-input {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 20px;
+  }
+  .single-input {
+    width: 50%;
+    display: flex;
+    justify-content: space-between;
+  }
+  .label-field {
+    color: var(--black);
+    font-size: 16px;
+    font-weight: 400;
+    margin-bottom: 0;
+    width: 100%;
+    margin-bottom: 3px;
+  }
+  .input-field {
+    color: var(--black);
+    font-size: 16px;
+    font-weight: 400;
+    border-radius: 8px;
+    border: 0.5px solid var(--grey-light);
+    background: var(--white);
+    padding: 8px 8px;
+    width: 100%;
+    outline: unset;
+  }
+  .label-bold {
+    color: var(--black);
+    font-size: 16px;
+    font-weight: 600;
+  }
+  .input-bold {
+    color: var(--black);
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 50px;
+    h1 {
+      color: var(--black);
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 0;
+    }
+  }
+  .quote-detail-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    h3 {
+      color: var(--black);
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 0;
+    }
+  }
+}
+
+@media screen and (max-width: 1200px) {
+  .sidebar {
+    width: 75%;
+    left: -13%;
+  }
+}
 
 @media screen and (max-width: 1024px) {
   .price-quote-wrapper {
@@ -76,6 +170,42 @@
       }
       .show-detail {
         margin: 10px auto 0;
+      }
+    }
+  }
+  .sidebar {
+    width: 100%;
+    left: 0;
+  }
+  .quote-wrapper {
+    padding: 8px;
+    .label-field,
+    .label-bold,
+    .input-bold {
+      font-size: 14px;
+    }
+    .input-field {
+      font-size: 14px;
+      padding: 6px 8px;
+    }
+    .double-input {
+      grid-template-columns: repeat(1, 1fr);
+      grid-gap: 10px;
+    }
+    .single-input {
+      width: 100%;
+    }
+
+    .header {
+      margin-bottom: 20px;
+      h1 {
+        font-size: 18px;
+      }
+    }
+    .quote-detail-wrapper {
+      gap: 12px;
+      h3 {
+        font-size: 16px;
       }
     }
   }

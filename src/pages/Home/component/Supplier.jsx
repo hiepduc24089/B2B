@@ -63,21 +63,23 @@ function Supplier() {
       return (
         <div className={cx('supplier-wrapper')}>
           {dataListSupplier.map((supplier, index) => (
-            <div key={index} className={cx('supplier-item')}>
-              <div className={cx('d-flex', 'align-items-center')}>
-                <img src={`${API_HOST}${supplier.src[0]}`} alt="Supplier Image" className={cx('supplier-image')} />
-                <div className={cx('supplier-text')}>
-                  <h3>{supplier.name}</h3>
-                  <Link to={'#'} className={cx('find-supplier')}>
-                    Tìm nhà cung cấp
-                  </Link>
-                  <span className={cx('d-flex', 'align-items-center', 'supplier-location')}>
-                    <img src={imagesHome.supplier_location} alt="Location" />
-                    {supplier.scope_name}
-                  </span>
+            <Link key={index} to={`${routesConfig.supplier_detail.replace(':id', supplier.id)}`}>
+              <div key={index} className={cx('supplier-item')}>
+                <div className={cx('d-flex', 'align-items-center')}>
+                  <img src={`${API_HOST}${supplier.src[0]}`} alt="Supplier Image" className={cx('supplier-image')} />
+                  <div className={cx('supplier-text')}>
+                    <h3>{supplier.name}</h3>
+                    <Link to={'#'} className={cx('find-supplier')}>
+                      Tìm nhà cung cấp
+                    </Link>
+                    <span className={cx('d-flex', 'align-items-center', 'supplier-location')}>
+                      <img src={imagesHome.supplier_location} alt="Location" />
+                      {supplier.scope_name}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       );

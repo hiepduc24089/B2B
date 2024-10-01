@@ -62,6 +62,10 @@ import backIcon from './all/back-icon.svg';
 import locationIcon from './all/location-icon.svg';
 import callIconWhite from './all/call-icon-white.svg';
 import productNote from './storemanagement/product-note.svg';
+import success from './popup/success.svg';
+import warning from './popup/warning.svg';
+import failed from './popup/failed.png';
+import closePopup from './popup/close-popup.svg';
 
 export const images = {
   logo,
@@ -152,4 +156,11 @@ export const imagesStore = {
   new_avatar_icon,
   new_introduce_image,
   productNote,
+};
+
+export const imagesPopup = {
+  success,
+  warning,
+  failed,
+  closePopup,
 };

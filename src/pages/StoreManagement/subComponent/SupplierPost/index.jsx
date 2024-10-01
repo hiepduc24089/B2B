@@ -4,6 +4,7 @@ import styles from './SupplierPost.module.scss';
 import { imagesStore } from '~/assets/images';
 import { fetchProvinces } from '~/api/province';
 import LoadingIndicator from '~/components/Loading';
+import { postRequestSupplier } from '~/api/requestsupplier';
 
 const cx = classNames.bind(styles);
 
@@ -16,6 +17,13 @@ function SupplierPost() {
   const [selectedImages, setSelectedImages] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState([]); // To hold the actual image files
   const { loading, dataListCity } = state;
+
+  const [inputCity, setInputCity] = useState('');
+  const [inputDate, setInputDate] = useState('');
+  const [inputInformation, setInputInformation] = useState('');
+  const [inputQuantity, setInputQuantity] = useState('');
+  const [inputTitle, setInputTitle] = useState('');
+  const [inputContent, setInputContent] = useState('');
 
   const handleFileChange = (event) => {
     const files = Array.from(event.target.files);
@@ -46,6 +54,35 @@ function SupplierPost() {
     }
   };
 
+  const handleSubmit = async () => {
+    const formData = new FormData();
+    formData.append('scope', inputCity);
+    formData.append('date_end', inputDate);
+    formData.append('phone', inputInformation);
+    formData.append('quantity', inputQuantity);
+    formData.append('name', inputTitle);
+    formData.append('content', inputContent);
+
+    // Append images
+    selectedFiles.forEach((file, index) => {
+      formData.append(`src[${index}]`, file);
+    });
+
+    try {
+      const response = await postRequestSupplier(formData);
+
+      if (!response.status) {
+        alert('Đăng yêu cầu thất bại.');
+        return;
+      }
+
+      alert('Yêu cầu đã được đăng thành công!');
+    } catch (error) {
+      console.error('Failed to post product:', error);
+      alert('Đăng yêu cầu thất bại.');
+    }
+  };
+
   return (
     <>
       <div className={cx('supplier-notes')}>
@@ -54,7 +91,7 @@ function SupplierPost() {
           <div className={cx('note-text')}>
             <h3 className={cx('title')}>Để được KIỂM DUYỆT, nội dung tin cần có:</h3>
             <p>- Mô tả về sản phẩm cần tìm </p>
-            <p>- Hình ảnh sản phẩml</p>
+            <p>- Hình ảnh sản phẩm</p>
             <p>Lưu ý: mọi tin đăng bán sản phẩm sẽ không được duyệt</p>
           </div>
         </div>
@@ -64,15 +101,13 @@ function SupplierPost() {
         <div className={cx('w-100', 'double-input')}>
           <div>
             <label className={cx('label-field')}>Khu vực ưu tiên</label>
-            <select className={cx('input-field')}>
-              <option value="all">Toàn Quốc</option>
+            <select className={cx('input-field')} onChange={(e) => setInputCity(e.target.value)}>
+              <option value="0">Toàn Quốc</option>
               {loading ? (
-                <option>
-                  <LoadingIndicator />
-                </option>
+                <option disabled>Loading...</option>
               ) : (
                 dataListCity.map((city, index) => (
-                  <option key={index} value={city.id}>
+                  <option key={index} value={city.province_id}>
                     {city.name}
                   </option>
                 ))
@@ -81,26 +116,52 @@ function SupplierPost() {
           </div>
           <div>
             <label className={cx('label-field')}>Hạn bài đăng</label>
-            <input type="date" placeholder="01/01/2024" className={cx('input-field')} />
+            <input
+              type="date"
+              placeholder="01/01/2024"
+              className={cx('input-field')}
+              onChange={(e) => setInputDate(e.target.value)}
+            />
           </div>
         </div>
         <div className={cx('w-100', 'double-input')}>
           <div>
             <label className={cx('label-field')}>Thông tin liên hệ của bạn</label>
-            <input type="text" placeholder="0379357213" className={cx('input-field')} />
+            <input
+              type="text"
+              placeholder="0379357213"
+              className={cx('input-field')}
+              onChange={(e) => setInputInformation(e.target.value)}
+            />
           </div>
           <div>
             <label className={cx('label-field')}>Số lượng mua</label>
-            <input type="number" placeholder="15" className={cx('input-field')} />
+            <input
+              type="number"
+              placeholder="15"
+              className={cx('input-field')}
+              onChange={(e) => setInputQuantity(e.target.value)}
+            />
           </div>
         </div>
         <div className={cx('name-wrapper', 'w-100')}>
           <label className={cx('label-field')}>Tiêu đề bài đăng</label>
-          <input type="text" placeholder="VD: tìm nhà cung cấp thuốc" className={cx('input-field')} />
+          <input
+            type="text"
+            placeholder="VD: tìm nhà cung cấp thuốc"
+            className={cx('input-field')}
+            onChange={(e) => setInputTitle(e.target.value)}
+          />
         </div>
         <div className={cx('describe-wrapper', 'w-100')}>
           <label className={cx('label-field')}>Nội dung bài đăng</label>
-          <textarea type="text" rows={3} placeholder="Viết nội dung bài đăng" className={cx('input-field')}></textarea>
+          <textarea
+            type="text"
+            rows={3}
+            placeholder="Viết nội dung bài đăng"
+            className={cx('input-field')}
+            onChange={(e) => setInputContent(e.target.value)}
+          ></textarea>
         </div>
       </div>
       <div className={cx('image-information', 'box-wrapper')}>
@@ -126,7 +187,9 @@ function SupplierPost() {
       </div>
 
       <div className={cx('submit-btn')}>
-        <button className={cx('post-supplier')}>Đăng bài</button>
+        <button className={cx('post-supplier')} onClick={handleSubmit}>
+          Đăng bài
+        </button>
       </div>
     </>
   );

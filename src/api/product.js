@@ -82,3 +82,22 @@ export const updateProductDisplay = async (product_id, display) => {
     throw error;
   }
 };
+
+//Ask to buy
+export const postAskToBuyRequest = async (askToBuyData) => {
+  try {
+    const token = localStorage.getItem('token');
+
+    const response = await postData(apiURL.postAskToBuy, askToBuyData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return response;
+  } catch (error) {
+    console.error('Failed to ask to buy:', error);
+    throw error;
+  }
+};

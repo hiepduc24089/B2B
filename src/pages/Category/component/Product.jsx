@@ -8,7 +8,7 @@ import { API_HOST } from '~/config/host';
 
 const cx = classNames.bind(styles);
 
-function Product({ loading, dataListProduct }) {
+function Product({ loading, dataListProduct, category_name }) {
   function formatPrice(price) {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   }
@@ -59,7 +59,7 @@ function Product({ loading, dataListProduct }) {
 
   return (
     <>
-      <h2>Deal HOT hôm nay</h2>
+      <h2>{category_name}</h2>
       {renderContent()}
     </>
   );

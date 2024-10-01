@@ -5,6 +5,8 @@ import styles from './Register.module.scss';
 import { images } from '~/assets/images';
 import { confirmEmail, verifyEmailCode } from '~/api/loginregister';
 import routesConfig from '~/config/routes';
+import Failed from '~/components/Layout/Popup/Failed';
+import Success from '~/components/Layout/Popup/Success';
 
 const cx = classNames.bind(styles);
 
@@ -18,7 +20,14 @@ function Register() {
   });
 
   const [error, setError] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [phoneError, setPhoneError] = useState('');
+  const [nameError, setNameError] = useState('');
+  const [emailCodeError, setEmailCodeError] = useState('');
   const [isEmailVerified, setIsEmailVerified] = useState(false);
+  const [showFailed, setShowFailed] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [emailSent, setEmailSent] = useState(false); // New state to track if email has been sent
 
   // Function to handle input change
   const handleChange = (e) => {
@@ -27,12 +36,17 @@ function Register() {
       ...formData,
       [name]: value,
     });
+
+    if (name === 'email') {
+      setEmailSent(false);
+      setIsEmailVerified(false);
+    }
   };
 
   // Function to handle email verification
   const handleEmailVerification = async () => {
     if (!formData.email) {
-      setError('Vui lòng nhập Email');
+      setEmailError('Vui lòng nhập Email');
       return;
     }
 
@@ -42,29 +56,51 @@ function Register() {
 
       if (!sendConfirmEmail) {
         alert(sendConfirmEmail.message);
+        return;
       }
 
-      alert('Mã xác nhận đã được gửi đến email của bạn');
+      //Success message
+      setSuccessMessage('Mã xác nhận đã được gửi, vui lòng kiểm tra Email');
+
       setIsEmailVerified(true);
+      setEmailSent(true);
     } catch (error) {
-      setError(error.message);
+      setEmailError(error.message);
     }
   };
 
   // Function to handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     // Validate input fields
-    if (!formData.name || !formData.phone || !formData.email || !formData.emailCode) {
-      setError('Cần nhập các tất cả các trường.');
-      return;
+    let hasError = false;
+
+    if (!formData.name) {
+      setNameError('Vui lòng nhập tên của bạn');
+      hasError = true;
+    }
+
+    if (!formData.phone) {
+      setPhoneError('Vui lòng nhập số điện thoại');
+      hasError = true;
+    }
+
+    if (!formData.email) {
+      setEmailError('Vui lòng nhập email');
+      hasError = true;
+    }
+
+    if (!formData.emailCode) {
+      setEmailCodeError('Vui lòng nhập mã xác nhận email');
+      hasError = true;
     }
 
     if (!isEmailVerified) {
       setError('Vui lòng xác thực Email trước khi tiếp tục.');
       return;
     }
+
+    if (hasError) return;
 
     setError('');
 
@@ -75,98 +111,127 @@ function Register() {
       });
 
       if (!verificationResult.status) {
-        alert(verificationResult.message); // Show alert if verification fails
+        setShowFailed(true);
         return;
       }
 
-      alert('Xác nhận thành công, vui lòng tiếp tục!');
-
       navigate(routesConfig.select_password, {
-        state: { name: formData.name, email: formData.email, phone: formData.phone },
+        state: {
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          successMessage: 'Xác nhận thành công, vui lòng tiếp tục!',
+        },
       });
     } catch (error) {
       setError(error.message);
     }
   };
 
+  const closeFailedPopup = () => {
+    setShowFailed(false);
+  };
+
+  const closeSuccessPopup = () => {
+    setSuccessMessage('');
+  };
+
   return (
-    <div className={cx('login-wrapper')}>
-      <img src={images.login_background} alt="Login Background" className={cx('login-background')} />
-      <div className={cx('login-details')}>
-        <div className={cx('login-details-wrapper')}>
-          <h1 className={cx('title')}>Shopping Mall</h1>
-          <div className={cx('login-form')}>
-            <h5>Đăng ký</h5>
-            <p className={cx('slogan')}>Mua thuốc sỉ giá tốt cùng với shopping mall</p>
-            <form onSubmit={handleSubmit}>
-              <div className={cx('form-wrapper')}>
-                <input
-                  type="text"
-                  required
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  className={cx('form-input-login')}
-                />
-                <label className={cx('form-label')}>Tên của bạn</label>
-              </div>
-              <div className={cx('form-wrapper', 'margin-top-24')}>
-                <input
-                  type="text"
-                  required
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  className={cx('form-input-login')}
-                />
-                <label className={cx('form-label')}>Số điện thoại</label>
-              </div>
-              <div className={cx('form-wrapper', 'margin-top-24')}>
-                <input
-                  type="text"
-                  required
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className={cx('form-input-login')}
-                />
-                <label className={cx('form-label')}>Email</label>
-              </div>
-              <div className={cx('form-wrapper', 'margin-top-24')}>
-                <div className={cx('d-flex', 'justify-content-between', 'flex-wrap')}>
+    <>
+      <div className={cx('login-wrapper')}>
+        <img src={images.login_background} alt="Login Background" className={cx('login-background')} />
+        <div className={cx('login-details')}>
+          <div className={cx('login-details-wrapper')}>
+            <h1 className={cx('title')}>Shopping Mall</h1>
+            <div className={cx('login-form')}>
+              <h5>Đăng ký</h5>
+              <p className={cx('slogan')}>Mua thuốc sỉ giá tốt cùng với shopping mall</p>
+              <form onSubmit={handleSubmit}>
+                <div className={cx('form-wrapper')}>
                   <input
                     type="text"
-                    required
-                    name="emailCode"
-                    value={formData.emailCode}
+                    name="name"
+                    value={formData.name}
                     onChange={handleChange}
-                    className={cx('form-input-login', 'email-confirm-input')}
+                    className={cx('form-input-login')}
+                    placeholder="Tên của bạn"
                   />
-                  <button
-                    type="button"
-                    className={cx('email-confirm')}
-                    onClick={handleEmailVerification} // Trigger email verification
-                  >
-                    Lấy mã xác nhận
-                  </button>
+                  <label className={cx('form-label')}>Tên của bạn</label>
+                  {nameError && <p className={cx('error-message')}>{nameError}</p>}
                 </div>
-                <label className={cx('form-label')}>Mã xác nhận Email</label>
-              </div>
-              {error && <p className={cx('error-message')}>{error}</p>}
-              <button type="submit" className={cx('login-btn')}>
-                Tiếp tục
-              </button>
-              <div className={cx('agree-wrapper')}>
-                <input type="checkbox" className={cx('agree')} />
-                <label>
-                  Đồng ý với <span>Chính sách bảo mật và điều khoản sử dụng</span>
-                </label>
-              </div>
-            </form>
+
+                <div className={cx('form-wrapper', 'margin-top-24')}>
+                  <input
+                    type="text"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    className={cx('form-input-login')}
+                    placeholder="Số điện thoại"
+                  />
+                  <label className={cx('form-label')}>Số điện thoại</label>
+                  {phoneError && <p className={cx('error-message')}>{phoneError}</p>}
+                </div>
+
+                <div className={cx('form-wrapper', 'margin-top-24')}>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className={cx('form-input-login')}
+                    placeholder="Email"
+                  />
+                  <label className={cx('form-label')}>Email</label>
+                  {emailError && <p className={cx('error-message')}>{emailError}</p>}
+                </div>
+
+                <div className={cx('form-wrapper', 'margin-top-24')}>
+                  <div className={cx('d-flex', 'justify-content-between', 'flex-wrap')}>
+                    <input
+                      type="text"
+                      name="emailCode"
+                      value={formData.emailCode}
+                      onChange={handleChange}
+                      className={cx('form-input-login', 'email-confirm-input')}
+                      placeholder="Mã xác nhận Email"
+                    />
+                    <button
+                      type="button"
+                      className={cx('email-confirm', isEmailVerified ? 'email-confirm-before' : 'email-confirm-first')}
+                      onClick={handleEmailVerification}
+                      disabled={emailSent}
+                    >
+                      {emailSent ? 'Đã gửi mã xác nhận' : 'Lấy mã xác nhận'}
+                    </button>
+                  </div>
+                  <label className={cx('form-label')}>Mã xác nhận Email</label>
+                  {emailCodeError && <p className={cx('error-message')}>{emailCodeError}</p>}
+                </div>
+
+                {error && <p className={cx('error-message')}>{error}</p>}
+
+                <button type="submit" className={cx('login-btn')}>
+                  Tiếp tục
+                </button>
+
+                <div className={cx('agree-wrapper')}>
+                  <input type="checkbox" className={cx('agree')} required />
+                  <label>
+                    Đồng ý với <span>Chính sách bảo mật và điều khoản sử dụng</span>
+                  </label>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+      {/* Show Failed popup  */}
+      {showFailed && <Failed message="Vui lòng thử lại" onClose={closeFailedPopup} />}
+
+      {/* Show Success popup */}
+      {successMessage && <Success message={successMessage} onClose={closeSuccessPopup} />}
+    </>
   );
 }
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import styles from './Header.module.scss';
@@ -7,12 +7,15 @@ import { images } from '~/assets/images';
 import Search from '../Search/Search';
 import { useAuth } from '~/context/AuthContext';
 import { useStoreHeader } from '~/context/StoreHeaderContext';
+import Tippy from '@tippyjs/react';
+import { Wrapper as PopperWrapper } from '~/components/Layout/Popper';
 
 const cx = classNames.bind(styles);
 
 function Header() {
-  const { isAuthenticated, user, logout } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const { isStoreHeaderVisible } = useStoreHeader();
+  const [isExpanded, setIsExpanded] = useState(false);
 
   return (
     <header className={cx('wrapper', { 'no-box-shadow': isStoreHeaderVisible })}>
@@ -41,9 +44,29 @@ function Header() {
               <div className={cx('text-center', 'user-icon')}>
                 <img src={images.user} alt="User Icon" />
                 {isAuthenticated ? (
-                  <Link to={routesConfig.profile} className={cx('icon-link')}>
-                    <p>{user.name}</p>
-                  </Link>
+                  <Tippy
+                    interactive={true}
+                    placement="bottom-end"
+                    hideOnClick={false}
+                    delay={[0, 700]}
+                    offset={[12, 8]}
+                    onShow={() => setIsExpanded(true)}
+                    onHide={() => setIsExpanded(false)}
+                    render={(attrs) => (
+                      <div
+                        className={cx('menu-dropdown')}
+                        tabIndex="-1"
+                        {...attrs}
+                        style={{ display: isExpanded ? 'block' : 'none' }}
+                      >
+                        <PopperWrapper />
+                      </div>
+                    )}
+                  >
+                    <Link to={routesConfig.profile} className={cx('icon-link')} aria-expanded={isExpanded}>
+                      <p>{user.name}</p>
+                    </Link>
+                  </Tippy>
                 ) : (
                   <p>
                     <Link to={routesConfig.login} className={cx('icon-link')}>

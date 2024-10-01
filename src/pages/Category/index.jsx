@@ -61,7 +61,7 @@ function Category() {
             </div>
           </Header>
           <Content className={cx('product')}>
-            <Product loading={loading} dataListProduct={dataListProduct} />
+            <Product loading={loading} dataListProduct={dataListProduct} category_name={category_name} />
           </Content>
         </Layout>
       </Layout>

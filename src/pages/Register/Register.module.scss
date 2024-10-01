@@ -74,14 +74,21 @@
     .email-confirm-input {
       width: 60%;
     }
+    .email-confirm-first {
+      color: var(--white);
+      background: var(--primary);
+    }
+    .email-confirm-before {
+      color: var(--grey-dark);
+      background: var(--grey-light);
+    }
     .email-confirm {
       width: 30%;
-      color: var(--grey-dark);
+
       font-size: 14px;
       font-weight: 600;
       border: none;
       border-radius: 63px;
-      background: var(--grey-light);
     }
     .login-btn {
       border-radius: 63px;
@@ -114,6 +121,14 @@
     }
   }
 }
+.error-message {
+  margin-bottom: 0;
+  margin-top: 3px;
+  color: red;
+  font-size: 12px;
+  font-weight: 500;
+}
+
 @media screen and (max-width: 1200px) {
   .login-details {
     width: 50%;
