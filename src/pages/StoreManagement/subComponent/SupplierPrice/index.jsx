@@ -131,7 +131,7 @@ function SupplierPrice() {
             </div>
             <div className={cx('single-input')}>
               <label className={cx('label-bold')}>Giá đưa ra:</label>
-              <span className={cx('input-bold')}>{formatPrice(dataQuoteDetail.price)}VNĐ</span>
+              <span className={cx('input-bold')}>{formatPrice(dataQuoteDetail.price)} VNĐ</span>
             </div>
             <div className={cx('single-input', 'flex-wrap')}>
               <label className={cx('label-field', 'w-100')}>Địa chỉ</label>
@@ -156,6 +156,8 @@ function SupplierPrice() {
         <div className={cx('price-quote-wrapper')}>
           {errorPriceQuote ? (
             <div className={cx('error-message')}>{errorPriceQuote}</div>
+          ) : dataPriceQuote.length === 0 ? (
+            <h5>Không có dữ liệu</h5>
           ) : (
             dataPriceQuote.map((quote, index) => (
               <div key={index} className={cx('list-quote')}>
@@ -170,7 +172,7 @@ function SupplierPrice() {
                       Số lượng mua: <span className={cx('text-black')}>{quote.request_quantity}</span>
                     </span>
                     <span className={cx('text-grey', 'price')}>
-                      Giá: <span className={cx('text-black')}>{quote.price}</span>
+                      Giá: <span className={cx('text-black')}>{formatPrice(quote.price)} VNĐ</span>
                     </span>
                     <span className={cx('text-grey', 'content')}>
                       Bài đăng: <span className={cx('text-black')}>{quote.content}</span>
@@ -183,7 +185,6 @@ function SupplierPrice() {
               </div>
             ))
           )}
-
           {/* Modal for showing details */}
           {showModal && (
             <div className={cx('overlay')} onClick={handleCloseModal}>

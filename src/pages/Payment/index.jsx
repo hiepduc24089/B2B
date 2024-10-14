@@ -6,6 +6,10 @@ import LoadingIndicator from '~/components/Loading';
 import { images, imagesCart, imagesFooter, imagesPayment } from '~/assets/images';
 import { createPayment } from '~/api/payment';
 import { API_HOST } from '~/config/host';
+import ModalAddAddress from './component/ModalAddAddress';
+import { deleteUserAddress, fetchAddress, updateDefaultAddress } from '~/api/address';
+import Warning from '~/components/Layout/Popup/Warning';
+import ModalEditAddress from './component/ModalEditAddress';
 
 const cx = classNames.bind(styles);
 
@@ -13,11 +17,109 @@ function Payment() {
   const { state } = useLocation();
   const { checkoutData } = state || {};
   const [loading, setLoading] = useState(true);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const handleShowAddModal = () => setShowAddModal(true);
+  const handleCloseAddModal = () => setShowAddModal(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [selectedShipping, setSelectedShipping] = useState({});
   const [paymentType, setPaymentType] = useState(1);
   const [usePoints, setUsePoints] = useState(false);
   const [deliveryAddress, setDeliveryAddress] = useState(1);
   const [exchangePoints, setExchangePoints] = useState(0);
+
+  //Get address
+  const [stateAddress, setStateAddress] = useState({
+    loadingAddress: true,
+    dataListAddress: [],
+  });
+  const { loadingAddress, dataListAddress } = stateAddress;
+
+  useEffect(() => {
+    const getListAddress = async () => {
+      try {
+        const getAddressResponse = await fetchAddress();
+
+        if (!getAddressResponse.status) {
+          alert('Lấy thông tin địa chỉ thất bại, vui lòng thử lại');
+          return;
+        }
+
+        setStateAddress({
+          loadingAddress: false,
+          dataListAddress: getAddressResponse.data,
+        });
+      } catch (error) {
+        console.error('Fetch order failed:', error);
+        alert('Lấy thông tin địa chỉ thất bại, vui lòng thử lại');
+      }
+    };
+    getListAddress();
+  }, []);
+
+  const [showWarning, setShowWarning] = useState(false);
+  const [selectedAddressID, setSelectedAddressID] = useState(null);
+
+  const handleShowWarning = (addressID) => {
+    setSelectedAddressID(addressID);
+    setShowWarning(true);
+  };
+
+  const handleShowEditModal = (id) => {
+    setSelectedAddressID(id);
+    setShowEditModal(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setShowEditModal(false);
+    setSelectedAddressID(null);
+  };
+
+  const handleUpdateDefaultAddress = async () => {
+    try {
+      const responseUpdateAddress = await updateDefaultAddress(selectedAddressID);
+
+      if (!responseUpdateAddress.status) {
+        alert('Cập nhật địa chỉ thất bại.');
+        return;
+      }
+      alert('Địa chỉ mặc định đã được cập nhật thành công.');
+      setTimeout(() => {
+        window.location.reload();
+      }, 300);
+    } catch (error) {
+      console.error('Failed to update address:', error);
+      alert('Cập nhật địa chỉ thất bại.');
+    } finally {
+      setShowWarning(false);
+    }
+  };
+
+  const [showDeleteWarning, setShowDeleteWarning] = useState(false);
+  const [addressToDelete, setAddressToDelete] = useState(null);
+
+  const handleDeleteAddress = (addressID) => {
+    setAddressToDelete(addressID);
+    setShowDeleteWarning(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      const response = await deleteUserAddress(addressToDelete);
+      if (response.status) {
+        const updatedAddress = dataListAddress.filter((address) => address.id !== addressToDelete);
+        setStateAddress({ ...stateAddress, dataListAddress: updatedAddress });
+        alert('Địa chỉ đã được xóa thành công!');
+      } else {
+        alert('Xóa địa chỉ thất bại. Vui lòng thử lại.');
+      }
+    } catch (error) {
+      console.error('Failed to delete address:', error);
+      alert('Xóa địa chỉ thất bại. Vui lòng thử lại.');
+    } finally {
+      setShowDeleteWarning(false);
+      setAddressToDelete(null);
+    }
+  };
 
   useEffect(() => {
     setTimeout(() => {
@@ -190,20 +292,44 @@ function Payment() {
           <h3>Vận Chuyển</h3>
           <div className={cx('d-flex')}>
             <span className={cx('select-location-text')}>Chọn địa chỉ giao hàng bên dưới hoặc</span>
-            <span className={cx('text-primary', 'add-new')}>Thêm mới</span>
+            <span className={cx('text-primary', 'add-new')} onClick={handleShowAddModal}>
+              Thêm mới
+            </span>
           </div>
+          <ModalAddAddress showModal={showAddModal} handleCloseModal={handleCloseAddModal} />
           <div className={cx('box-infor-wrapper')}>
-            <div className={cx('box-infor')}>
-              <h5>Trần Đình Phi - 0379357213</h5>
-              <p className={cx('location-details')}>90 Hoàng Ngân, Trung Hoà, Cầu Giấy, Hà Nội</p>
-              <div className={cx('d-flex', 'justify-content-between')}>
-                <button className={cx('select-location')}>Giao đến địa chỉ này</button>
-                <div className={cx('action-icon')}>
-                  <img src={images.edit_icon} alt="Edit" />
-                  <img src={images.delete_icon} alt="Delete" />
+            {loadingAddress ? (
+              <LoadingIndicator />
+            ) : (
+              dataListAddress.map((dataAddress, index) => (
+                <div key={index} className={cx('box-infor')}>
+                  <h5>
+                    {dataAddress.name} - {dataAddress.phone}
+                  </h5>
+                  <p className={cx('location-details')}>{dataAddress.full_address}</p>
+                  <div className={cx('d-flex', 'justify-content-between')}>
+                    {dataAddress.display == 1 ? (
+                      <button className={cx('default-location')}>Địa chỉ mặc định</button>
+                    ) : (
+                      <button className={cx('select-location')} onClick={() => handleShowWarning(dataAddress.id)}>
+                        Giao đến địa chỉ này
+                      </button>
+                    )}
+                    <div className={cx('action-icon')}>
+                      <img src={images.edit_icon} alt="Edit" onClick={() => handleShowEditModal(dataAddress.id)} />
+                      {showEditModal && selectedAddressID === dataAddress.id && (
+                        <ModalEditAddress
+                          showModal={showEditModal}
+                          handleCloseModal={handleCloseEditModal}
+                          addressID={selectedAddressID}
+                        />
+                      )}
+                      <img src={images.delete_icon} alt="Delete" onClick={() => handleDeleteAddress(dataAddress.id)} />
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
+              ))
+            )}
           </div>
         </div>
         {/* Store And Product Information */}
@@ -275,6 +401,20 @@ function Payment() {
           Đặt Mua
         </button>
       </div>
+      {showWarning && (
+        <Warning
+          message="Bạn có muốn thay đổi địa chỉ mặc định?"
+          onClose={() => setShowWarning(false)}
+          onOk={handleUpdateDefaultAddress}
+        />
+      )}
+      {showDeleteWarning && (
+        <Warning
+          message="Bạn có muốn xoá địa chỉ này?"
+          onClose={() => setShowDeleteWarning(false)}
+          onOk={handleConfirmDelete}
+        />
+      )}
     </div>
   );
 }

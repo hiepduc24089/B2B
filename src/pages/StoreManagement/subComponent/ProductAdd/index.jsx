@@ -9,7 +9,7 @@ import { postProduct } from '~/api/product';
 
 const cx = classNames.bind(styles);
 
-function ProductAdd() {
+function ProductAdd({ onSubmitSuccess }) {
   const [state, setState] = useState({
     loading: true,
     dataListCategory: [],
@@ -35,6 +35,14 @@ function ProductAdd() {
     const imageUrls = files.map((file) => URL.createObjectURL(file));
     setSelectedImages([...selectedImages, ...imageUrls]);
     setSelectedFiles([...selectedFiles, ...files]); // Store the files for FormData
+  };
+
+  const handleRemoveImage = (indexToRemove) => {
+    const updatedImages = selectedImages.filter((_, index) => index !== indexToRemove);
+    setSelectedImages(updatedImages);
+
+    const updatedFiles = selectedFiles.filter((_, index) => index !== indexToRemove);
+    setSelectedFiles(updatedFiles);
   };
 
   const handleAddPriceTier = () => {
@@ -123,6 +131,9 @@ function ProductAdd() {
       }
 
       alert('Sản phẩm đã được đăng thành công!');
+      if (onSubmitSuccess) {
+        onSubmitSuccess();
+      }
     } catch (error) {
       console.error('Failed to post product:', error);
       alert('Đăng sản phẩm thất bại.');
@@ -245,6 +256,9 @@ function ProductAdd() {
           {selectedImages.map((image, index) => (
             <div key={index} className={cx('image-preview-wrapper')}>
               <img src={image} alt={`Preview ${index}`} className={cx('image-preview')} />
+              <button className={cx('remove-image-button')} onClick={() => handleRemoveImage(index)}>
+                X
+              </button>
             </div>
           ))}
           <label className={cx('file-input-label')} htmlFor="file-input">

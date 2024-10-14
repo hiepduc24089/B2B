@@ -56,7 +56,7 @@ function SupplierDetail() {
         </div>
         <div className={cx('store-details')}>
           {!loading && requestSupplier ? (
-            <Store requestSupplier={requestSupplier.user} loading={loading} />
+            <Store requestSupplier={requestSupplier.user} loading={loading} requestSupplierID={id} />
           ) : (
             <p>Loading store details...</p>
           )}

@@ -3,8 +3,9 @@ import classNames from 'classnames/bind';
 import styles from './Supplier.module.scss';
 import { imagesHome, imagesSupplier } from '~/assets/images';
 import LoadingIndicator from '~/components/Loading';
-import { dataSupplier } from '../Home/data/supplier';
+import { fetchSupplier } from '~/api/home';
 import SubTitle from '~/components/Layout/SubTitle/SubTitle';
+import { API_HOST } from '~/config/host';
 
 const cx = classNames.bind(styles);
 
@@ -14,21 +15,29 @@ function Supplier() {
     dataListSupplier: [],
   });
   const { loading, dataListSupplier } = state;
-  useEffect(() => {
-    fetchDataListSupplierAPI();
-    return () => {};
-  }, []);
 
   const fetchDataListSupplierAPI = async () => {
-    setTimeout(() => {
-      setState((prevState) => ({
-        ...prevState,
+    try {
+      const data = await fetchSupplier();
+
+      if (!data.status) {
+        alert('Lấy dữ liệu thất bại');
+        return;
+      }
+
+      setState({
         loading: false,
-        dataListSupplier: dataSupplier,
-      }));
-    }, 1000);
+        dataListSupplier: data.data.data,
+      });
+    } catch (error) {
+      console.error('Error fetching supplier data:', error);
+      setState((prevState) => ({ ...prevState, loading: false }));
+    }
   };
 
+  useEffect(() => {
+    fetchDataListSupplierAPI();
+  }, []);
   const renderContent = () => {
     if (loading) {
       return <LoadingIndicator />;
@@ -37,13 +46,13 @@ function Supplier() {
         <div className={cx('supplier-item')}>
           {dataListSupplier.map((supplier, index) => (
             <div key={index} className={cx('supplier-item-details')}>
-              <img src={supplier.image} alt="Supplier" />
+              <img src={`${API_HOST}${supplier.src[0]}`} alt="Supplier Image" />
               <div className={cx('supplier-text')}>
-                <h3>{supplier.title}</h3>
-                <p>{supplier.description}</p>
+                <h3>{supplier.name}</h3>
+                <p>Tìm nhà cung cấp</p>
                 <span className={cx('d-flex', 'align-items-center', 'supplier-location')}>
                   <img src={imagesHome.supplier_location} alt="Location" />
-                  {supplier.location}
+                  {supplier.scope_name}
                 </span>
               </div>
             </div>

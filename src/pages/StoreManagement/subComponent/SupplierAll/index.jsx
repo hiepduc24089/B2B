@@ -1,14 +1,15 @@
 import React, { memo, useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
 import styles from './SupplierAll.module.scss';
-import { fetchRequestSupplier } from '~/api/requestsupplier';
+import { fetchRequestSupplier, postUpdateRequestStatus } from '~/api/requestsupplier';
 import LoadingIndicator from '~/components/Loading';
+import Warning from '~/components/Layout/Popup/Warning';
 import { API_HOST } from '~/config/host';
 import { imagesHome } from '~/assets/images';
 
 const cx = classNames.bind(styles);
 
-function SupplierAll() {
+function SupplierAll({ onFindSupplierClick }) {
   const [state, setState] = useState({
     loading: true,
     dataRequestSupplier: [],
@@ -21,7 +22,9 @@ function SupplierAll() {
 
   const { loading, dataRequestSupplier, pagination } = state;
 
-  // Move fetchRequest function to the component scope
+  const [showWarning, setShowWarning] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+
   const fetchRequest = async (page = 1) => {
     try {
       const getRequestSupplierResponse = await fetchRequestSupplier(page);
@@ -51,9 +54,42 @@ function SupplierAll() {
   }, []);
 
   const handlePageChange = (page) => {
-    // Fetch data for the selected page
     setState((prevState) => ({ ...prevState, loading: true }));
     fetchRequest(page);
+  };
+
+  const handleToggleStatus = (item) => {
+    setSelectedItem(item);
+    setShowWarning(true);
+  };
+
+  const handleConfirmToggle = async () => {
+    if (!selectedItem) return;
+
+    const { id, display } = selectedItem;
+    const newDisplay = display === 1 ? 0 : 1;
+
+    try {
+      setState((prevState) => ({
+        ...prevState,
+        dataRequestSupplier: prevState.dataRequestSupplier.map((item) =>
+          item.id === id ? { ...item, display: newDisplay } : item,
+        ),
+      }));
+
+      const responseUpdateStatus = await postUpdateRequestStatus(id, newDisplay);
+
+      if (!responseUpdateStatus.status) {
+        alert('Cập nhật trạng thái thất bại.');
+        return;
+      }
+    } catch (error) {
+      console.error('Failed to update request supplier status:', error);
+      alert('Cập nhật trạng thái thất bại.');
+    } finally {
+      setShowWarning(false);
+      setSelectedItem(null);
+    }
   };
 
   return (
@@ -73,9 +109,16 @@ function SupplierAll() {
                     <div className={cx('information')}>
                       <h5>{item.name}</h5>
                       <div className={cx('d-flex', 'justify-content-between', 'align-items-center')}>
-                        <button className={cx('find-supplier')}>Tìm nhà cung cấp</button>
+                        <button className={cx('find-supplier')} onClick={onFindSupplierClick}>
+                          Tìm nhà cung cấp
+                        </button>
                         <div className={cx('toggle-switch')}>
-                          <input type="checkbox" id={`switch-${index}`} />
+                          <input
+                            type="checkbox"
+                            id={`switch-${index}`}
+                            checked={item.display === 1}
+                            onChange={() => handleToggleStatus(item)} // Show the warning on toggle
+                          />
                           <label htmlFor={`switch-${index}`}></label>
                         </div>
                       </div>
@@ -104,6 +147,18 @@ function SupplierAll() {
           <button onClick={() => handlePageChange(pagination.current_page + 1)}>Next</button>
         )}
       </div>
+
+      {showWarning && (
+        <Warning
+          message={
+            selectedItem && selectedItem.display === 1
+              ? 'Bạn có chắc chắn muốn ngừng hiển thị bài đăng này không?'
+              : 'Bạn có muốn hiển thị bài đăng này không?'
+          }
+          onClose={() => setShowWarning(false)}
+          onOk={handleConfirmToggle}
+        />
+      )}
     </>
   );
 }

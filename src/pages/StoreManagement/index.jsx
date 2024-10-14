@@ -1,4 +1,4 @@
-import React, { memo, useState } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
 import styles from './StoreManagement.module.scss';
 import SubTitle from '~/components/Layout/SubTitle/SubTitle';
@@ -16,19 +16,31 @@ import ProductSale from './subComponent/ProductSale';
 import SupplierAll from './subComponent/SupplierAll';
 import SupplierPrice from './subComponent/SupplierPrice';
 import SupplierPost from './subComponent/SupplierPost';
+import ProductEdit from './subComponent/ProductEdit';
+import { useLocation } from 'react-router-dom';
 
 const cx = classNames.bind(styles);
 
 function StoreManagement() {
-  const [activeTab, setActiveTab] = useState('Create Profile');
+  const location = useLocation();
+  const { activeTab: initialActiveTab } = location.state || {};
+
+  const [activeTab, setActiveTab] = useState(initialActiveTab || 'Create Profile');
+  const [activeSubItem, setActiveSubItem] = useState(initialActiveTab || 'Create Profile');
   const [isProductDropdownOpen, setProductDropdownOpen] = useState(false);
   const [isSupplierDropdownOpen, setSupplierDropdownOpen] = useState(false);
-  const [activeSubItem, setActiveSubItem] = useState('');
+  const [productEditID, setProductEditID] = useState('');
 
+  useEffect(() => {
+    if (initialActiveTab) {
+      setActiveTab(initialActiveTab);
+      setActiveSubItem(initialActiveTab);
+    }
+  }, [initialActiveTab]);
   const renderContent = () => {
     switch (activeSubItem) {
       case 'Home':
-        return <Home />;
+        return <Home onAddProductClick={() => handleProductComponentClick('Product-Add')} />;
       case 'Create Profile':
         return <CreateProfile />;
       case 'Order':
@@ -40,15 +52,19 @@ function StoreManagement() {
       case 'Customer':
         return <Customer />;
       case 'Product-All':
-        return <ProductAll />;
+        return (
+          <ProductAll onEditProductClick={(productID) => handleEditProductComponentClick('Product-Edit', productID)} />
+        );
       case 'Product-Add':
-        return <ProductAdd />;
+        return <ProductAdd onSubmitSuccess={handleProductSubmitSuccess} />;
       case 'Product-Remaining':
         return <ProductRemaining />;
       case 'Product-Sale':
         return <ProductSale />;
+      case 'Product-Edit':
+        return <ProductEdit productID={productEditID} onSubmitSuccess={handleProductSubmitSuccess} />;
       case 'Supplier-All':
-        return <SupplierAll />;
+        return <SupplierAll onFindSupplierClick={() => handleSupplierComponentClick('Supplier-Post')} />;
       case 'Supplier-Price':
         return <SupplierPrice />;
       case 'Supplier-Post':
@@ -83,6 +99,28 @@ function StoreManagement() {
     setActiveSubItem(tab);
   };
 
+  const handleProductComponentClick = (tab) => {
+    setActiveTab('Product');
+    setProductDropdownOpen(true);
+    setActiveSubItem(tab);
+  };
+
+  const handleSupplierComponentClick = (tab) => {
+    setActiveTab('Supplier');
+    setSupplierDropdownOpen(true);
+    setActiveSubItem(tab);
+  };
+
+  const handleEditProductComponentClick = (tab, productID) => {
+    setActiveTab('Product');
+    setProductDropdownOpen(true);
+    setActiveSubItem(tab);
+    setProductEditID(productID);
+  };
+
+  const handleProductSubmitSuccess = () => {
+    setActiveSubItem('Product-All');
+  };
   return (
     <>
       <SubTitle />
@@ -122,7 +160,7 @@ function StoreManagement() {
                   className={cx('dropdown-item', { 'sub-item-active': activeSubItem === 'Supplier-Price' })}
                   onClick={() => handleSubItemClick('Supplier-Price')}
                 >
-                  Báo giá đã gửi
+                  Báo giá đã nhận
                 </div>
                 <div
                   className={cx('dropdown-item', { 'sub-item-active': activeSubItem === 'Supplier-Post' })}

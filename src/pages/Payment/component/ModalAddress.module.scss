@@ -1,0 +1,61 @@
+.modal-title {
+  color: var(--black);
+  font-size: 24px !important;
+  font-weight: 600 !important;
+}
+.double-input {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-gap: 20px;
+  margin-bottom: 30px;
+}
+.modal-address-label-field {
+  color: var(--black);
+  font-size: 16px;
+  font-weight: 400;
+  margin-bottom: 0;
+  width: 100%;
+  margin-bottom: 3px;
+}
+.modal-address-input-field {
+  color: var(--black);
+  font-size: 16px;
+  font-weight: 400;
+  border-radius: 8px;
+  border: 0.5px solid var(--grey-light);
+  background: var(--white);
+  padding: 8px 12px;
+  width: 100%;
+}
+.modal-submit-quote {
+  border-radius: 63px;
+  background: var(--primary);
+  color: var(--white);
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  padding: 8px 64px;
+}
+.describe-wrapper {
+  margin-bottom: 30px;
+}
+@media screen and (max-width: 768px) {
+  .modal-title {
+    font-size: 18px !important;
+  }
+  .double-input {
+    grid-template-columns: repeat(1, 1fr);
+    grid-gap: 10px;
+    margin-bottom: 15px;
+  }
+  .describe-wrapper {
+    margin-bottom: 15px;
+  }
+  .modal-address-label-field {
+    font-size: 14px;
+  }
+  .modal-address-input-field {
+    font-size: 14px;
+    padding: 6px 8px;
+  }
+}

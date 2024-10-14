@@ -6,8 +6,14 @@ import { imagesPopup } from '~/assets/images';
 const cx = classNames.bind(styles);
 
 function Success({ message, onClose }) {
+  const handleOverlayClick = (e) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   return (
-    <div className={cx('popup-overlay')}>
+    <div className={cx('popup-overlay')} onClick={handleOverlayClick}>
       <div className={cx('popup')}>
         <div className={cx('close-icon')} onClick={onClose}>
           <img src={imagesPopup.closePopup} alt="Close" />

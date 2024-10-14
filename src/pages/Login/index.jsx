@@ -87,7 +87,7 @@ function Login() {
 
       const userData = result.data;
       login(userData);
-
+      localStorage.setItem('user_id', userData.id);
       navigate(routesConfig.home, { state: { showSuccessPopup: true } });
     } catch (error) {
       setEmailError(error.message);

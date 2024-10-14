@@ -23,10 +23,11 @@ function Category() {
 
   const { loading, dataListProduct } = state;
 
+  const userID = localStorage.getItem('user_id') || 0;
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await fetchCategoryProduct(category_id, '', '', '', 1);
+        const data = await fetchCategoryProduct(category_id, '', '', '', 1, userID);
 
         setState((prevState) => ({
           ...prevState,

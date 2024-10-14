@@ -8,7 +8,7 @@ import { postCreateQuotesFromUser } from '~/api/requestsupplier';
 
 const cx = classNames.bind(styles);
 
-function Store({ requestSupplier, loading }) {
+function Store({ requestSupplier, loading, requestSupplierID }) {
   const [showModal, setShowModal] = useState(false);
   const handleShowModal = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
@@ -20,10 +20,10 @@ function Store({ requestSupplier, loading }) {
   const [inputContent, setInputContent] = useState('');
 
   useEffect(() => {
-    if (requestSupplier && requestSupplier.id) {
-      setInputRequestSupplierID(requestSupplier.id);
+    if (requestSupplierID) {
+      setInputRequestSupplierID(requestSupplierID);
     }
-  }, [requestSupplier]);
+  }, [requestSupplierID]);
 
   const handleSubmit = async () => {
     const formData = new FormData();

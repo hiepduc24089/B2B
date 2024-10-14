@@ -107,3 +107,24 @@ export const postCreateQuotesFromUser = async (quoteData) => {
     throw error;
   }
 };
+
+export const postUpdateRequestStatus = async (request_id, display) => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await postData(
+      apiURL.postUpdateRequestStatus(request_id),
+      { display },
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    return response;
+  } catch (error) {
+    console.error('Failed to update request supplier ID:', error);
+    throw error;
+  }
+};

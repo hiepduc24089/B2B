@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import HotDeal from './component/HotDeal';
 import Banner from './component/Banner';
 import Category from './component/Category';
@@ -8,13 +9,13 @@ import ForYou from './component/ForYou';
 import classNames from 'classnames/bind';
 import styles from './Home.module.scss';
 import { imagesHome } from '~/assets/images';
-import { useLocation } from 'react-router-dom';
 import Success from '~/components/Layout/Popup/Success';
 
 const cx = classNames.bind(styles);
 
 function Home() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [showSuccess, setShowSuccess] = useState(false);
 
   useEffect(() => {
@@ -22,9 +23,10 @@ function Home() {
       setShowSuccess(true);
       setTimeout(() => {
         setShowSuccess(false);
+        navigate(location.pathname, { replace: true });
       }, 2000);
     }
-  }, [location.state]);
+  }, [location.state, location.pathname, navigate]);
 
   return (
     <>

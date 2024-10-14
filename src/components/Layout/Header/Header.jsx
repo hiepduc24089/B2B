@@ -9,6 +9,7 @@ import { useAuth } from '~/context/AuthContext';
 import { useStoreHeader } from '~/context/StoreHeaderContext';
 import Tippy from '@tippyjs/react';
 import { Wrapper as PopperWrapper } from '~/components/Layout/Popper';
+import Success from '~/components/Layout/Popup/Success';
 
 const cx = classNames.bind(styles);
 
@@ -16,6 +17,7 @@ function Header() {
   const { isAuthenticated, user } = useAuth();
   const { isStoreHeaderVisible } = useStoreHeader();
   const [isExpanded, setIsExpanded] = useState(false);
+  const [showSuccessLogout, setShowSuccessLogout] = useState(false);
 
   return (
     <header className={cx('wrapper', { 'no-box-shadow': isStoreHeaderVisible })}>
@@ -59,7 +61,7 @@ function Header() {
                         {...attrs}
                         style={{ display: isExpanded ? 'block' : 'none' }}
                       >
-                        <PopperWrapper />
+                        <PopperWrapper onLogoutSuccess={() => setShowSuccessLogout(true)} />
                       </div>
                     )}
                   >
@@ -87,6 +89,7 @@ function Header() {
           </div>
         </div>
       </div>
+      {showSuccessLogout && <Success message="Đăng xuất thành công" onClose={() => setShowSuccessLogout(false)} />}
     </header>
   );
 }

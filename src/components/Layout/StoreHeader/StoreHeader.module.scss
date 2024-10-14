@@ -59,10 +59,21 @@
   font-weight: 600;
   .follow,
   .see-phone {
+    display: flex;
+    align-items: center;
     border-radius: 63px;
     border: 1px solid var(--primary);
     background: #fdf1e7;
     padding: 4px 8px;
+  }
+  .unfollow {
+    border-radius: 63px;
+    border: 1px solid var(--primary);
+    background: var(--primary);
+    padding: 4px 8px;
+    button {
+      color: var(--white);
+    }
   }
   button {
     border: none;

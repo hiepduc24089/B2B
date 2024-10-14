@@ -44,15 +44,31 @@
   }
   .hot-deal-wrapper {
     margin-top: 25px;
+    .heart-icon {
+      position: absolute;
+      top: 10px;
+      right: 25px;
+      cursor: pointer;
+      transition: transform 0.2s ease-in-out;
+      opacity: 0;
+      &.active-heart {
+        opacity: 1;
+      }
+    }
 
+    .list-item:hover .heart-icon {
+      opacity: 1;
+      transform: scale(1.1);
+    }
     .list-item {
+      position: relative;
       margin: 8px;
       text-align: left;
       padding-right: 15px;
 
-      img {
+      .product-img {
         width: 100%;
-        max-height: 220px;
+        height: 200px;
       }
 
       h3 {
@@ -236,12 +252,9 @@
   margin: 64px 0;
 
   .supplier-wrapper {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    align-items: flex-start;
-    align-content: flex-start;
-    gap: 30px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 30px;
     margin-top: 24px;
   }
 
@@ -249,7 +262,6 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
     border-radius: 8px;
     border: 1px solid #f3f3f3;
     background: var(--white);
@@ -356,16 +368,33 @@
     grid-gap: 20px;
     width: 100%;
     max-width: calc(6 * 200px + 5 * 20px);
+
+    .heart-icon {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      cursor: pointer;
+      transition: transform 0.2s ease-in-out;
+      opacity: 0;
+      &.active-heart {
+        opacity: 1;
+      }
+    }
+    .for-you-item:hover .heart-icon {
+      opacity: 1;
+      transform: scale(1.1);
+    }
   }
 
   .for-you-item {
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: 8px;
     box-sizing: border-box;
-    img {
+    .product-img {
       width: 100%;
-      height: auto;
+      height: 200px;
     }
     h1 {
       overflow: hidden;
@@ -473,6 +502,10 @@
         margin: 5px;
         padding-right: 0;
       }
+      .heart-icon {
+        top: 10px;
+        right: 10px;
+      }
     }
   }
   .category {
@@ -515,7 +548,8 @@
   .supplier {
     margin: 30px 0;
     .supplier-wrapper {
-      gap: 10px;
+      grid-template-columns: repeat(1, 1fr);
+      grid-gap: 10px;
       margin-top: 15px;
     }
     .supplier-item {
@@ -549,6 +583,22 @@
 }
 
 @media screen and (max-width: 475px) {
+  .hot-deal {
+    .hot-deal-wrapper {
+      .list-item {
+        img {
+          height: 160px;
+        }
+      }
+    }
+  }
+  .for-you {
+    .for-you-item {
+      img {
+        height: 160px;
+      }
+    }
+  }
   .category {
     .category-wrapper {
       grid-template-columns: repeat(2, 1fr);

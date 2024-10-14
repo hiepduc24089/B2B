@@ -12,7 +12,8 @@ import { useStoreHeader } from '~/context/StoreHeaderContext';
 const cx = classNames.bind(styles);
 
 function ProductDetails() {
-  const { setStoreHeaderVisibility, setStoreName, setStoreAddress, setStoreAvatar, setStoreID } = useStoreHeader();
+  const { setStoreHeaderVisibility, setStoreName, setStoreAddress, setStoreAvatar, setStoreID, setStoreIsFollow } =
+    useStoreHeader();
   const [isDesktop, setIsDesktop] = useState(window.innerWidth > 992);
 
   useEffect(() => {
@@ -52,15 +53,15 @@ function ProductDetails() {
   });
 
   const { loading, seller, product, recommendProduct, relatedProduct, viewedProduct } = state;
+  const userID = localStorage.getItem('user_id') || 0;
 
   useEffect(() => {
     fetchData();
-  }, [slug, id]);
+  }, [slug, id, userID]);
 
   const fetchData = async () => {
     try {
-      const selectedProduct = await fetchProductDetails(slug);
-
+      const selectedProduct = await fetchProductDetails(slug, userID);
       if (selectedProduct && selectedProduct.product) {
         const shopId = selectedProduct.product.shop_id;
 
@@ -81,6 +82,7 @@ function ProductDetails() {
         setStoreAddress(shopDetails.sub_address);
         setStoreAvatar(shopDetails.avatar);
         setStoreID(shopDetails.id);
+        setStoreIsFollow(shopDetails.is_follow ?? 0);
       } else {
         setState({
           loading: false,

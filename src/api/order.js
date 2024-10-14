@@ -2,12 +2,12 @@ import { getData, postData } from '~/axios/config';
 import { apiURL } from '~/axios/apiURL';
 
 // Fetch list order
-export const fetchListOrder = async () => {
+export const fetchListOrder = async (key_search = '') => {
   try {
     const token = localStorage.getItem('token');
     const response = await postData(
       apiURL.getListOrder,
-      {},
+      { key_search },
       {
         withCredentials: true,
         headers: {

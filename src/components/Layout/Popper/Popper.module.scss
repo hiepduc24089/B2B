@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Mulish:wght@400;600&display=swap');
 
 .menu-wrapper {
-  width: 100%;
+  width: max-content;
   max-height: min((100vh - 96px) - 60px, 734px);
   min-height: 100px;
   background: rgb(255, 255, 255);

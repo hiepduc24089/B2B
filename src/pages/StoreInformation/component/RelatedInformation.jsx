@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import routesConfig from '~/config/routes';
 import { API_HOST } from '~/config/host';
 import Slider from 'react-slick';
-import { imagesHome, imagesHotDeal } from '~/assets/images';
+import { images, imagesHome, imagesHotDeal } from '~/assets/images';
 import { getProductByShop } from '~/api/store';
 import FilterSearch from '~/components/Layout/FilterSearch';
 import { Layout } from 'antd';
@@ -13,11 +13,16 @@ import HeadlessTippy from '@tippyjs/react/headless';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import LoadingIndicator from '~/components/Loading';
+import Success from '~/components/Layout/Popup/Success';
+import { postFavoriteProduct } from '~/api/home';
 
 const cx = classNames.bind(styles);
 const { Header, Content } = Layout;
 
 function RelatedInformation({ dataStore, shopID }) {
+  const [showSuccessAdd, setShowSuccessAdd] = useState(false);
+  const [showSuccessRemove, setShowSuccessRemove] = useState(false);
+
   const [activeTab, setActiveTab] = useState('introduction');
   const [isMobile, setIsMobile] = useState(window.innerWidth < 992);
 
@@ -90,6 +95,44 @@ function RelatedInformation({ dataStore, shopID }) {
   function formatPrice(price) {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   }
+
+  const [favorites, setFavorites] = useState(new Set());
+  useEffect(() => {
+    if (dataProductStore) {
+      const favoriteSet = new Set(dataProductStore.filter((item) => item.is_favorite === 1).map((item) => item.id));
+      setFavorites(favoriteSet);
+    }
+  }, [dataProductStore]);
+
+  const handleFavoriteClick = async (id) => {
+    try {
+      const response = await postFavoriteProduct(id);
+
+      if (response.status) {
+        setFavorites((prevFavorites) => {
+          const newFavorites = new Set(prevFavorites);
+          if (newFavorites.has(id)) {
+            newFavorites.delete(id);
+            setShowSuccessRemove(true);
+          } else {
+            newFavorites.add(id);
+            setShowSuccessAdd(true);
+          }
+          return newFavorites;
+        });
+      } else {
+        alert('Failed to update favorite status. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error updating favorite:', error);
+
+      if (error.response && error.response.status === 401) {
+        return;
+      } else {
+        alert('An error occurred while updating the favorite status.');
+      }
+    }
+  };
 
   if (loading) {
     return <LoadingIndicator />;
@@ -164,7 +207,7 @@ function RelatedInformation({ dataStore, shopID }) {
                       to={`${routesConfig.product_details.replace(':slug', product.slug).replace(':id', product.id)}`}
                     >
                       <div className={cx('product-items')}>
-                        <img src={`${API_HOST}${product.src[0]}`} alt={product.name} />
+                        <img src={`${API_HOST}${product.src[0]}`} alt={product.name} className={cx('product-img')} />
                         <h1 className={cx('product-title')}>{product.name}</h1>
                         <h3 className={cx('product-price')}>
                           {formatPrice(product.original_price)}đ<span>/{product.unit}</span>
@@ -182,6 +225,17 @@ function RelatedInformation({ dataStore, shopID }) {
                           <span className={cx('location')}>{product.province_name}</span>
                           <span className={cx('contact')}>2 lượt liên hệ</span>
                         </div>
+                        <img
+                          src={favorites.has(product.id) ? images.heart_red : images.heart}
+                          alt="Heart"
+                          className={cx('heart-icon', {
+                            'active-heart': favorites.has(product.id),
+                          })}
+                          onClick={async (e) => {
+                            e.preventDefault();
+                            await handleFavoriteClick(product.id);
+                          }}
+                        />
                       </div>
                     </Link>
                   ))}
@@ -213,7 +267,11 @@ function RelatedInformation({ dataStore, shopID }) {
                             .replace(':id', product.id)}`}
                         >
                           <div className={cx('product-items')}>
-                            <img src={`${API_HOST}${product.src[0]}`} alt={product.name} />
+                            <img
+                              src={`${API_HOST}${product.src[0]}`}
+                              alt={product.name}
+                              className={cx('product-img')}
+                            />
                             <h1 className={cx('product-title')}>{product.name}</h1>
                             <h3 className={cx('product-price')}>
                               {formatPrice(product.original_price)}đ<span>/{product.unit}</span>
@@ -231,6 +289,17 @@ function RelatedInformation({ dataStore, shopID }) {
                               <span className={cx('location')}>{product.province_name}</span>
                               <span className={cx('contact')}>2 lượt liên hệ</span>
                             </div>
+                            <img
+                              src={favorites.has(product.id) ? images.heart_red : images.heart}
+                              alt="Heart"
+                              className={cx('heart-icon', {
+                                'active-heart': favorites.has(product.id),
+                              })}
+                              onClick={async (e) => {
+                                e.preventDefault();
+                                await handleFavoriteClick(product.id);
+                              }}
+                            />
                           </div>
                         </Link>
                       ))}
@@ -241,7 +310,13 @@ function RelatedInformation({ dataStore, shopID }) {
             </div>
           )}
         </div>
-        ;
+        ;{/* Show Success Popup */}
+        {showSuccessAdd && (
+          <Success message="Thêm sản phẩm yêu thích thành công" onClose={() => setShowSuccessAdd(false)} />
+        )}
+        {showSuccessRemove && (
+          <Success message="Bỏ sản phẩm yêu thích thành công" onClose={() => setShowSuccessRemove(false)} />
+        )}
       </div>
     </div>
   );

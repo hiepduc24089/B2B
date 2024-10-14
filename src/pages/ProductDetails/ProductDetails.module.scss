@@ -195,6 +195,17 @@
       font-weight: 600;
     }
 
+    .unfollow-btn {
+      color: var(--white);
+      font-size: 16px;
+      font-weight: 600;
+      width: 100%;
+      padding: 8px 0;
+      border-radius: 63px;
+      border: 1px solid var(--primary);
+      background: var(--primary);
+      margin-top: 10px;
+    }
     .follow-btn,
     .phone-btn {
       color: var(--primary);
@@ -210,6 +221,12 @@
 
     .follow-btn {
       margin-top: 32px;
+    }
+
+    .follow-btn:hover,
+    .phone-btn:hover {
+      color: var(--white);
+      background: var(--primary);
     }
   }
 }

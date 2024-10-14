@@ -5,7 +5,7 @@ import { imagesStore } from '~/assets/images';
 
 const cx = classNames.bind(styles);
 
-function Home() {
+function Home({ onAddProductClick }) {
   return (
     <>
       <div className={cx('list-job-wrapper', 'box-wrapper')}>
@@ -48,7 +48,10 @@ function Home() {
           </h5>
         </div>
         <div className={cx('submit-btn')}>
-          <button className={cx('post-product')}>Đăng sản phẩm</button>
+          <button className={cx('post-product')} onClick={onAddProductClick}>
+            {' '}
+            Đăng sản phẩm
+          </button>
         </div>
       </div>
     </>

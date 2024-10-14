@@ -1,37 +1,42 @@
-import React, { useEffect, memo } from 'react';
+import React, { useEffect, memo, useState } from 'react';
 import Slider from 'react-slick';
 import classNames from 'classnames/bind';
 import styles from '../Home.module.scss';
-import { imagesHome } from '~/assets/images';
+import { images, imagesHome } from '~/assets/images';
 import { Link } from 'react-router-dom';
 import routesConfig from '~/config/routes';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import LoadingIndicator from '~/components/Loading';
-import { fetchHotDeal } from '~/api/home';
+import { fetchHotDeal, postFavoriteProduct } from '~/api/home';
 import { API_HOST } from '~/config/host';
+import Success from '~/components/Layout/Popup/Success';
 
 const cx = classNames.bind(styles);
 
 function HotDeal() {
+  const [showSuccessAdd, setShowSuccessAdd] = useState(false);
+  const [showSuccessRemove, setShowSuccessRemove] = useState(false);
+
   const [state, setState] = React.useState({
     loading: true,
     dataListProduct: [],
   });
   const { loading, dataListProduct } = state;
 
+  const userID = localStorage.getItem('user_id') || 0;
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await fetchHotDeal();
-
+        const data = await fetchHotDeal(userID);
         setState((prevState) => ({
           ...prevState,
-          loading: false,
           dataListProduct: data.data,
         }));
       } catch (error) {
         console.error('Failed to fetch hot deals:', error);
+      } finally {
         setState((prevState) => ({
           ...prevState,
           loading: false,
@@ -40,7 +45,7 @@ function HotDeal() {
     };
 
     fetchData();
-  }, []);
+  }, [userID]);
 
   const settings = {
     dots: false,
@@ -78,6 +83,47 @@ function HotDeal() {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   }
 
+  const [favorites, setFavorites] = useState(new Set());
+  useEffect(() => {
+    if (dataListProduct) {
+      const favoriteSet = new Set(dataListProduct.filter((item) => item.is_favorite === 1).map((item) => item.id));
+      setFavorites(favoriteSet);
+    }
+  }, [dataListProduct]);
+
+  const handleFavoriteClick = async (id) => {
+    try {
+      const response = await postFavoriteProduct(id);
+
+      if (response.status) {
+        setFavorites((prevFavorites) => {
+          const newFavorites = new Set(prevFavorites);
+          if (newFavorites.has(id)) {
+            newFavorites.delete(id);
+            setShowSuccessRemove(true);
+          } else {
+            newFavorites.add(id);
+            setShowSuccessAdd(true);
+          }
+          return newFavorites;
+        });
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      } else {
+        alert('Failed to update favorite status. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error updating favorite:', error);
+
+      if (error.response && error.response.status === 401) {
+        return;
+      } else {
+        alert('An error occurred while updating the favorite status.');
+      }
+    }
+  };
+
   const renderContent = () => {
     if (loading) {
       return <LoadingIndicator />;
@@ -86,25 +132,38 @@ function HotDeal() {
         <div className={cx('hot-deal-wrapper')}>
           <Slider {...settings}>
             {dataListProduct.slice(0, 5).map((hotdeal, index) => (
-              <Link
-                key={index}
-                to={`${routesConfig.product_details.replace(':slug', hotdeal.slug).replace(':id', hotdeal.id)}`}
-              >
-                <div className={cx('list-item')}>
-                  <img src={`${API_HOST}${hotdeal.src[0]}`} alt={hotdeal.name} />
-                  <h3>
-                    {formatPrice(hotdeal.price)}đ<span>/{hotdeal.unit}</span>
-                  </h3>
-                  <h4>{formatPrice(hotdeal.price_original)}đ</h4>
-                  <h5>
-                    Mua sỉ từ{' '}
-                    <span>
-                      {hotdeal.min_quantity} {hotdeal.unit}
-                    </span>
-                  </h5>
-                  <p>{hotdeal.name}</p>
-                </div>
-              </Link>
+              <div key={index} className={cx('list-item-wrapper')}>
+                <Link
+                  to={`${routesConfig.product_details.replace(':slug', hotdeal.slug).replace(':id', hotdeal.id)}`}
+                  className={cx('product-link')}
+                >
+                  <div className={cx('list-item')}>
+                    <img src={`${API_HOST}${hotdeal.src[0]}`} alt={hotdeal.name} className={cx('product-img')} />
+                    <h3>
+                      {formatPrice(hotdeal.price)}đ<span>/{hotdeal.unit}</span>
+                    </h3>
+                    <h4>{formatPrice(hotdeal.price_original)}đ</h4>
+                    <h5>
+                      Mua sỉ từ{' '}
+                      <span>
+                        {hotdeal.min_quantity} {hotdeal.unit}
+                      </span>
+                    </h5>
+                    <p>{hotdeal.name}</p>
+                    <img
+                      src={favorites.has(hotdeal.id) ? images.heart_red : images.heart}
+                      alt="Heart"
+                      className={cx('heart-icon', {
+                        'active-heart': favorites.has(hotdeal.id),
+                      })}
+                      onClick={async (e) => {
+                        e.preventDefault();
+                        await handleFavoriteClick(hotdeal.id);
+                      }}
+                    />
+                  </div>
+                </Link>
+              </div>
             ))}
           </Slider>
         </div>
@@ -135,6 +194,14 @@ function HotDeal() {
         </div>
       </div>
       {renderContent()}
+
+      {/* Show Success Popup */}
+      {showSuccessAdd && (
+        <Success message="Thêm sản phẩm yêu thích thành công" onClose={() => setShowSuccessAdd(false)} />
+      )}
+      {showSuccessRemove && (
+        <Success message="Bỏ sản phẩm yêu thích thành công" onClose={() => setShowSuccessRemove(false)} />
+      )}
     </>
   );
 }

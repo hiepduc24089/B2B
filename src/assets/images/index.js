@@ -66,6 +66,8 @@ import success from './popup/success.svg';
 import warning from './popup/warning.svg';
 import failed from './popup/failed.png';
 import closePopup from './popup/close-popup.svg';
+import heart from './all/heart.png';
+import heart_red from './all/heart-red.png';
 
 export const images = {
   logo,
@@ -85,6 +87,8 @@ export const images = {
   backIcon,
   locationIcon,
   callIconWhite,
+  heart,
+  heart_red,
 };
 
 export const imagesHome = {

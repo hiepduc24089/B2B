@@ -7,7 +7,9 @@ import { API_HOST } from '~/config/host';
 import { Link } from 'react-router-dom';
 import routesConfig from '~/config/routes';
 import CustomInputNumber from '~/components/Layout/CustomInputNumber';
-import { postAskToBuyRequest } from '~/api/product';
+import { postAskToBuyRequest, postCheckFollowShop, postFollowShop } from '~/api/product';
+import { postUnfollowShop } from '~/api/profile';
+import Success from '~/components/Layout/Popup/Success';
 
 const cx = classNames.bind(styles);
 
@@ -19,6 +21,7 @@ function Store({ seller, product, loading }) {
   const [quantity, setQuantity] = useState(1);
   const [inputContent, setInputContent] = useState('');
   const [inputShopID, setInputShopID] = useState(null);
+  const [sellerLoading, setSellerLoading] = useState(true);
 
   useEffect(() => {
     if (product && product.id) {
@@ -26,6 +29,7 @@ function Store({ seller, product, loading }) {
     }
     if (seller && seller.id) {
       setInputShopID(seller.id);
+      setSellerLoading(false);
     }
   }, [product, seller]);
 
@@ -55,8 +59,70 @@ function Store({ seller, product, loading }) {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   }
 
+  const userID = localStorage.getItem('user_id') || 0;
+  useEffect(() => {
+    const checkFollowStatus = async () => {
+      try {
+        const response = await postCheckFollowShop(seller.id, userID);
+        if (response.status) {
+          setIsFollowing(response.data);
+        }
+      } catch (error) {
+        console.error('Error checking follow status:', error);
+      }
+    };
+
+    if (seller && seller.id) {
+      checkFollowStatus();
+    }
+  }, [seller]);
+
+  const [showSuccessFollow, setShowSuccessFollow] = useState(false);
+  const [showSuccessUnfollow, setShowSuccessUnfollow] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
+
+  const handleFollowShop = async (shopId) => {
+    try {
+      const followResponse = await postFollowShop(shopId);
+      if (followResponse.status) {
+        setShowSuccessFollow(true);
+        setIsFollowing(true);
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      } else {
+        alert('Theo dõi shop thất bại.');
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        return;
+      } else {
+        console.error('Error follow shop:', error);
+        alert('Theo dõi shop thất bại');
+      }
+    }
+  };
+
+  const handleUnfollowShop = async (shopId) => {
+    try {
+      const unfollowResponse = await postUnfollowShop(shopId);
+      if (unfollowResponse.status) {
+        setShowSuccessUnfollow(true);
+        setIsFollowing(false);
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      } else {
+        alert('Bỏ theo dõi thất bại.');
+      }
+    } catch (error) {
+      console.error('Error unfollowing shop:', error);
+      alert('Bỏ theo dõi thất bại');
+    }
+  };
+
   const renderContent = () => {
-    if (loading) {
+    if (loading || sellerLoading) {
       return <LoadingIndicator />;
     } else {
       return (
@@ -90,7 +156,15 @@ function Store({ seller, product, loading }) {
               <span className={cx('title')}>Tỷ lệ phản hồi</span>
               <span className={cx('number')}>50%</span>
             </div>
-            <button className={cx('follow-btn')}>Theo dõi</button>
+            {!isFollowing ? (
+              <button className={cx('follow-btn')} onClick={() => handleFollowShop(seller.id)}>
+                Theo dõi
+              </button>
+            ) : (
+              <button className={cx('unfollow-btn')} onClick={() => handleUnfollowShop(seller.id)}>
+                Bỏ theo dõi
+              </button>
+            )}
             <button className={cx('phone-btn')}>Xem SĐT</button>
           </div>
         </div>
@@ -160,6 +234,11 @@ function Store({ seller, product, loading }) {
           </button>
         </Modal.Footer>
       </Modal>
+      {/* Show Success Popup */}
+      {showSuccessFollow && <Success message="Theo dõi shop thành công" onClose={() => setShowSuccessFollow(false)} />}
+      {showSuccessUnfollow && (
+        <Success message="Bỏ theo dõi shop thành công" onClose={() => setShowSuccessUnfollow(false)} />
+      )}
     </>
   );
 }
