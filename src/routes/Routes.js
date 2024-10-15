@@ -19,6 +19,7 @@ import StoreInformation from '~/pages/StoreInformation';
 import StoreInformationMobile from '~/pages/StoreInformationMobile';
 import OrderDetail from '~/pages/OrderDetail';
 import SupplierDetail from '~/pages/SupplierDetail';
+import PostSupplier from '~/pages/Supplier/component/PostSupplier';
 
 const useViewport = () => {
   const [width, setWidth] = useState(window.innerWidth);
@@ -62,6 +63,7 @@ const privateRoutes = [
   { path: routesConfig.profile, component: Profile },
   { path: routesConfig.payment, component: Payment },
   { path: routesConfig.store_management, component: StoreManagement },
+  { path: routesConfig.supplier_post, component: PostSupplier },
 ];
 
 export { publicRoutes, privateRoutes };

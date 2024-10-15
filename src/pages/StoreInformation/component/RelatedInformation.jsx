@@ -70,11 +70,11 @@ function RelatedInformation({ dataStore, shopID }) {
     };
   }, []);
 
+  const userID = localStorage.getItem('user_id') || 0;
   useEffect(() => {
     const fetchProductByShopID = async () => {
       try {
-        const data = await getProductByShop(shopID, currentPage);
-
+        const data = await getProductByShop(shopID, userID, currentPage);
         setState((prevState) => ({
           ...prevState,
           loading: false,
@@ -90,7 +90,7 @@ function RelatedInformation({ dataStore, shopID }) {
     };
 
     fetchProductByShopID();
-  }, [currentPage]);
+  }, [userID, currentPage]);
 
   function formatPrice(price) {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');

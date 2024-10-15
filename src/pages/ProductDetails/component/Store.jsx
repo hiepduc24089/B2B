@@ -10,10 +10,15 @@ import CustomInputNumber from '~/components/Layout/CustomInputNumber';
 import { postAskToBuyRequest, postCheckFollowShop, postFollowShop } from '~/api/product';
 import { postUnfollowShop } from '~/api/profile';
 import Success from '~/components/Layout/Popup/Success';
+import Failed from '~/components/Layout/Popup/Failed';
 
 const cx = classNames.bind(styles);
 
 function Store({ seller, product, loading }) {
+  const [loadingFullScreen, setLoadingFullScreen] = useState(false);
+  const [showSuccessSendRequest, setShowSuccessSendRequest] = useState(false);
+  const [showErrorSendRequest, setShowErrorSendRequest] = useState(false);
+
   const [showModal, setShowModal] = useState(false);
   const handleShowModal = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
@@ -39,19 +44,23 @@ function Store({ seller, product, loading }) {
     formData.append('quantity', quantity);
     formData.append('content', inputContent);
     formData.append('shop_id', inputShopID);
+
+    setLoadingFullScreen(true);
     try {
       const response = await postAskToBuyRequest(formData);
 
       if (!response.status) {
-        alert('Hỏi mua sản phẩm thất bại.');
+        setShowErrorSendRequest(true);
         return;
       }
 
-      alert('Gửi yêu cầu mua sản phẩm thành công!');
+      setShowSuccessSendRequest(true);
       handleCloseModal();
     } catch (error) {
       console.error('Failed to post product:', error);
-      alert('Hỏi mua sản phẩm thất bại.');
+      setShowErrorSendRequest(true);
+    } finally {
+      setLoadingFullScreen(false);
     }
   };
 
@@ -79,9 +88,12 @@ function Store({ seller, product, loading }) {
 
   const [showSuccessFollow, setShowSuccessFollow] = useState(false);
   const [showSuccessUnfollow, setShowSuccessUnfollow] = useState(false);
+  const [showErrorFollow, setShowErrorFollow] = useState(false);
+  const [showErrorUnfollow, setShowErrorUnfollow] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
 
   const handleFollowShop = async (shopId) => {
+    setLoadingFullScreen(true);
     try {
       const followResponse = await postFollowShop(shopId);
       if (followResponse.status) {
@@ -91,19 +103,22 @@ function Store({ seller, product, loading }) {
           window.location.reload();
         }, 1000);
       } else {
-        alert('Theo dõi shop thất bại.');
+        setShowErrorFollow(true);
       }
     } catch (error) {
       if (error.response && error.response.status === 401) {
         return;
       } else {
         console.error('Error follow shop:', error);
-        alert('Theo dõi shop thất bại');
+        setShowErrorFollow(true);
       }
+    } finally {
+      setLoadingFullScreen(false);
     }
   };
 
   const handleUnfollowShop = async (shopId) => {
+    setLoadingFullScreen(true);
     try {
       const unfollowResponse = await postUnfollowShop(shopId);
       if (unfollowResponse.status) {
@@ -113,11 +128,13 @@ function Store({ seller, product, loading }) {
           window.location.reload();
         }, 1000);
       } else {
-        alert('Bỏ theo dõi thất bại.');
+        setShowErrorUnfollow(true);
       }
     } catch (error) {
       console.error('Error unfollowing shop:', error);
-      alert('Bỏ theo dõi thất bại');
+      setShowErrorUnfollow(true);
+    } finally {
+      setLoadingFullScreen(false);
     }
   };
 
@@ -173,6 +190,11 @@ function Store({ seller, product, loading }) {
   };
   return (
     <>
+      {loadingFullScreen && (
+        <div className={cx('fullscreen-loading')}>
+          <LoadingIndicator />
+        </div>
+      )}
       <div className={cx('store-contact')}>
         <p>Để hỏi về giá sản phẩm, sản phẩm liên quan hoặc các thông tin khác:</p>
         <button onClick={handleShowModal}>Liên hệ ngay</button>
@@ -238,6 +260,14 @@ function Store({ seller, product, loading }) {
       {showSuccessFollow && <Success message="Theo dõi shop thành công" onClose={() => setShowSuccessFollow(false)} />}
       {showSuccessUnfollow && (
         <Success message="Bỏ theo dõi shop thành công" onClose={() => setShowSuccessUnfollow(false)} />
+      )}
+      {showErrorFollow && <Failed message="Theo dõi shop thất bại" onClose={() => setShowErrorFollow(false)} />}
+      {showErrorUnfollow && <Failed message="Bỏ theo dõi shop thất bại" onClose={() => setShowErrorUnfollow(false)} />}
+      {showSuccessSendRequest && (
+        <Success message="Gửi yêu cầu mua hàng thành công" onClose={() => setShowSuccessSendRequest(false)} />
+      )}
+      {showErrorSendRequest && (
+        <Failed message="Gửi yêu cầu mua hàng thất bại" onClose={() => setShowErrorSendRequest(false)} />
       )}
     </>
   );

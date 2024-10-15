@@ -6,10 +6,16 @@ import { fetchAllListCategory } from '~/api/requestsupplier';
 import { API_HOST } from '~/config/host';
 import LoadingIndicator from '~/components/Loading';
 import { getProductDetailAtShop, postUpdateProduct } from '~/api/product';
+import Success from '~/components/Layout/Popup/Success';
+import Failed from '~/components/Layout/Popup/Failed';
 
 const cx = classNames.bind(styles);
 
 function ProductEdit({ productID, onSubmitSuccess }) {
+  const [loadingFullScreen, setLoadingFullScreen] = useState(false);
+  const [showUpdateSuccess, setShowUpdateSuccess] = useState(false);
+  const [showUpdateFailed, setShowUpdateFailed] = useState(false);
+
   const [state, setState] = useState({
     loadingCategory: true,
     loadingProduct: true,
@@ -162,20 +168,24 @@ function ProductEdit({ productID, onSubmitSuccess }) {
     selectedFiles.forEach((file, index) => {
       formData.append(`src[${index}]`, file);
     });
+    setLoadingFullScreen(true);
     try {
       const response = await postUpdateProduct(productID, formData);
-      console.log(response);
       if (!response.status) {
-        alert('Thay đổi sản phẩm thất bại.');
+        setShowUpdateFailed(true);
         return;
       }
-      alert('Sản phẩm đã được thay đổi thành công!');
-      if (onSubmitSuccess) {
-        onSubmitSuccess();
-      }
+      setShowUpdateSuccess(true);
+      setTimeout(() => {
+        if (onSubmitSuccess) {
+          onSubmitSuccess();
+        }
+      }, 1500);
     } catch (error) {
       console.error('Failed to post product:', error);
-      alert('Thay đổi phẩm thất bại.');
+      setShowUpdateFailed(true);
+    } finally {
+      setLoadingFullScreen(false);
     }
   };
 
@@ -211,6 +221,11 @@ function ProductEdit({ productID, onSubmitSuccess }) {
 
   return (
     <>
+      {loadingFullScreen && (
+        <div className={cx('fullscreen-loading')}>
+          <LoadingIndicator />
+        </div>
+      )}
       <div className={cx('edit-product-header')}>
         <h3 className={cx('mb-0')}>Sửa sản phẩm</h3>
       </div>
@@ -399,6 +414,11 @@ function ProductEdit({ productID, onSubmitSuccess }) {
           </div>
         </div>
       )}
+
+      {showUpdateSuccess && (
+        <Success message="Cập nhật sản phẩm thành công" onClose={() => setShowUpdateSuccess(false)} />
+      )}
+      {showUpdateFailed && <Failed message="Cập nhật sản phẩm thất bại" onClose={() => setShowUpdateFailed(false)} />}
     </>
   );
 }

@@ -310,6 +310,20 @@
   border: none;
   padding: 8px 32px;
 }
+@media screen and (max-width: 1400px) {
+  .product-details {
+    .product-infor {
+      .product-order {
+        .product-btn {
+          .order,
+          .add-to-cart {
+            padding: 8px 30px;
+          }
+        }
+      }
+    }
+  }
+}
 @media screen and (max-width: 1200px) {
   .product-details {
     .product-infor {

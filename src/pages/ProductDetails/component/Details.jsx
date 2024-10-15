@@ -8,10 +8,18 @@ import { imagesHotDeal } from '~/assets/images';
 import { createShoppingCard, createBuyNow } from '~/api/payment';
 import routesConfig from '~/config/routes';
 import { API_HOST } from '~/config/host';
+import Success from '~/components/Layout/Popup/Success';
+import Failed from '~/components/Layout/Popup/Failed';
 
 const cx = classNames.bind(styles);
 
 function Details({ product, loading, seller }) {
+  const [loadingFullScreen, setLoadingFullScreen] = useState(false);
+  const [successCreateCart, setSuccessCreateCart] = useState(false);
+  const [successCheckout, setSuccessCheckout] = useState(false);
+  const [failedCreateCart, setFailedCreateCart] = useState(false);
+  const [failedCheckout, setFailedCheckout] = useState(false);
+
   const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
 
@@ -20,6 +28,7 @@ function Details({ product, loading, seller }) {
   }
 
   const handleCreateCart = async () => {
+    setLoadingFullScreen(true);
     try {
       const response = await createShoppingCard({
         shop_id: seller.id,
@@ -28,18 +37,24 @@ function Details({ product, loading, seller }) {
       });
 
       if (!response.status) {
-        alert('Thêm sản phẩm thất bại, vui lòng thử lại');
+        setFailedCreateCart(true);
         return;
       }
-      alert(response.message);
+      setSuccessCreateCart(true);
 
-      navigate(routesConfig.shopping_cart);
+      setTimeout(() => {
+        setSuccessCreateCart(false);
+        navigate(routesConfig.shopping_cart);
+      }, 1500);
     } catch (error) {
-      console.error('Failed to create cart:', error);
+      setFailedCreateCart(true);
+    } finally {
+      setLoadingFullScreen(false);
     }
   };
 
   const handleCheckout = async () => {
+    setLoadingFullScreen(true);
     try {
       const response = await createBuyNow({
         product_id: product.id,
@@ -47,14 +62,19 @@ function Details({ product, loading, seller }) {
       });
 
       if (!response.status) {
-        alert('Đặt hàng thất bại, vui lòng thử lại');
+        setFailedCheckout(true);
         return;
       }
-      alert('Đặt hành thành công!');
 
-      navigate(routesConfig.payment, { state: { checkoutData: response.data } });
+      setSuccessCheckout(true);
+      setTimeout(() => {
+        setSuccessCheckout(false);
+        navigate(routesConfig.payment, { state: { checkoutData: response.data } });
+      }, 1500);
     } catch (error) {
-      console.error('Failed to create cart:', error);
+      setFailedCheckout(true);
+    } finally {
+      setLoadingFullScreen(false);
     }
   };
 
@@ -135,6 +155,15 @@ function Details({ product, loading, seller }) {
               </div>
             </div>
           </div>
+
+          {successCreateCart && (
+            <Success message="Thêm vào giỏ hàng thành công" onClose={() => setSuccessCreateCart(false)} />
+          )}
+          {successCheckout && <Success message="Đặt hàng thành công" onClose={() => setSuccessCheckout(false)} />}
+          {failedCreateCart && (
+            <Failed message="Thêm vào giỏ hàng thất bại" onClose={() => setFailedCreateCart(false)} />
+          )}
+          {failedCheckout && <Failed message="Đặt hàng thất bại" onClose={() => setFailedCheckout(false)} />}
         </>
       );
     } else {
@@ -142,7 +171,16 @@ function Details({ product, loading, seller }) {
     }
   };
 
-  return <>{renderContent()}</>;
+  return (
+    <>
+      {loadingFullScreen && (
+        <div className={cx('fullscreen-loading')}>
+          <LoadingIndicator />
+        </div>
+      )}
+      {renderContent()}
+    </>
+  );
 }
 
 export default memo(Details);

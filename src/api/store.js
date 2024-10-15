@@ -30,9 +30,9 @@ export const getShopByUser = async (shop_id) => {
   }
 };
 
-export const getProductByShop = async (shop_id, page = 1) => {
+export const getProductByShop = async (shop_id, user_id, page = 1) => {
   try {
-    const response = await getData(apiURL.getProductByShop(shop_id, page));
+    const response = await getData(apiURL.getProductByShop(shop_id, user_id, page));
     return response.data;
   } catch (error) {
     console.error('Error fetching product store:', error);

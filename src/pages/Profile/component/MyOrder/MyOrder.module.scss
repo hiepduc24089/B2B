@@ -126,6 +126,7 @@
   }
   .product-detail {
     display: flex;
+    justify-content: space-between;
     gap: 60px;
     .title-image {
       display: flex;

@@ -6,6 +6,7 @@ import Supplier from './component/Supplier';
 import Store from './component/Store';
 import { useParams } from 'react-router-dom';
 import { fetchDetailRequestSupplier } from '~/api/requestsupplier';
+import LoadingIndicator from '~/components/Loading';
 
 const cx = classNames.bind(styles);
 
@@ -51,14 +52,14 @@ function SupplierDetail() {
           {!loading && requestSupplier ? (
             <Supplier requestSupplier={requestSupplier.request} loading={loading} />
           ) : (
-            <p>Loading supplier details...</p>
+            <LoadingIndicator />
           )}
         </div>
         <div className={cx('store-details')}>
           {!loading && requestSupplier ? (
             <Store requestSupplier={requestSupplier.user} loading={loading} requestSupplierID={id} />
           ) : (
-            <p>Loading store details...</p>
+            <LoadingIndicator />
           )}
         </div>
       </div>

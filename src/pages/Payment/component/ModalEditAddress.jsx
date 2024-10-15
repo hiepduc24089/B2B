@@ -3,12 +3,18 @@ import classNames from 'classnames/bind';
 import styles from './ModalAddress.module.scss';
 import { Modal } from 'react-bootstrap';
 import { fetchDistricts, fetchProvinces, fetchWards } from '~/api/province';
-import { deleteUserAddress, fetchAddressDetail, updateUserAddress } from '~/api/address';
+import { fetchAddressDetail, updateUserAddress } from '~/api/address';
 import LoadingIndicator from '~/components/Loading';
+import Success from '~/components/Layout/Popup/Success';
+import Failed from '~/components/Layout/Popup/Failed';
 
 const cx = classNames.bind(styles);
 
 function ModalEditAddress({ showModal, handleCloseModal, addressID }) {
+  const [loadingFullScreen, setLoadingFullScreen] = useState(false);
+  const [successUpdateAddress, setSuccessUpdateAddress] = useState(false);
+  const [failedUpdateAddress, setFailedUpdateAddress] = useState(false);
+
   // Fetch Province API
   const [selectedProvince, setSelectedProvince] = useState('');
   const [provinces, setProvinces] = useState([]);
@@ -114,6 +120,8 @@ function ModalEditAddress({ showModal, handleCloseModal, addressID }) {
   const [inputAddressDetail, setInputAddressDetail] = useState('');
 
   const handleSubmit = async () => {
+    setLoadingFullScreen(true);
+
     const formData = new FormData();
     formData.append('name', inputName);
     formData.append('phone', inputPhone);
@@ -125,23 +133,29 @@ function ModalEditAddress({ showModal, handleCloseModal, addressID }) {
     try {
       const response = await updateUserAddress(addressID, formData);
       if (!response.status) {
-        alert('Cập nhật địa chỉ thất bại, vui lòng thử lại.');
+        setFailedUpdateAddress(true);
         return;
       }
-
-      alert('Cập nhật địa chỉ thành công');
       handleCloseModal();
+      setSuccessUpdateAddress(true);
       setTimeout(() => {
         window.location.reload();
-      }, 300);
+      }, 1500);
     } catch (error) {
-      console.error('Failed to create address:', error);
-      alert('Cập nhật địa chỉ thất bại, vui lòng thử lại.');
+      console.error('Failed to update address:', error);
+      setFailedUpdateAddress(true);
+    } finally {
+      setLoadingFullScreen(false);
     }
   };
 
   return (
     <>
+      {loadingFullScreen && (
+        <div className={cx('fullscreen-loading')}>
+          <LoadingIndicator />
+        </div>
+      )}
       <Modal show={showModal} onHide={handleCloseModal} className={cx('store-modal')}>
         <Modal.Header closeButton>
           <Modal.Title className={cx('modal-title')}>Địa chỉ giao hàng</Modal.Title>
@@ -251,6 +265,12 @@ function ModalEditAddress({ showModal, handleCloseModal, addressID }) {
           </button>
         </Modal.Footer>
       </Modal>
+      {successUpdateAddress && (
+        <Success message="Địa chỉ cập nhật thành công" onClose={() => setSuccessUpdateAddress(false)} />
+      )}
+      {failedUpdateAddress && (
+        <Failed message="Địa chỉ cập nhật thất bại" onClose={() => setFailedUpdateAddress(false)} />
+      )}
     </>
   );
 }

@@ -4,10 +4,17 @@ import styles from './ModalAddress.module.scss';
 import { Modal } from 'react-bootstrap';
 import { fetchDistricts, fetchProvinces, fetchWards } from '~/api/province';
 import { postCreateAddress } from '~/api/address';
+import Success from '~/components/Layout/Popup/Success';
+import Failed from '~/components/Layout/Popup/Failed';
+import LoadingIndicator from '~/components/Loading';
 
 const cx = classNames.bind(styles);
 
 function ModalAddAddress({ showModal, handleCloseModal }) {
+  const [loadingFullScreen, setLoadingFullScreen] = useState(false);
+  const [successAddAddress, setSuccessAddAddress] = useState(false);
+  const [failedAddAddress, setFailedAddAddress] = useState(false);
+
   // Fetch Province API
   const [selectedProvince, setSelectedProvince] = useState('');
   const [provinces, setProvinces] = useState([]);
@@ -76,6 +83,8 @@ function ModalAddAddress({ showModal, handleCloseModal }) {
   const [inputAddressDetail, setInputAddressDetail] = useState('');
 
   const handleSubmit = async () => {
+    setLoadingFullScreen(true);
+
     const formData = new FormData();
     formData.append('name', inputName);
     formData.append('phone', inputPhone);
@@ -87,22 +96,29 @@ function ModalAddAddress({ showModal, handleCloseModal }) {
     try {
       const response = await postCreateAddress(formData);
       if (!response.status) {
-        alert('Tạo địa chỉ thất bại, vui lòng thử lại.');
+        setFailedAddAddress(true);
         return;
       }
 
-      alert('Tạo địa chỉ thành công');
+      setSuccessAddAddress(true);
       handleCloseModal();
       setTimeout(() => {
         window.location.reload();
-      }, 300);
+      }, 1500);
     } catch (error) {
       console.error('Failed to create address:', error);
-      alert('Tạo địa chỉ thất bại, vui lòng thử lại.');
+      setFailedAddAddress(true);
+    } finally {
+      setLoadingFullScreen(false);
     }
   };
   return (
     <>
+      {loadingFullScreen && (
+        <div className={cx('fullscreen-loading')}>
+          <LoadingIndicator />
+        </div>
+      )}
       <Modal show={showModal} onHide={handleCloseModal} className={cx('store-modal')}>
         <Modal.Header closeButton>
           <Modal.Title className={cx('modal-title')}>Địa chỉ giao hàng</Modal.Title>
@@ -203,6 +219,10 @@ function ModalAddAddress({ showModal, handleCloseModal }) {
           </button>
         </Modal.Footer>
       </Modal>
+      {successAddAddress && (
+        <Success message="Địa chỉ được tạo thành công" onClose={() => setSuccessAddAddress(false)} />
+      )}
+      {failedAddAddress && <Failed message="Địa chỉ tạo thất bại" onClose={() => setFailedAddAddress(false)} />}
     </>
   );
 }

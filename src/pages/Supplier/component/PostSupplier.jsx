@@ -1,16 +1,16 @@
 import React, { memo, useState, useEffect } from 'react';
 import classNames from 'classnames/bind';
-import styles from './SupplierPost.module.scss';
+import styles from './PostSupplier.module.scss';
 import { imagesStore } from '~/assets/images';
 import { fetchProvinces } from '~/api/province';
-import LoadingIndicator from '~/components/Loading';
 import { postRequestSupplier } from '~/api/requestsupplier';
+import LoadingIndicator from '~/components/Loading';
 import Success from '~/components/Layout/Popup/Success';
 import Failed from '~/components/Layout/Popup/Failed';
 
 const cx = classNames.bind(styles);
 
-function SupplierPost() {
+function PostSupplier() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [showError, setShowError] = useState(false);
   const [loadingFullScreen, setLoadingFullScreen] = useState(false);
@@ -211,4 +211,4 @@ function SupplierPost() {
   );
 }
 
-export default memo(SupplierPost);
+export default memo(PostSupplier);

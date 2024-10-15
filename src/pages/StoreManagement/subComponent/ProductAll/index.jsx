@@ -8,10 +8,13 @@ import { images, imagesHome } from '~/assets/images';
 import { deleteProductByShop, fetchProductByShopAtShop, updateProductDisplay } from '~/api/product';
 import LoadingIndicator from '~/components/Loading';
 import Warning from '~/components/Layout/Popup/Warning';
+import Success from '~/components/Layout/Popup/Success';
+import Failed from '~/components/Layout/Popup/Failed';
 
 const cx = classNames.bind(styles);
 
 function ProductAll({ onEditProductClick }) {
+  const [loadingFullScreen, setLoadingFullScreen] = useState(false);
   const [state, setState] = useState({
     loading: true,
     dataListProduct: [],
@@ -19,6 +22,8 @@ function ProductAll({ onEditProductClick }) {
   const { loading, dataListProduct } = state;
   const [showWarning, setShowWarning] = useState(false); // Warning popup control
   const [showDeleteWarning, setShowDeleteWarning] = useState(false); // Control delete warning popup
+  const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
+  const [showDeleteFailed, setShowDeleteFailed] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null); // Store product ID to delete
   const [selectedProduct, setSelectedProduct] = useState(null); // Store the selected product to update
   const [newDisplayValue, setNewDisplayValue] = useState(null); // Store the new display value
@@ -49,19 +54,21 @@ function ProductAll({ onEditProductClick }) {
   };
 
   const handleConfirmDelete = async () => {
+    setLoadingFullScreen(true);
     try {
       const response = await deleteProductByShop(productToDelete);
       if (response.status) {
         const updatedProducts = dataListProduct.filter((product) => product.id !== productToDelete);
         setState({ ...state, dataListProduct: updatedProducts });
-        alert('Sản phẩm đã được xóa thành công!');
+        setShowDeleteSuccess(true);
       } else {
-        alert('Xóa sản phẩm thất bại. Vui lòng thử lại.');
+        setShowDeleteFailed(true);
       }
     } catch (error) {
       console.error('Failed to delete product:', error);
-      alert('Xóa sản phẩm thất bại. Vui lòng thử lại.');
+      setShowDeleteFailed(true);
     } finally {
+      setLoadingFullScreen(false);
       setShowDeleteWarning(false);
       setProductToDelete(null);
     }
@@ -107,6 +114,11 @@ function ProductAll({ onEditProductClick }) {
 
   return (
     <>
+      {loadingFullScreen && (
+        <div className={cx('fullscreen-loading')}>
+          <LoadingIndicator />
+        </div>
+      )}
       <div className={cx('all-product-header')}>
         <h3 className={cx('mb-0')}>Tất cả sản phẩm</h3>
         <HeadlessTippy>
@@ -192,6 +204,9 @@ function ProductAll({ onEditProductClick }) {
           onOk={handleConfirmToggle}
         />
       )}
+
+      {showDeleteSuccess && <Success message="Xoá sản phẩm thành công" onClose={() => setShowDeleteSuccess(false)} />}
+      {showDeleteFailed && <Failed message="Xoá sản phẩm thất bại" onClose={() => setShowDeleteFailed(false)} />}
     </>
   );
 }

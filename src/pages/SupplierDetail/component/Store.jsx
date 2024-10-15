@@ -5,10 +5,16 @@ import { Modal } from 'react-bootstrap';
 import LoadingIndicator from '~/components/Loading';
 import { API_HOST } from '~/config/host';
 import { postCreateQuotesFromUser } from '~/api/requestsupplier';
+import Success from '~/components/Layout/Popup/Success';
+import Failed from '~/components/Layout/Popup/Failed';
 
 const cx = classNames.bind(styles);
 
 function Store({ requestSupplier, loading, requestSupplierID }) {
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [showError, setShowError] = useState(false);
+  const [loadingFullScreen, setLoadingFullScreen] = useState(false);
+
   const [showModal, setShowModal] = useState(false);
   const handleShowModal = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
@@ -33,18 +39,27 @@ function Store({ requestSupplier, loading, requestSupplierID }) {
     formData.append('price', inputPrice);
     formData.append('address', inputAddress);
     formData.append('content', inputContent);
+
+    setLoadingFullScreen(true);
     try {
       const response = await postCreateQuotesFromUser(formData);
       if (!response.status) {
-        alert('Gửi báo giá thất bại, vui lòng thử lại.');
+        handleCloseModal();
+        setShowError(true);
         return;
       }
 
-      alert('Gửi báo giá thành công');
+      setShowSuccess(true);
       handleCloseModal();
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
     } catch (error) {
+      handleCloseModal();
       console.error('Failed to create quotes:', error);
-      alert('Gửi báo giá thất bại, vui lòng thử lại.');
+      setShowError(true);
+    } finally {
+      setLoadingFullScreen(false);
     }
   };
 
@@ -73,6 +88,11 @@ function Store({ requestSupplier, loading, requestSupplierID }) {
 
   return (
     <>
+      {loadingFullScreen && (
+        <div className={cx('fullscreen-loading')}>
+          <LoadingIndicator />
+        </div>
+      )}
       {renderContent()}
       {/* Modal */}
       <Modal show={showModal} onHide={handleCloseModal} className={cx('store-modal')}>
@@ -137,6 +157,9 @@ function Store({ requestSupplier, loading, requestSupplierID }) {
           </button>
         </Modal.Footer>
       </Modal>
+
+      {showSuccess && <Success message="Gửi báo giá thành công" onClose={() => setShowSuccess(false)} />}
+      {showError && <Failed message="Gửi báo giá thất bại" onClose={() => setShowError(false)} />}
     </>
   );
 }

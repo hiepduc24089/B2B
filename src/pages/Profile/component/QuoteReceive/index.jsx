@@ -1,7 +1,7 @@
 import React, { memo, useState, useEffect } from 'react';
 import classNames from 'classnames/bind';
 import styles from './QuoteReceive.module.scss';
-import { fetchListPriceQuote } from '~/api/requestsupplier';
+import { fetchListPriceQuote, fetchPriceQuoteDetail } from '~/api/requestsupplier';
 import { API_HOST } from '~/config/host';
 import LoadingIndicator from '~/components/Loading';
 import { imagesHotDeal } from '~/assets/images';
@@ -39,10 +39,9 @@ function QuoteReceive() {
   };
 
   // Fetch price quotes
-  const fetchPriceQuote = async (page = 1) => {
+  const fetchPriceQuote = async () => {
     try {
-      const response = await fetchListPriceQuote(page);
-
+      const response = await fetchQuoteSent();
       if (!response.status) {
         throw new Error('Failed to fetch price quotes');
       }
@@ -64,8 +63,7 @@ function QuoteReceive() {
   // Fetch quote details
   const fetchQuoteDetail = async (id) => {
     try {
-      const response = await fetchQuoteSent(id);
-
+      const response = await fetchPriceQuoteDetail(id);
       if (!response.status) {
         throw new Error('Failed to fetch price quote details');
       }
@@ -101,7 +99,8 @@ function QuoteReceive() {
   }, []);
 
   function formatPrice(price) {
-    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    const validPrice = price ?? 0;
+    return validPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   }
 
   const renderDetail = () => {

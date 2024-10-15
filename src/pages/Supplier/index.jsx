@@ -6,6 +6,8 @@ import LoadingIndicator from '~/components/Loading';
 import { fetchSupplier } from '~/api/home';
 import SubTitle from '~/components/Layout/SubTitle/SubTitle';
 import { API_HOST } from '~/config/host';
+import { useNavigate } from 'react-router-dom';
+import routesConfig from '~/config/routes';
 
 const cx = classNames.bind(styles);
 
@@ -14,7 +16,9 @@ function Supplier() {
     loading: true,
     dataListSupplier: [],
   });
+
   const { loading, dataListSupplier } = state;
+  const navigate = useNavigate();
 
   const fetchDataListSupplierAPI = async () => {
     try {
@@ -38,6 +42,10 @@ function Supplier() {
   useEffect(() => {
     fetchDataListSupplierAPI();
   }, []);
+
+  const handlePostSupplier = () => {
+    navigate(routesConfig.supplier_post);
+  };
   const renderContent = () => {
     if (loading) {
       return <LoadingIndicator />;
@@ -66,7 +74,7 @@ function Supplier() {
       <SubTitle />
       <div className={cx('supplier')}>
         <h1 className={cx('supplier-title')}>Tìm nhà cung cấp trên toàn quốc</h1>
-        <button className={cx('post-news')}>
+        <button className={cx('post-news')} onClick={handlePostSupplier}>
           <img src={imagesSupplier.post_news} alt="Post New" />
           <span>Đăng tin của bạn</span>
         </button>

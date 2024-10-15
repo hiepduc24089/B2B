@@ -63,7 +63,7 @@ export const apiURL = {
   // Store Management
   createShop: '/api/create-shop',
   getShopByUser: (shop_id) => `/api/detail-shop/${shop_id}`,
-  getProductByShop: (shop_id, page) => `/api/get-product-shop/${shop_id}?page=${page}`,
+  getProductByShop: (shop_id, user_id, page) => `/api/get-product-shop/${shop_id}?user_id=${user_id}&page=${page}`,
 
   //Render Category Product
   getCategoyProduct: '/api/filter-Product',

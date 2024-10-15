@@ -5,10 +5,11 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '~/context/AuthContext';
 import { logoutUser } from '~/api/loginregister';
 import routesConfig from '~/config/routes';
+import Failed from '../Popup/Failed';
 
 const cx = classNames.bind(styles);
 
-function Wrapper({ onLogoutSuccess }) {
+function Wrapper({ onLogoutSuccess, onLogoutFailed }) {
   const { logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -17,7 +18,7 @@ function Wrapper({ onLogoutSuccess }) {
     try {
       const logoutResponse = await logoutUser();
       if (!logoutResponse.status) {
-        alert('Đăng xuất thất bại, vui lòng thử lại!');
+        onLogoutFailed();
         return;
       }
       logout();
@@ -29,8 +30,7 @@ function Wrapper({ onLogoutSuccess }) {
         window.location.reload();
       }, 1000);
     } catch (error) {
-      console.error('Failed to log out:', error);
-      logout();
+      onLogoutFailed();
     }
   };
 
