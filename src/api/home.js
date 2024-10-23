@@ -1,10 +1,10 @@
-import { getData } from '~/axios/config';
+import { getData, postData } from '~/axios/config';
 import { apiURL } from '~/axios/apiURL';
 
 // Fetch hot deal products
-export const fetchHotDeal = async (page = 1) => {
+export const fetchHotDeal = async (user_id, page = 1) => {
   try {
-    const response = await getData(apiURL.dealHotToday, { params: { page } });
+    const response = await getData(apiURL.dealHotToday, { params: { user_id, page } });
     return response.data;
   } catch (error) {
     console.error('Error fetching hot deal product:', error);
@@ -13,9 +13,9 @@ export const fetchHotDeal = async (page = 1) => {
 };
 
 // Fetch "For You" products
-export const fetchForYou = async () => {
+export const fetchForYou = async (user_id) => {
   try {
-    const response = await getData(apiURL.productForYou);
+    const response = await getData(apiURL.productForYou, { params: { user_id } });
     return response.data;
   } catch (error) {
     console.error('Error fetching "For You" product:', error);
@@ -52,6 +52,28 @@ export const fetchCategory = async (page = 1) => {
     return response;
   } catch (error) {
     console.error('Error fetching category data:', error);
+    throw error;
+  }
+};
+
+//Favorite Product Add or Remove
+export const postFavoriteProduct = async (product_id) => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await postData(
+      apiURL.postFavoriteProduct,
+      { product_id },
+      {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    return response;
+  } catch (error) {
+    console.error('Error update favorite:', error);
     throw error;
   }
 };

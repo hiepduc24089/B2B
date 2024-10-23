@@ -198,7 +198,10 @@
     color: var(--white);
   }
 }
-
+.not-found-order {
+  margin-top: 10px;
+  font-size: 14px;
+}
 @media screen and (max-width: 768px) {
   .order-wrapper {
     .order-item {
@@ -257,5 +260,8 @@
       font-size: 12px;
       padding: 4px 12px;
     }
+  }
+  .not-found-order {
+    font-size: 12px;
   }
 }

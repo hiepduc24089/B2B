@@ -23,10 +23,11 @@ function Category() {
 
   const { loading, dataListProduct } = state;
 
+  const userID = localStorage.getItem('user_id') || 0;
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await fetchCategoryProduct(category_id, '', '', '', 1);
+        const data = await fetchCategoryProduct(category_id, '', '', '', 1, userID);
 
         setState((prevState) => ({
           ...prevState,
@@ -61,7 +62,7 @@ function Category() {
             </div>
           </Header>
           <Content className={cx('product')}>
-            <Product loading={loading} dataListProduct={dataListProduct} />
+            <Product loading={loading} dataListProduct={dataListProduct} category_name={category_name} />
           </Content>
         </Layout>
       </Layout>

@@ -1,0 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=Mulish:wght@400;600&display=swap');
+
+.menu-wrapper {
+  width: max-content;
+  max-height: min((100vh - 96px) - 60px, 734px);
+  min-height: 100px;
+  background: rgb(255, 255, 255);
+  box-shadow: rgb(0 0 0 / 12%) 0px 2px 12px;
+  border-radius: 8px;
+  padding: 16px;
+
+  ul {
+    margin-bottom: 0;
+    padding-left: 0;
+    li {
+      list-style: none;
+      text-align: left;
+      font-family: Mulish;
+      color: var(--black);
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 2;
+      cursor: pointer;
+    }
+    li.active {
+      font-family: Inter;
+      color: var(--black);
+      font-size: 16px;
+      font-weight: 600;
+    }
+  }
+}

@@ -44,3 +44,22 @@ export const loginUser = async (userData) => {
     throw error;
   }
 };
+
+//Logout
+export const logoutUser = async () => {
+  try {
+    const token = localStorage.getItem('token');
+
+    const response = await postData(apiURL.logout, null, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return response;
+  } catch (error) {
+    console.error('Failed to log out:', error);
+    throw error;
+  }
+};

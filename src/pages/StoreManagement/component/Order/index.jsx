@@ -19,6 +19,7 @@ function Order() {
     loading: true,
     listOrder: [],
   });
+  const [searchKey, setSearchKey] = useState('');
 
   const { loading, listOrder } = state;
 
@@ -70,13 +71,15 @@ function Order() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const getListOrderResponse = await fetchListOrder();
+        const getListOrderResponse = await fetchListOrder(searchKey);
 
         if (!getListOrderResponse.status) {
-          alert('Lấy thông tin đơn hàng thất bại');
+          setState({
+            loading: false,
+            listOrder: [],
+          });
           return;
         }
-
         setState({
           loading: false,
           listOrder: getListOrderResponse.data,
@@ -90,18 +93,35 @@ function Order() {
     fetchOrders();
   }, []);
 
+  const handleSearch = async () => {
+    try {
+      setState({ ...state, loading: true });
+      const getListOrderResponse = await fetchListOrder(searchKey);
+
+      setState({
+        loading: false,
+        listOrder: getListOrderResponse.data,
+      });
+    } catch (error) {
+      console.error('Fetch order failed:', error);
+      alert('Lấy thông tin đơn hàng thất bại.');
+    }
+  };
+
   function formatPrice(price) {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   }
 
   // Filter orders based on the selected status
   const filteredOrders =
-    activeStatus === 7 // Show all orders when "Tất cả" is selected
-      ? listOrder
-      : listOrder.filter((order) => order.status === activeStatus); // Filter based on active status
+    activeStatus === 7 ? listOrder || [] : (listOrder || []).filter((order) => order.status === activeStatus);
 
   const handleLinkToOrderDetail = (order_id) => {
     navigate(routesConfig.order_detail.replace(':id', order_id));
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchKey(e.target.value);
   };
 
   return (
@@ -138,8 +158,10 @@ function Order() {
                 className={cx('search-field', 'form-control')}
                 placeholder="Nhập từ khoá để tìm kiếm"
                 spellCheck={false}
+                value={searchKey}
+                onChange={handleSearchChange}
               />
-              <button className={cx('search-btn', 'd-flex')}>
+              <button className={cx('search-btn', 'd-flex')} onClick={handleSearch}>
                 <FontAwesomeIcon icon={faMagnifyingGlass} />
               </button>
             </div>
@@ -149,7 +171,7 @@ function Order() {
 
       {loading ? (
         <LoadingIndicator />
-      ) : (
+      ) : filteredOrders && filteredOrders.length > 0 ? (
         <div className={cx('order-wrapper')}>
           {filteredOrders.map((order) => (
             <div className={cx('order-item')} key={order.order_id}>
@@ -179,7 +201,6 @@ function Order() {
                 <span className={cx('total')}>{formatPrice(order.total_payment)}đ</span>
               </div>
               <div className={cx('button-wrapper')}>
-                <button className={cx('receive')}>Nhận đơn</button>
                 <button className={cx('cancel')}>Huỷ đơn</button>
                 <button className={cx('detail')} onClick={() => handleLinkToOrderDetail(order.order_id)}>
                   Xem chi tiết
@@ -188,6 +209,8 @@ function Order() {
             </div>
           ))}
         </div>
+      ) : (
+        <p className={cx('not-found-order')}>Không tìm thấy đơn hàng</p>
       )}
     </>
   );

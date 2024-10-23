@@ -10,10 +10,26 @@ import routesConfig from '~/config/routes';
 import { useCart } from '~/context/CartContext';
 import { getShoppingCard, createCheckOut, removeProductByShop, removeStore, updateCart } from '~/api/payment';
 import { API_HOST } from '~/config/host';
+import Success from '~/components/Layout/Popup/Success';
+import Failed from '~/components/Layout/Popup/Failed';
+import Warning from '~/components/Layout/Popup/Warning';
 
 const cx = classNames.bind(styles);
 
 function ShoppingCart() {
+  const [loadingFullScreen, setLoadingFullScreen] = useState(false);
+  const [successUpdateQuantity, setSuccessUpdateQuantity] = useState(false);
+  const [successDeleteProduct, setSuccessDeleteProduct] = useState(false);
+  const [successDeleteStore, setSuccessDeleteStore] = useState(false);
+  const [successBuying, setSuccessBuying] = useState(false);
+  const [failedUpdateQuantity, setFailedUpdateQuantity] = useState(false);
+  const [failedDeleteProduct, setFailedDeleteProduct] = useState(false);
+  const [failedDeleteStore, setFailedDeleteStore] = useState(false);
+  const [failedBuying, setFailedBuying] = useState(false);
+  const [warningSelectProduct, setWarningSelectProduct] = useState(false);
+  const [warningDeleteProduct, setWarningDeleteProduct] = useState(false);
+  const [warningDeleteStore, setWarningDeleteStore] = useState(false);
+
   const { quantities, setQuantities } = useCart();
   const [state, setState] = useState({
     loading: true,
@@ -61,8 +77,7 @@ function ShoppingCart() {
         });
 
         if (!response.status) {
-          alert('Cập nhật giỏ hàng thất bại, vui lòng thử lại.');
-
+          setFailedUpdateQuantity(true);
           // Revert the quantity change in the state if the update fails
           setQuantities((prevQuantities) => ({
             ...prevQuantities,
@@ -80,8 +95,7 @@ function ShoppingCart() {
           });
         }
       } catch (error) {
-        console.error('Failed to update product quantity:', error);
-        alert('Failed to update product quantity. Please try again.');
+        setFailedUpdateQuantity(true);
 
         // Revert the quantity change in the state if the update fails
         setQuantities((prevQuantities) => ({
@@ -102,13 +116,13 @@ function ShoppingCart() {
     }, 1000);
   };
 
-  // Handle removing a product
-  const handleRemoveProduct = async (storeId, productId, quantity) => {
-    const isConfirmed = window.confirm('Bạn có muốn xóa sản phẩm này không?');
+  const [productToDelete, setProductToDelete] = useState({ storeId: null, productId: null, quantity: null });
+  const [storeToDelete, setStoreToDelete] = useState(null);
 
-    if (!isConfirmed) {
-      return;
-    }
+  // Handle product deletion
+  const handleRemoveProduct = async () => {
+    const { storeId, productId, quantity } = productToDelete;
+    setLoadingFullScreen(true);
     try {
       const removeProduct = await removeProductByShop({
         shop_id: storeId,
@@ -116,8 +130,10 @@ function ShoppingCart() {
         quantity: quantity,
       });
       if (!removeProduct.status) {
-        alert('Xoá sản phẩm thất bại, vui lòng thử lại');
+        setFailedDeleteProduct(true);
         return;
+      } else {
+        setSuccessDeleteProduct(true);
       }
       // Update state to remove the product from the UI
       setState((prevState) => {
@@ -147,42 +163,56 @@ function ShoppingCart() {
       });
     } catch (error) {
       console.error('Failed to remove product:', error);
-      alert('Failed to remove the product. Please try again.');
+      setFailedDeleteProduct(true);
+    } finally {
+      setLoadingFullScreen(false);
+      setWarningDeleteProduct(false);
     }
   };
 
-  // Handle removing a store
-  const handleRemoveStore = async (storeId) => {
-    const isConfirmed = window.confirm('Bạn có muốn xóa cửa hàng này không?');
-    if (!isConfirmed) {
-      return;
-    }
-
+  // Handle store deletion
+  const handleRemoveStore = async () => {
+    setLoadingFullScreen(true);
     try {
-      const responseRemoveStore = await removeStore({ shop_id: storeId });
+      const responseRemoveStore = await removeStore({ shop_id: storeToDelete });
 
       if (!responseRemoveStore.status) {
-        alert('Xoá thất bại, vui lòng thử lại');
+        setFailedDeleteStore(true);
         return;
+      } else {
+        setSuccessDeleteStore(true);
       }
 
       setState((prevState) => {
         const updatedGroupedProducts = { ...prevState.groupedProducts };
-        delete updatedGroupedProducts[storeId];
+        delete updatedGroupedProducts[storeToDelete];
 
         return { ...prevState, groupedProducts: updatedGroupedProducts };
       });
 
       setCheckedState((prevState) => {
         const updatedCheckedState = { ...prevState };
-        delete updatedCheckedState[storeId];
+        delete updatedCheckedState[storeToDelete];
 
         return updatedCheckedState;
       });
     } catch (error) {
       console.error('Failed to remove store:', error);
-      alert('Failed to remove the store. Please try again.');
+      setFailedDeleteStore(true);
+    } finally {
+      setLoadingFullScreen(false);
+      setWarningDeleteStore(false);
     }
+  };
+
+  const handleOpenWarningProduct = (storeId, productId, quantity) => {
+    setProductToDelete({ storeId, productId, quantity });
+    setWarningDeleteProduct(true);
+  };
+
+  const handleOpenWarningStore = (storeId) => {
+    setStoreToDelete(storeId);
+    setWarningDeleteStore(true);
   };
 
   // Handle store checkbox change
@@ -298,21 +328,27 @@ function ShoppingCart() {
       .filter((item) => item.products.length > 0);
 
     if (items.length === 0) {
-      alert('Vui lòng chọn sản phẩm');
+      setWarningSelectProduct(true);
       return;
     }
 
+    setLoadingFullScreen(true);
     try {
       const checkoutResponse = await createCheckOut(items);
 
       if (!checkoutResponse.status) {
-        alert('Mua hàng thất bại, vui lòng thử lại.');
+        setFailedBuying(true);
         return;
       }
-      navigate(routesConfig.payment, { state: { checkoutData: checkoutResponse.data } });
+      setSuccessBuying(true);
+      setTimeout(() => {
+        navigate(routesConfig.payment, { state: { checkoutData: checkoutResponse.data } });
+      }, 1500);
     } catch (error) {
       console.error('Checkout failed:', error);
-      alert('Mua hàng thất bại, vui lòng thử lại.');
+      setFailedBuying(true);
+    } finally {
+      setLoadingFullScreen(false);
     }
   };
 
@@ -344,7 +380,7 @@ function ShoppingCart() {
               src={imagesCart.trash_icon}
               alt="Trash Icon"
               className={cx('trash-icon')}
-              onClick={() => handleRemoveStore(storeId)}
+              onClick={() => handleOpenWarningStore(storeId)}
             />
           </div>
 
@@ -386,7 +422,7 @@ function ShoppingCart() {
                     src={imagesCart.trash_icon}
                     alt="Trash Icon"
                     className={cx('trash-icon')}
-                    onClick={() => handleRemoveProduct(storeId, product.product_id, product.quantity)}
+                    onClick={() => handleOpenWarningProduct(storeId, product.product_id, product.quantity)}
                   />
                 </div>
               </div>
@@ -399,6 +435,11 @@ function ShoppingCart() {
 
   return (
     <>
+      {loadingFullScreen && (
+        <div className={cx('fullscreen-loading')}>
+          <LoadingIndicator />
+        </div>
+      )}
       <SubTitle />
       <div className={cx('shopping-cart-wrapper')}>
         <div className={cx('shopping-cart-details')}>
@@ -423,6 +464,42 @@ function ShoppingCart() {
           </div>
         </div>
       </div>
+
+      {successUpdateQuantity && (
+        <Success message="Cập nhật số lượng sản phẩm thành công" onClose={() => setSuccessUpdateQuantity(false)} />
+      )}
+      {successDeleteProduct && (
+        <Success message="Xoá sản phẩm thành công" onClose={() => setSuccessDeleteProduct(false)} />
+      )}
+      {successDeleteStore && <Success message="Xoá cửa hàng thành công" onClose={() => setSuccessDeleteStore(false)} />}
+      {successBuying && <Success message="Mua hàng thành công" onClose={() => setSuccessBuying(false)} />}
+      {failedUpdateQuantity && (
+        <Failed message="Cập nhật số lượng sản phẩm thất bại" onClose={() => setFailedUpdateQuantity(false)} />
+      )}
+      {failedDeleteProduct && <Failed message="Xoá sản phẩm thất bại" onClose={() => setFailedDeleteProduct(false)} />}
+      {failedDeleteStore && <Failed message="Xoá cửa hàng thất bại" onClose={() => setFailedDeleteStore(false)} />}
+      {failedBuying && <Failed message="Mua hàng thất bại" onClose={() => setFailedBuying(false)} />}
+      {warningSelectProduct && (
+        <Warning
+          message="Vui lòng chọn sản phẩm"
+          onClose={() => setWarningSelectProduct(false)}
+          onOk={() => setWarningSelectProduct(false)}
+        />
+      )}
+      {warningDeleteProduct && (
+        <Warning
+          message="Bạn có muốn xoá sản phẩm này"
+          onClose={() => setWarningDeleteProduct(false)}
+          onOk={handleRemoveProduct}
+        />
+      )}
+      {warningDeleteStore && (
+        <Warning
+          message="Bạn có muốn xoá cửa hàng này"
+          onClose={() => setWarningDeleteStore(false)}
+          onOk={handleRemoveStore}
+        />
+      )}
     </>
   );
 }

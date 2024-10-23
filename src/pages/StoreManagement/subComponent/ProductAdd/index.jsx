@@ -6,10 +6,16 @@ import { fetchAllListCategory } from '~/api/requestsupplier';
 import { API_HOST } from '~/config/host';
 import LoadingIndicator from '~/components/Loading';
 import { postProduct } from '~/api/product';
+import Success from '~/components/Layout/Popup/Success';
+import Failed from '~/components/Layout/Popup/Failed';
 
 const cx = classNames.bind(styles);
 
-function ProductAdd() {
+function ProductAdd({ onSubmitSuccess }) {
+  const [loadingFullScreen, setLoadingFullScreen] = useState(false);
+  const [showAddSuccess, setShowAddSuccess] = useState(false);
+  const [showAddFailed, setShowAddFailed] = useState(false);
+
   const [state, setState] = useState({
     loading: true,
     dataListCategory: [],
@@ -35,6 +41,14 @@ function ProductAdd() {
     const imageUrls = files.map((file) => URL.createObjectURL(file));
     setSelectedImages([...selectedImages, ...imageUrls]);
     setSelectedFiles([...selectedFiles, ...files]); // Store the files for FormData
+  };
+
+  const handleRemoveImage = (indexToRemove) => {
+    const updatedImages = selectedImages.filter((_, index) => index !== indexToRemove);
+    setSelectedImages(updatedImages);
+
+    const updatedFiles = selectedFiles.filter((_, index) => index !== indexToRemove);
+    setSelectedFiles(updatedFiles);
   };
 
   const handleAddPriceTier = () => {
@@ -114,13 +128,26 @@ function ProductAdd() {
       formData.append(`src[${index}]`, file);
     });
 
+    setLoadingFullScreen(true);
     try {
       const response = await postProduct(formData);
-      console.log('Product posted successfully:', response);
-      alert('Sản phẩm đã được đăng thành công!');
+
+      if (!response.status) {
+        setShowAddFailed(true);
+        return;
+      }
+
+      setShowAddSuccess(true);
+      setTimeout(() => {
+        if (onSubmitSuccess) {
+          onSubmitSuccess();
+        }
+      }, 1500);
     } catch (error) {
       console.error('Failed to post product:', error);
-      alert('Đăng sản phẩm thất bại.');
+      setShowAddFailed(true);
+    } finally {
+      setLoadingFullScreen(false);
     }
   };
 
@@ -154,6 +181,11 @@ function ProductAdd() {
 
   return (
     <>
+      {loadingFullScreen && (
+        <div className={cx('fullscreen-loading')}>
+          <LoadingIndicator />
+        </div>
+      )}
       <div className={cx('product-notes')}>
         <div className={cx('content')}>
           <img src={imagesStore.productNote} alt="Note" />
@@ -240,6 +272,9 @@ function ProductAdd() {
           {selectedImages.map((image, index) => (
             <div key={index} className={cx('image-preview-wrapper')}>
               <img src={image} alt={`Preview ${index}`} className={cx('image-preview')} />
+              <button className={cx('remove-image-button')} onClick={() => handleRemoveImage(index)}>
+                X
+              </button>
             </div>
           ))}
           <label className={cx('file-input-label')} htmlFor="file-input">
@@ -341,6 +376,8 @@ function ProductAdd() {
           </div>
         </div>
       )}
+      {showAddSuccess && <Success message="Đăng sản phẩm mới thành công" onClose={() => setShowAddSuccess(false)} />}
+      {showAddFailed && <Failed message="Đăng sản phẩm thất bại" onClose={() => setShowAddFailed(false)} />}
     </>
   );
 }

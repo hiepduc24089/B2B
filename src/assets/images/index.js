@@ -62,6 +62,16 @@ import backIcon from './all/back-icon.svg';
 import locationIcon from './all/location-icon.svg';
 import callIconWhite from './all/call-icon-white.svg';
 import productNote from './storemanagement/product-note.svg';
+import success from './popup/success.svg';
+import warning from './popup/warning.svg';
+import failed from './popup/failed.png';
+import closePopup from './popup/close-popup.svg';
+import heart from './all/heart.png';
+import heart_red from './all/heart-red.png';
+import attach_file from './all/attach-file.svg';
+import record from './all/record.svg';
+import send_message from './all/send-message-dm.svg';
+import avatar_icon from './all/avatar-icon.png';
 
 export const images = {
   logo,
@@ -81,6 +91,12 @@ export const images = {
   backIcon,
   locationIcon,
   callIconWhite,
+  heart,
+  heart_red,
+  attach_file,
+  record,
+  send_message,
+  avatar_icon,
 };
 
 export const imagesHome = {
@@ -152,4 +168,11 @@ export const imagesStore = {
   new_avatar_icon,
   new_introduce_image,
   productNote,
+};
+
+export const imagesPopup = {
+  success,
+  warning,
+  failed,
+  closePopup,
 };

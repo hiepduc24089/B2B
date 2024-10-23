@@ -16,6 +16,8 @@ const routes = {
   store_details: '/store-details/:id',
   store_information: '/store-information/:id',
   order_detail: '/order/:id',
+  supplier_detail: '/supplier/:id',
+  supplier_post: '/supplier/post',
 };
 
 export default routes;

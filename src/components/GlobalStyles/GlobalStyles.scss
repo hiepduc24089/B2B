@@ -52,12 +52,45 @@ body {
   text-align: center !important;
   padding: 0;
 }
+.error-message {
+  margin-bottom: 0;
+  margin-top: 3px;
+  color: red;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+//custom modal
+.modal-dialog {
+  max-width: 75% !important;
+}
+
+//Loading full screen
+.fullscreen-loading {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+canvas {
+  width: 100% !important;
+}
 @media screen and (max-width: 992px) {
   .slick-dots li {
     margin: 0;
   }
   .slick-dots li button:before {
     font-size: 15px !important;
+  }
+  .modal-dialog {
+    max-width: 100% !important;
   }
 }
 @media screen and (max-width: 475px) {
