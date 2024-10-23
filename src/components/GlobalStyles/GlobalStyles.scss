@@ -79,6 +79,9 @@ body {
   z-index: 9999;
 }
 
+canvas {
+  width: 100% !important;
+}
 @media screen and (max-width: 992px) {
   .slick-dots li {
     margin: 0;

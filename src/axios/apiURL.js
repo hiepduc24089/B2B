@@ -81,4 +81,13 @@ export const apiURL = {
   getDetailRequest: (request_id) => `/api/edit-request-supplier-user/${request_id}`,
   postCreateQuote: '/api/create-quotes',
   postUpdateRequestStatus: (request_id) => `/api/update-request-display/${request_id}`,
+
+  //Chat
+  getMessage: (user_id, receiver_id) => `/api/messages/${user_id}/${receiver_id}`,
+  sendMessage: `/api/messages`,
+  getConversations: 'api/conversations',
+  broadCast: 'api/test-chat/broadcast',
+
+  //Statistic
+  getStatistic: 'api/statistical',
 };
