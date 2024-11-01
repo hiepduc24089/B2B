@@ -67,7 +67,18 @@ function Message() {
                             : 'No time available'}
                         </label>
                       </div>
-                      <p className={cx('message')}>{conversation.last_message.content}</p>
+                      <div className={cx('d-flex', 'justify-content-between')}>
+                        <p
+                          className={cx('message', {
+                            'fw-bold': conversation.unread_message_count > 0,
+                          })}
+                        >
+                          {conversation.last_message.content}
+                        </p>
+                        {conversation.unread_message_count !== null && conversation.unread_message_count > 0 && (
+                          <span className={cx('unread-message')}>{conversation.unread_message_count}</span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>

@@ -4,34 +4,41 @@ import classNames from 'classnames/bind';
 import styles from '../HotDeal.module.scss';
 import routesConfig from '~/config/routes';
 import { Link } from 'react-router-dom';
-import { fetchHotDeal, postFavoriteProduct } from '~/api/home';
+import { postFavoriteProduct } from '~/api/home';
 import { API_HOST } from '~/config/host';
 import { images } from '~/assets/images';
 import Success from '~/components/Layout/Popup/Success';
+import { filterHotDeal } from '~/api/filter';
 
 const cx = classNames.bind(styles);
 
-function Product() {
+function Product({ filters }) {
   const [showSuccessAdd, setShowSuccessAdd] = useState(false);
   const [showSuccessRemove, setShowSuccessRemove] = useState(false);
-
   const [state, setState] = React.useState({
     loading: true,
     dataListProduct: [],
   });
   const { loading, dataListProduct } = state;
-
   const userID = localStorage.getItem('user_id') || 0;
   useEffect(() => {
     const fetchData = async () => {
+      setState((prevState) => ({
+        ...prevState,
+        loading: true,
+      }));
       try {
-        const data = await fetchHotDeal(userID);
-
-        setState((prevState) => ({
-          ...prevState,
+        const data = await filterHotDeal(
+          filters.categories,
+          filters.cities,
+          filters.min_price,
+          filters.max_price,
+          userID,
+        );
+        setState({
           loading: false,
-          dataListProduct: data.data,
-        }));
+          dataListProduct: data.data.data,
+        });
       } catch (error) {
         console.error('Failed to fetch hot deals:', error);
         setState((prevState) => ({
@@ -42,7 +49,7 @@ function Product() {
     };
 
     fetchData();
-  }, [userID]);
+  }, [filters, userID]);
 
   function formatPrice(price) {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');

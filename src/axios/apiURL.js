@@ -36,6 +36,8 @@ export const apiURL = {
   getRequestSupplier: '/api/get-request-supplier',
   category: '/api/category',
   postFavoriteProduct: '/api/favorite-product',
+  filterHotDeal: '/api/filter-deal-hot-today',
+  filterProduct: '/api/filter-Product',
 
   // Product and Shop Details
   productDetails: (slug) => `/api/detail-product/${slug}`,
@@ -87,6 +89,7 @@ export const apiURL = {
   sendMessage: `/api/messages`,
   getConversations: 'api/conversations',
   broadCast: 'api/test-chat/broadcast',
+  markReadMessage: (user_id, conversation_id) => `api/messages/mark-as-read/${user_id}/${conversation_id}`,
 
   //Statistic
   getStatistic: 'api/statistical',

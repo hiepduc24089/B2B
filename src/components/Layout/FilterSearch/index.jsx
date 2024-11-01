@@ -8,21 +8,23 @@ import { fetchCategory } from '~/api/home';
 import { fetchProvinces } from '~/api/province';
 
 const cx = classNames.bind(styles);
-
 const { Sider } = Layout;
 
-function FilterSearch({ category_id }) {
-  const [state, setState] = React.useState({
+function FilterSearch({ category_id, onFilterChange }) {
+  const [state, setState] = useState({
     loading: true,
     dataListCategory: [],
     dataListCity: [],
   });
+
   const [isFilterVisible, setIsFilterVisible] = useState(false);
   const [visibleCitiesCount, setVisibleCitiesCount] = useState(6);
   const [maxCitiesCount, setMaxCitiesCount] = useState(0);
   const [visibleCategoriesCount, setVisibleCategoriesCount] = useState(10);
   const [maxCategoriesCount, setMaxCategoriesCount] = useState(0);
   const [checkedCategories, setCheckedCategories] = useState([]);
+  const [checkedCities, setCheckedCities] = useState([]);
+  const [priceRange, setPriceRange] = useState({ min_price: '', max_price: '' });
 
   const { loading, dataListCategory, dataListCity } = state;
 
@@ -31,20 +33,24 @@ function FilterSearch({ category_id }) {
     fetchDataListCityAPI();
   }, []);
 
+  useEffect(() => {
+    if (category_id && !checkedCategories.includes(category_id)) {
+      setCheckedCategories((prev) => [...prev, category_id]);
+    }
+  }, [category_id, checkedCategories]);
+
   const fetchDataListCategoryAPI = async () => {
     try {
       const listProductResponse = await fetchCategory();
       setMaxCategoriesCount(listProductResponse.data.data.length);
 
       const categories = listProductResponse.data.data || [];
-      const checked = categories.filter((category) => category.id === category_id).map((category) => category.name);
 
       setState((prevState) => ({
         ...prevState,
         loading: false,
         dataListCategory: categories,
       }));
-      setCheckedCategories(checked);
     } catch (error) {
       console.error('Error fetching category data:', error);
       setState((prevState) => ({
@@ -57,7 +63,6 @@ function FilterSearch({ category_id }) {
   const fetchDataListCityAPI = async () => {
     try {
       const listCityResponse = await fetchProvinces();
-
       setMaxCitiesCount(listCityResponse.length);
 
       setState((prevState) => ({
@@ -73,17 +78,42 @@ function FilterSearch({ category_id }) {
       }));
     }
   };
+
+  // Debounced price range update (triggered after 1 second of no change)
+  const [debouncedPriceRange, setDebouncedPriceRange] = useState(priceRange);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setDebouncedPriceRange(priceRange);
+    }, 1000);
+
+    return () => clearTimeout(timeoutId);
+  }, [priceRange]);
+
+  useEffect(() => {
+    onFilterChange({ categories: checkedCategories, cities: checkedCities, ...debouncedPriceRange });
+  }, [debouncedPriceRange, checkedCategories, checkedCities]);
+
   const handleCategoryChange = (checkedValues) => {
     setCheckedCategories(checkedValues);
   };
+
+  const handleCityChange = (checkedValues) => {
+    setCheckedCities(checkedValues);
+  };
+
+  const handlePriceChange = (field, value) => {
+    setPriceRange((prev) => ({ ...prev, [field]: value }));
+  };
+
   const renderCategory = () => {
     if (loading) {
       return <LoadingIndicator />;
     } else {
       return (
         <Checkbox.Group className={cx('checkbox-groups')} value={checkedCategories} onChange={handleCategoryChange}>
-          {dataListCategory.slice(0, visibleCategoriesCount).map((category, index) => (
-            <Checkbox key={index} value={category.name} className={cx('w-100')}>
+          {dataListCategory.slice(0, visibleCategoriesCount).map((category) => (
+            <Checkbox key={category.id} value={category.id} className={cx('w-100')}>
               {category.name}
             </Checkbox>
           ))}
@@ -115,9 +145,9 @@ function FilterSearch({ category_id }) {
       return <LoadingIndicator />;
     } else {
       return (
-        <Checkbox.Group className={cx('checkbox-groups')}>
-          {dataListCity.slice(0, visibleCitiesCount).map((city, index) => (
-            <Checkbox key={index} value={city.name} className={cx('w-100')}>
+        <Checkbox.Group className={cx('checkbox-groups')} value={checkedCities} onChange={handleCityChange}>
+          {dataListCity.slice(0, visibleCitiesCount).map((city) => (
+            <Checkbox key={city.province_id} value={city.province_id} className={cx('w-100')}>
               {city.name}
             </Checkbox>
           ))}
@@ -171,9 +201,21 @@ function FilterSearch({ category_id }) {
             <div className={cx('filter-section')}>
               <h4>Khoảng giá</h4>
               <div className={cx('price-range')}>
-                <Input type="number" placeholder="Từ" className={cx('price-input')} />
+                <Input
+                  type="number"
+                  placeholder="Từ"
+                  className={cx('price-input')}
+                  value={priceRange.min_price}
+                  onChange={(e) => handlePriceChange('min_price', e.target.value)}
+                />
                 <span className={cx('separator')}>-</span>
-                <Input type="number" placeholder="Đến" className={cx('price-input')} />
+                <Input
+                  type="number"
+                  placeholder="Đến"
+                  className={cx('price-input')}
+                  value={priceRange.max_price}
+                  onChange={(e) => handlePriceChange('max_price', e.target.value)}
+                />
               </div>
             </div>
             <div className={cx('d-flex', 'justify-content-center')}>
@@ -193,9 +235,21 @@ function FilterSearch({ category_id }) {
           <div className={cx('filter-section')}>
             <h4>Khoảng giá</h4>
             <div className={cx('price-range')}>
-              <Input type="number" placeholder="Từ" className={cx('price-input')} />
+              <Input
+                type="number"
+                placeholder="Từ"
+                className={cx('price-input')}
+                value={priceRange.min_price}
+                onChange={(e) => handlePriceChange('min_price', e.target.value)}
+              />
               <span className={cx('separator')}>-</span>
-              <Input type="number" placeholder="Đến" className={cx('price-input')} />
+              <Input
+                type="number"
+                placeholder="Đến"
+                className={cx('price-input')}
+                value={priceRange.max_price}
+                onChange={(e) => handlePriceChange('max_price', e.target.value)}
+              />
             </div>
           </div>
           <div className={cx('d-flex', 'justify-content-center')}>

@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import { Layout } from 'antd';
 import FilterSearch from '~/components/Layout/FilterSearch';
 import Product from './component/Product';
@@ -12,11 +12,21 @@ const cx = classNames.bind(styles);
 const { Header, Content } = Layout;
 
 function ForYou() {
+  const [filters, setFilters] = useState({
+    categories: [],
+    cities: [],
+    min_price: '',
+    max_price: '',
+  });
+
+  const handleFilterChange = (newFilters) => {
+    setFilters(newFilters);
+  };
   return (
     <>
       <SubTitle />
       <Layout style={{ minHeight: '100vh', position: 'relative' }}>
-        <FilterSearch />
+        <FilterSearch onFilterChange={handleFilterChange} />
         <Layout className={cx('layout-right')}>
           <Header>
             <div className={cx('d-flex', 'align-items-center', 'product-notes')}>
@@ -28,7 +38,7 @@ function ForYou() {
             </div>
           </Header>
           <Content className={cx('product')}>
-            <Product />
+            <Product filters={filters} />
           </Content>
         </Layout>
       </Layout>
