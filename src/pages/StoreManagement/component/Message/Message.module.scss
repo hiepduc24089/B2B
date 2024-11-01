@@ -70,6 +70,7 @@
       flex-direction: column;
       width: 100%;
       gap: 5px;
+      overflow: hidden;
       .name {
         color: #243b53;
         font-size: 12px;
@@ -91,6 +92,15 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: normal;
+        width: 80%;
+      }
+      .unread-message {
+        color: var(--white);
+        font-size: 12px;
+        font-weight: 500;
+        background: #c52707;
+        padding: 2px 5px;
+        border-radius: 50%;
       }
     }
   }

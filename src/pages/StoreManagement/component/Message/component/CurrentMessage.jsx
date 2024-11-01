@@ -2,7 +2,7 @@ import React, { memo, useState, useEffect, useRef } from 'react';
 import classNames from 'classnames/bind';
 import styles from '../Message.module.scss';
 import { images } from '~/assets/images';
-import { broadCast, getMessage, postSendMessage } from '~/api/chat';
+import { broadCast, getMessage, markReadMessage, postSendMessage } from '~/api/chat';
 import { API_HOST } from '~/config/host';
 import LoadingIndicator from '~/components/Loading';
 import Pusher from 'pusher-js';
@@ -24,6 +24,10 @@ function CurrentMessage({ userId, receiverId, conversationId, receiverAvatar }) 
         setLoading(true);
         const response = await getMessage(userId, receiverId);
         setMessages(response.message);
+
+        if (response.message.length > 0) {
+          markMessagesAsRead();
+        }
       } catch (error) {
         console.error('Error fetching messages:', error);
       } finally {
@@ -33,6 +37,15 @@ function CurrentMessage({ userId, receiverId, conversationId, receiverAvatar }) 
 
     fetchMessages();
   }, [userId, receiverId]);
+
+  // Function to mark messages as read
+  const markMessagesAsRead = async () => {
+    try {
+      await markReadMessage(userId, conversationId);
+    } catch (error) {
+      console.error('Error marking messages as read:', error);
+    }
+  };
 
   // Function to scroll the current-message container to the bottom
   const scrollToBottom = () => {

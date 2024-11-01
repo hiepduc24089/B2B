@@ -1,7 +1,7 @@
 import { getData, postData } from '~/axios/config';
 import { apiURL } from '~/axios/apiURL';
 
-export const getMessage = async (user_id, receiver_id) => {
+export const getMessage = async (user_id, receiver_id, page = 1, limit = 20) => {
   try {
     const token = localStorage.getItem('token');
     const response = await getData(apiURL.getMessage(user_id, receiver_id), {
@@ -9,6 +9,10 @@ export const getMessage = async (user_id, receiver_id) => {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
+      },
+      params: {
+        page: page, // Add pagination parameters
+        limit: limit,
       },
     });
     return response;
@@ -81,6 +85,27 @@ export const broadCast = async (message, sender_id, receiver_id) => {
     return response;
   } catch (error) {
     console.error('Error sending message:', error);
+    throw error;
+  }
+};
+
+export const markReadMessage = async (receiver_id, conversation_id) => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await postData(
+      apiURL.markReadMessage(receiver_id, conversation_id),
+      {},
+      {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    return response;
+  } catch (error) {
+    console.error('Error marking read message:', error);
     throw error;
   }
 };

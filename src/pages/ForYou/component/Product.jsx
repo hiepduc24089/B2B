@@ -8,10 +8,11 @@ import { fetchForYou, postFavoriteProduct } from '~/api/home';
 import { API_HOST } from '~/config/host';
 import Success from '~/components/Layout/Popup/Success';
 import { images } from '~/assets/images';
+import { filterProduct } from '~/api/filter';
 
 const cx = classNames.bind(styles);
 
-function Product() {
+function Product({ filters }) {
   const [showSuccessAdd, setShowSuccessAdd] = useState(false);
   const [showSuccessRemove, setShowSuccessRemove] = useState(false);
 
@@ -31,13 +32,17 @@ function Product() {
       }));
 
       try {
-        const listProductResponse = await fetchForYou(userID);
-
-        setState((prevState) => ({
-          ...prevState,
+        const data = await filterProduct(
+          filters.categories,
+          filters.cities,
+          filters.min_price,
+          filters.max_price,
+          userID,
+        );
+        setState({
           loading: false,
-          dataListProduct: listProductResponse.data,
-        }));
+          dataListProduct: data.data.data,
+        });
       } catch (error) {
         console.error('Failed to fetch for you data:', error);
         setState((prevState) => ({
@@ -48,9 +53,7 @@ function Product() {
     };
 
     fetchDataListProductAPI();
-
-    return () => {};
-  }, [userID]);
+  }, [filters, userID]);
 
   function formatPrice(price) {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
@@ -97,6 +100,8 @@ function Product() {
   const renderContent = () => {
     if (loading) {
       return <LoadingIndicator />;
+    } else if (dataListProduct.length === 0) {
+      return <p className={cx('text-center', 'mt-3')}>Không tìm thấy sản phẩm</p>;
     } else {
       return (
         <div className={cx('product-wrapper')}>

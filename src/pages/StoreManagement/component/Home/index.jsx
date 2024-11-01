@@ -3,6 +3,7 @@ import classNames from 'classnames/bind';
 import styles from './Home.module.scss';
 import { imagesStore } from '~/assets/images';
 import { getStatistic } from '~/api/statistic';
+import LoadingIndicator from '~/components/Loading';
 
 const cx = classNames.bind(styles);
 
@@ -11,6 +12,7 @@ function Home({ onAddProductClick }) {
   const [awaitingOrder, setAwaitingOrder] = useState('');
   const [completeOrder, setCompleteOrder] = useState('');
   const [outStockOrder, setOutStockOrder] = useState('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchStatistic = async () => {
@@ -24,11 +26,17 @@ function Home({ onAddProductClick }) {
         }
       } catch (error) {
         console.error('Error fetching statistic:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchStatistic();
   }, []);
+
+  if (loading) {
+    return <LoadingIndicator />;
+  }
 
   return (
     <>
@@ -54,7 +62,7 @@ function Home({ onAddProductClick }) {
           </div>
           <div className={cx('job-item')}>
             <span className={cx('number')}>0</span>
-            <p>Sản phẩm bị từ chồi</p>
+            <p>Sản phẩm bị từ chối</p>
           </div>
           <div className={cx('job-item')}>
             <span className={cx('number')}>0</span>
