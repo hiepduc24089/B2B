@@ -12,6 +12,8 @@ export function StoreHeaderProvider({ children }) {
   const [storeAvatar, setStoreAvatar] = useState('');
   const [storeID, setStoreID] = useState('');
   const [storeIsFollow, setStoreIsFollow] = useState(0);
+  const [storeFollowers, setStoreFollowers] = useState(0);
+  const [storeContacts, setStoreContacts] = useState(0);
 
   return (
     <StoreHeaderContext.Provider
@@ -28,6 +30,10 @@ export function StoreHeaderProvider({ children }) {
         setStoreID,
         storeIsFollow,
         setStoreIsFollow,
+        storeFollowers,
+        setStoreFollowers,
+        storeContacts,
+        setStoreContacts,
       }}
     >
       {children}

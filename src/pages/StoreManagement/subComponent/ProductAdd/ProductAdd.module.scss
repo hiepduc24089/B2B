@@ -39,6 +39,15 @@
   grid-template-columns: repeat(2, 1fr);
   grid-gap: 20px;
 }
+.price-tier {
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  gap: 20px;
+  .price-tier-item {
+    width: 45%;
+  }
+}
 .product-notes {
   border-top: 4px solid #e8c242;
   background: #fcf7e5;
@@ -272,6 +281,12 @@
     }
   }
 }
+.minus-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: cover;
+  cursor: pointer;
+}
 @media screen and (max-width: 1200px) {
   .sidebar {
     width: 50%;
@@ -320,6 +335,9 @@
   .double-input {
     grid-template-columns: repeat(1, 1fr);
     grid-gap: 10px;
+  }
+  .price-tier {
+    gap: 10px;
   }
   .product-notes {
     .content {

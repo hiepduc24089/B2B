@@ -20,6 +20,24 @@ export const createShop = async (shopData) => {
   }
 };
 
+export const updateShop = async (shopData) => {
+  try {
+    const token = localStorage.getItem('token');
+
+    const response = await postData(apiURL.updateShop, shopData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return response;
+  } catch (error) {
+    console.error('Failed to create shop:', error);
+    throw error;
+  }
+};
+
 export const getShopByUser = async (shop_id) => {
   try {
     const response = await getData(apiURL.getShopByUser(shop_id));
@@ -36,6 +54,87 @@ export const getProductByShop = async (shop_id, user_id, page = 1) => {
     return response.data;
   } catch (error) {
     console.error('Error fetching product store:', error);
+    throw error;
+  }
+};
+
+export const getProfileShop = async () => {
+  try {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      console.log('No token found, user not logged in.');
+      return null;
+    }
+
+    const response = await getData(apiURL.getShopProfile, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return response;
+  } catch (error) {
+    if (error.response && error.response.status === 401) {
+      console.log('User not authenticated, skipping profile shop data fetch.');
+      return null;
+    }
+    console.error('Failed to get shop:', error);
+    throw error; // Re-throw if it’s an unexpected error
+  }
+};
+
+export const cancelOrder = async (orderData) => {
+  try {
+    const token = localStorage.getItem('token');
+
+    const response = await postData(apiURL.cancelOrder, orderData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return response;
+  } catch (error) {
+    console.error('Failed to create shop:', error);
+    throw error;
+  }
+};
+
+export const updateOrderStatus = async (orderData) => {
+  try {
+    const token = localStorage.getItem('token');
+
+    const response = await postData(apiURL.updateStatusOrder, orderData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return response;
+  } catch (error) {
+    console.error('Failed to create shop:', error);
+    throw error;
+  }
+};
+
+export const getCustomer = async () => {
+  try {
+    const token = localStorage.getItem('token');
+
+    const response = await getData(apiURL.getCustomer, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return response;
+  } catch (error) {
+    console.error('Failed to create shop:', error);
     throw error;
   }
 };

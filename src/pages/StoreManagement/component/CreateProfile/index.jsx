@@ -5,11 +5,19 @@ import { imagesStore } from '~/assets/images';
 import { fetchDistricts, fetchProvinces, fetchWards } from '~/api/province';
 import { createShop } from '~/api/store';
 import { useAuth } from '~/context/AuthContext';
+import Failed from '~/components/Layout/Popup/Failed';
+import Success from '~/components/Layout/Popup/Success';
+import LoadingIndicator from '~/components/Loading';
+import Warning from '~/components/Layout/Popup/Warning';
 
 const cx = classNames.bind(styles);
 
 function CreateProfile() {
   const { user } = useAuth();
+  const [loadingFullScreen, setLoadingFullScreen] = useState(false);
+  const [showUpdateSuccess, setShowUpdateSuccess] = useState(false);
+  const [showUpdateFailed, setShowUpdateFailed] = useState(false);
+  const [showWarningField, setShowWarningField] = useState(false);
   // Avatar and Cover
   const [coverImage, setCoverImage] = useState(null);
   const [avatarImage, setAvatarImage] = useState(imagesStore.new_avatar);
@@ -126,6 +134,23 @@ function CreateProfile() {
   const [content, setContent] = useState('');
 
   const handleSubmit = async () => {
+    if (
+      !shopName ||
+      !phone ||
+      !email ||
+      !scope ||
+      !selectedProvince ||
+      !selectedDistrict ||
+      !selectedWard ||
+      !addressDetail ||
+      !content ||
+      !avatarFile ||
+      !coverFile
+    ) {
+      setShowWarningField(true);
+      return;
+    }
+
     const formData = new FormData();
 
     // Append form data
@@ -149,210 +174,229 @@ function CreateProfile() {
       formData.append(`src[${index}]`, file);
     });
 
+    setLoadingFullScreen(true);
     try {
       const result = await createShop(formData);
       console.log(result);
       if (!result.status) {
-        alert('Tạo shop không thành công, vui lòng thử lại');
+        setShowUpdateFailed(true);
         return;
       }
-      alert('Tạo shop thành công!');
+      setShowUpdateSuccess(true);
     } catch (error) {
       console.error('Error creating shop:', error);
-      alert('Có lỗi xảy ra, vui lòng thử lại.');
+      setShowUpdateFailed(true);
+    } finally {
+      setLoadingFullScreen(false);
     }
   };
 
   return (
-    <div className={cx('create-profile')}>
-      <div className={cx('cover')} style={{ backgroundImage: coverImage ? `url(${coverImage})` : 'none' }}>
-        <div className={cx('new-cover')} onClick={() => coverInputRef.current.click()}>
-          <img src={imagesStore.new_cover_icon} alt="New Image" className={cx('new_cover_icon')} />
-          <span>Thêm ảnh bìa</span>
-          <input
-            type="file"
-            accept="image/*"
-            style={{ display: 'none' }}
-            ref={coverInputRef}
-            onChange={handleCoverImageChange}
-          />
+    <>
+      {loadingFullScreen && (
+        <div className={cx('fullscreen-loading')}>
+          <LoadingIndicator />
         </div>
-        <div className={cx('new-avatar')}>
-          <div className={cx('avater-wrapper')}>
-            <img src={avatarImage} alt="New Avatar" className={cx('avartar-image')} />
-            <img
-              src={imagesStore.new_avatar_icon}
-              alt="New Image"
-              className={cx('new_avatar_icon')}
-              onClick={() => avatarInputRef.current.click()}
-            />
+      )}
+      <div className={cx('create-profile')}>
+        <div className={cx('cover')} style={{ backgroundImage: coverImage ? `url(${coverImage})` : 'none' }}>
+          <div className={cx('new-cover')} onClick={() => coverInputRef.current.click()}>
+            <img src={imagesStore.new_cover_icon} alt="New Image" className={cx('new_cover_icon')} />
+            <span>Thêm ảnh bìa</span>
             <input
               type="file"
               accept="image/*"
               style={{ display: 'none' }}
-              ref={avatarInputRef}
-              onChange={handleAvatarImageChange}
+              ref={coverInputRef}
+              onChange={handleCoverImageChange}
             />
           </div>
+          <div className={cx('new-avatar')}>
+            <div className={cx('avater-wrapper')}>
+              <img src={avatarImage} alt="New Avatar" className={cx('avartar-image')} />
+              <img
+                src={imagesStore.new_avatar_icon}
+                alt="New Image"
+                className={cx('new_avatar_icon')}
+                onClick={() => avatarInputRef.current.click()}
+              />
+              <input
+                type="file"
+                accept="image/*"
+                style={{ display: 'none' }}
+                ref={avatarInputRef}
+                onChange={handleAvatarImageChange}
+              />
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div className={cx('content')}>
-        <div className={cx('basic-information', 'wrapper')}>
-          <h5 className={cx('title')}>Thông tin cơ bản</h5>
-          <div className={cx('box-wrapper', 'basic-information-details')}>
-            <div className={cx('details')}>
-              <label className={cx('names')}>Tên gian hàng</label>
-              <input
-                type="text"
-                className={cx('input-field')}
-                placeholder="Tran Dinh Phi"
-                value={shopName}
-                onChange={(e) => setShopName(e.target.value)}
-              />
-            </div>
-            <div className={cx('details')}>
-              <label className={cx('names')}>SĐT gian hàng</label>
-              <input
-                type="text"
-                className={cx('input-field')}
-                placeholder="0379357213"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-              />
-            </div>
-            <div className={cx('details')}>
-              <label className={cx('names')}>Email gian hàng</label>
-              <input
-                type="text"
-                className={cx('input-field')}
-                placeholder="tphi6012@gmail.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div className={cx('details')}>
-              <label className={cx('names')}>Phạm vi kinh doanh</label>
-              <select
-                className={cx('select-field', 'input-field')}
-                value={scope}
-                onChange={(e) => setScope(e.target.value)}
-              >
-                <option value="1">Toàn Quốc</option>
-                <option value="2">Tỉnh Thành</option>
-              </select>
-            </div>
-            <div className={cx('details')}>
-              <label className={cx('names')}>Địa chỉ</label>
-              <div className={cx('address-fields')}>
-                <div className={cx('field-group')}>
-                  <label className={cx('field-label')}>Tỉnh/Thành</label>
-                  <select
-                    className={cx('address-select-field')}
-                    value={selectedProvince}
-                    onChange={handleProvinceChange}
-                  >
-                    <option value="" disabled>
-                      Chọn Tỉnh/Thành
-                    </option>
-                    {provinces.map((province) => (
-                      <option key={province.province_id} value={province.province_id}>
-                        {province.name}
+        <div className={cx('content')}>
+          <div className={cx('basic-information', 'wrapper')}>
+            <h5 className={cx('title')}>Thông tin cơ bản</h5>
+            <div className={cx('box-wrapper', 'basic-information-details')}>
+              <div className={cx('details')}>
+                <label className={cx('names')}>Tên gian hàng</label>
+                <input
+                  type="text"
+                  className={cx('input-field')}
+                  placeholder="Tran Dinh Phi"
+                  value={shopName}
+                  onChange={(e) => setShopName(e.target.value)}
+                />
+              </div>
+              <div className={cx('details')}>
+                <label className={cx('names')}>SĐT gian hàng</label>
+                <input
+                  type="text"
+                  className={cx('input-field')}
+                  placeholder="0379357213"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                />
+              </div>
+              <div className={cx('details')}>
+                <label className={cx('names')}>Email gian hàng</label>
+                <input
+                  type="text"
+                  className={cx('input-field')}
+                  placeholder="tphi6012@gmail.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+              <div className={cx('details')}>
+                <label className={cx('names')}>Phạm vi kinh doanh</label>
+                <select
+                  className={cx('select-field', 'input-field')}
+                  value={scope}
+                  onChange={(e) => setScope(e.target.value)}
+                >
+                  <option value="1">Toàn Quốc</option>
+                  <option value="2">Tỉnh Thành</option>
+                </select>
+              </div>
+              <div className={cx('details')}>
+                <label className={cx('names')}>Địa chỉ</label>
+                <div className={cx('address-fields')}>
+                  <div className={cx('field-group')}>
+                    <label className={cx('field-label')}>Tỉnh/Thành</label>
+                    <select
+                      className={cx('address-select-field')}
+                      value={selectedProvince}
+                      onChange={handleProvinceChange}
+                    >
+                      <option value="" disabled>
+                        Chọn Tỉnh/Thành
                       </option>
-                    ))}
-                  </select>
-                </div>
+                      {provinces.map((province) => (
+                        <option key={province.province_id} value={province.province_id}>
+                          {province.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-                <div className={cx('field-group')}>
-                  <label className={cx('field-label')}>Quận/Huyện</label>
-                  <select
-                    className={cx('address-select-field')}
-                    value={selectedDistrict}
-                    onChange={handleDistrictChange}
-                  >
-                    <option value="" disabled>
-                      Chọn Quận/Huyện
-                    </option>
-                    {districts.map((district) => (
-                      <option key={district.district_id} value={district.district_id}>
-                        {district.name}
+                  <div className={cx('field-group')}>
+                    <label className={cx('field-label')}>Quận/Huyện</label>
+                    <select
+                      className={cx('address-select-field')}
+                      value={selectedDistrict}
+                      onChange={handleDistrictChange}
+                    >
+                      <option value="" disabled>
+                        Chọn Quận/Huyện
                       </option>
-                    ))}
-                  </select>
-                </div>
+                      {districts.map((district) => (
+                        <option key={district.district_id} value={district.district_id}>
+                          {district.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-                <div className={cx('field-group')}>
-                  <label className={cx('field-label')}>Phường/Xã</label>
-                  <select
-                    className={cx('address-select-field')}
-                    value={selectedWard}
-                    onChange={(e) => setSelectedWard(e.target.value)}
-                  >
-                    <option value="" disabled>
-                      Chọn Phường/Xã
-                    </option>
-                    {wards.map((ward) => (
-                      <option key={ward.wards_id} value={ward.wards_id}>
-                        {ward.name}
+                  <div className={cx('field-group')}>
+                    <label className={cx('field-label')}>Phường/Xã</label>
+                    <select
+                      className={cx('address-select-field')}
+                      value={selectedWard}
+                      onChange={(e) => setSelectedWard(e.target.value)}
+                    >
+                      <option value="" disabled>
+                        Chọn Phường/Xã
                       </option>
-                    ))}
-                  </select>
-                </div>
+                      {wards.map((ward) => (
+                        <option key={ward.wards_id} value={ward.wards_id}>
+                          {ward.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-                <div className={cx('field-group')}>
-                  <label className={cx('field-label')}>Số nhà, tên đường</label>
-                  <input
-                    type="text"
-                    className={cx('address-select-field')}
-                    placeholder="Input Text"
-                    value={addressDetail}
-                    onChange={(e) => setAddressDetail(e.target.value)}
-                  />
+                  <div className={cx('field-group')}>
+                    <label className={cx('field-label')}>Số nhà, tên đường</label>
+                    <input
+                      type="text"
+                      className={cx('address-select-field')}
+                      placeholder="Input Text"
+                      value={addressDetail}
+                      onChange={(e) => setAddressDetail(e.target.value)}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div className={cx('introduce-post', 'wrapper')}>
-          <h5 className={cx('title')}>Bài viết giới thiệu</h5>
-          <div className={cx('box-wrapper', 'introduce-post-details')}>
-            <label className={cx('names')}>Nội dung bài viết</label>
-            <textarea
-              className={cx('content-field')}
-              placeholder="Noi Dung"
-              rows="5"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-            />
+          <div className={cx('introduce-post', 'wrapper')}>
+            <h5 className={cx('title')}>Bài viết giới thiệu</h5>
+            <div className={cx('box-wrapper', 'introduce-post-details')}>
+              <label className={cx('names')}>Nội dung bài viết</label>
+              <textarea
+                className={cx('content-field')}
+                placeholder="Noi Dung"
+                rows="5"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+              />
+            </div>
           </div>
-        </div>
 
-        <div className={cx('introduce-image', 'wrapper')}>
-          <h5 className={cx('title')}>Hình ảnh giới thiệu</h5>
-          <div className={cx('introduce-image-details')}>
-            {selectedImages.map((image, index) => (
-              <div key={index} className={cx('image-preview-wrapper')}>
-                <img src={image} alt={`Preview ${index}`} className={cx('image-preview')} />
-              </div>
-            ))}
-            <label className={cx('file-input-label')} htmlFor="file-input">
-              <input type="file" id="file-input" className={cx('file-input')} multiple onChange={handleFileChange} />
-              <span
-                className={cx('file-icon')}
-                style={{ backgroundImage: `url(${imagesStore.new_introduce_image})` }}
-              ></span>
-            </label>
+          <div className={cx('introduce-image', 'wrapper')}>
+            <h5 className={cx('title')}>Hình ảnh giới thiệu</h5>
+            <div className={cx('introduce-image-details')}>
+              {selectedImages.map((image, index) => (
+                <div key={index} className={cx('image-preview-wrapper')}>
+                  <img src={image} alt={`Preview ${index}`} className={cx('image-preview')} />
+                </div>
+              ))}
+              <label className={cx('file-input-label')} htmlFor="file-input">
+                <input type="file" id="file-input" className={cx('file-input')} multiple onChange={handleFileChange} />
+                <span
+                  className={cx('file-icon')}
+                  style={{ backgroundImage: `url(${imagesStore.new_introduce_image})` }}
+                ></span>
+              </label>
+            </div>
           </div>
-        </div>
 
-        <div className={cx('d-flex', 'justify-content-end')}>
-          <button className={cx('save-profile')} onClick={handleSubmit}>
-            Lưu
-          </button>
+          <div className={cx('d-flex', 'justify-content-end')}>
+            <button className={cx('save-profile')} onClick={handleSubmit}>
+              Lưu
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+      {showUpdateSuccess && <Success message="Tạo cửa hàng thành công" onClose={() => setShowUpdateSuccess(false)} />}
+      {showUpdateFailed && <Failed message="Tạo cửa hàng thất bại" onClose={() => setShowUpdateFailed(false)} />}
+      {showWarningField && (
+        <Warning
+          message="Vui lòng điền đủ thông tin"
+          onClose={() => setShowWarningField(false)}
+          onOk={() => setShowWarningField(false)}
+        />
+      )}
+    </>
   );
 }
 

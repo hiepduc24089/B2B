@@ -15,7 +15,8 @@ import Failed from '../Popup/Failed';
 const cx = classNames.bind(styles);
 
 function StoreHeader() {
-  const { storeName, storeAddress, storeAvatar, storeID, storeIsFollow } = useStoreHeader();
+  const { storeName, storeAddress, storeAvatar, storeID, storeIsFollow, storeFollowers, storeContacts } =
+    useStoreHeader();
 
   const [loadingFullScreen, setLoadingFullScreen] = useState(false);
   const [showSuccessFollow, setShowSuccessFollow] = useState(false);
@@ -109,14 +110,14 @@ function StoreHeader() {
               </Link>
               <div className={cx('store-followers')}>
                 <span>
-                  <span className={cx('fw-bold-600')}>38</span> Theo dõi
+                  <span className={cx('fw-bold-600')}>{storeFollowers}</span> Theo dõi
                 </span>
                 <span>
-                  <span className={cx('fw-bold-600')}>106</span> Liên hệ
+                  <span className={cx('fw-bold-600')}>{storeContacts}</span> Liên hệ
                 </span>
-                <span>
+                {/* <span>
                   <span className={cx('fw-bold-600')}>50%</span> Phản hồi
-                </span>
+                </span> */}
               </div>
             </div>
             <div className={cx('store-button')}>

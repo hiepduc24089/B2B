@@ -1,13 +1,14 @@
 import React, { memo, useState, useEffect } from 'react';
 import classNames from 'classnames/bind';
 import styles from './ProductEdit.module.scss';
-import { imagesHotDeal, imagesStore } from '~/assets/images';
+import { images, imagesHotDeal, imagesStore } from '~/assets/images';
 import { fetchAllListCategory } from '~/api/requestsupplier';
 import { API_HOST } from '~/config/host';
 import LoadingIndicator from '~/components/Loading';
 import { getProductDetailAtShop, postUpdateProduct } from '~/api/product';
 import Success from '~/components/Layout/Popup/Success';
 import Failed from '~/components/Layout/Popup/Failed';
+import Warning from '~/components/Layout/Popup/Warning';
 
 const cx = classNames.bind(styles);
 
@@ -15,6 +16,7 @@ function ProductEdit({ productID, onSubmitSuccess }) {
   const [loadingFullScreen, setLoadingFullScreen] = useState(false);
   const [showUpdateSuccess, setShowUpdateSuccess] = useState(false);
   const [showUpdateFailed, setShowUpdateFailed] = useState(false);
+  const [showWarningField, setShowWarningField] = useState(false);
 
   const [state, setState] = useState({
     loadingCategory: true,
@@ -67,6 +69,10 @@ function ProductEdit({ productID, onSubmitSuccess }) {
     const newPriceTiers = [...priceTiers];
     newPriceTiers[index][field] = value;
     setPriceTiers(newPriceTiers);
+  };
+
+  const handleClearPriceTier = (indexToRemove) => {
+    setPriceTiers((prevPriceTiers) => prevPriceTiers.filter((_, index) => index !== indexToRemove));
   };
 
   useEffect(() => {
@@ -147,6 +153,21 @@ function ProductEdit({ productID, onSubmitSuccess }) {
     setShowFullList(false);
   };
   const handleSubmit = async () => {
+    if (
+      !inputName ||
+      !inputDescription ||
+      !selectedCategoryID ||
+      !inputUnit ||
+      !inputContactInfor ||
+      !inputMinQuantity ||
+      !inputRemainingQuantity ||
+      !inputSKU ||
+      priceTiers.some((tier) => !tier.quantity || !tier.price) // Check if any price tier is incomplete
+    ) {
+      setShowWarningField(true);
+      return;
+    }
+
     const formData = new FormData();
     formData.append('name', inputName);
     formData.append('describe', inputDescription);
@@ -330,8 +351,8 @@ function ProductEdit({ productID, onSubmitSuccess }) {
         <h3 className={cx('title', 'mb-0')}>Giá sản phẩm</h3>
 
         {priceTiers.map((tier, index) => (
-          <div key={index} className={cx('w-100', 'double-input')}>
-            <div>
+          <div key={index} className={cx('w-100', 'price-tier')}>
+            <div className={cx('price-tier-item')}>
               <label className={cx('label-field')}>Mua từ</label>
               <input
                 type="number"
@@ -341,7 +362,7 @@ function ProductEdit({ productID, onSubmitSuccess }) {
                 onChange={(e) => handlePriceTierChange(index, 'quantity', e.target.value)}
               />
             </div>
-            <div>
+            <div className={cx('price-tier-item')}>
               <label className={cx('label-field')}>Giá bán</label>
               <input
                 type="number"
@@ -351,6 +372,14 @@ function ProductEdit({ productID, onSubmitSuccess }) {
                 onChange={(e) => handlePriceTierChange(index, 'price', e.target.value)}
               />
             </div>
+            {index > 0 && (
+              <img
+                src={images.minus_icon}
+                alt="minus"
+                className={cx('minus-icon')}
+                onClick={() => handleClearPriceTier(index)}
+              />
+            )}
           </div>
         ))}
 
@@ -419,6 +448,13 @@ function ProductEdit({ productID, onSubmitSuccess }) {
         <Success message="Cập nhật sản phẩm thành công" onClose={() => setShowUpdateSuccess(false)} />
       )}
       {showUpdateFailed && <Failed message="Cập nhật sản phẩm thất bại" onClose={() => setShowUpdateFailed(false)} />}
+      {showWarningField && (
+        <Warning
+          message="Vui lòng điền đủ thông tin"
+          onClose={() => setShowWarningField(false)}
+          onOk={() => setShowWarningField(false)}
+        />
+      )}
     </>
   );
 }

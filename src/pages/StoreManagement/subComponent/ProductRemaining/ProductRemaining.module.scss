@@ -144,6 +144,14 @@ td {
   .status-checkbox:checked:before {
     transform: translateX(20px);
   }
+  .remaining-quantity {
+    padding: 6px 8px;
+    width: 30%;
+    border-radius: 5px;
+    border: 0.5px solid var(--grey-dark);
+    text-align: center;
+    cursor: pointer;
+  }
 }
 
 button.edit,
@@ -159,11 +167,43 @@ button.delete {
   border-bottom: unset;
   text-align: -webkit-right;
 }
+.modal-update-remaining {
+  border-radius: 63px;
+  background: var(--primary);
+  color: var(--white);
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  padding: 8px 32px;
+}
+.modal-title {
+  color: var(--black);
+  font-size: 24px;
+  font-weight: 600;
+}
+.input-field {
+  color: var(--black);
+  font-size: 16px;
+  font-weight: 600;
+  width: 100% !important;
+  border-radius: 5px;
+}
+.modal-body {
+  margin: 30px 0 50px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
 @media screen and (max-width: 1024px) {
   td {
     .product-name {
       max-width: unset;
     }
+  }
+}
+@media screen and (max-width: 992px) {
+  .modal-title {
+    font-size: 18px;
   }
 }
 @media screen and (max-width: 768px) {
@@ -175,6 +215,11 @@ button.delete {
     .search {
       width: 100%;
       margin-top: 20px;
+    }
+  }
+  td {
+    .remaining-quantity {
+      width: 75px;
     }
   }
 }

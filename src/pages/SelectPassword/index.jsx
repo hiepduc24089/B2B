@@ -7,6 +7,7 @@ import routesConfig from '~/config/routes';
 import { registerUser } from '~/api/loginregister'; // Import the register API function
 import Success from '~/components/Layout/Popup/Success';
 import Failed from '~/components/Layout/Popup/Failed';
+import LoadingIndicator from '~/components/Loading';
 
 const cx = classNames.bind(styles);
 
@@ -23,6 +24,7 @@ function SelectPassword() {
   const [error, setError] = useState('');
   const [receiveSuccessMessage, setReceiveSuccessMessage] = useState('');
   const [showFailed, setShowFailed] = useState(false);
+  const [loadingFullScreen, setLoadingFullScreen] = useState(false);
 
   useEffect(() => {
     if (location.state?.successMessage) {
@@ -66,7 +68,7 @@ function SelectPassword() {
     }
 
     setError(''); // Clear any previous errors
-
+    setLoadingFullScreen(true);
     try {
       // Make the final registration API call with name, email, phone, and password
       const registerResponse = await registerUser({
@@ -88,6 +90,8 @@ function SelectPassword() {
       });
     } catch (error) {
       setError(error.message);
+    } finally {
+      setLoadingFullScreen(false);
     }
   };
 
@@ -101,6 +105,11 @@ function SelectPassword() {
 
   return (
     <>
+      {loadingFullScreen && (
+        <div className={cx('fullscreen-loading')}>
+          <LoadingIndicator />
+        </div>
+      )}
       <div className={cx('login-wrapper')}>
         <img src={images.login_background} alt="Login Background" className={cx('login-background')} />
         <div className={cx('login-details')}>

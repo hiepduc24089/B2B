@@ -137,7 +137,16 @@ function RelatedInformation({ dataStore, shopID }) {
   if (loading) {
     return <LoadingIndicator />;
   }
+  // const [filters, setFilters] = useState({
+  //   categories: [],
+  //   cities: [],
+  //   min_price: '',
+  //   max_price: '',
+  // });
 
+  const handleFilterChange = () => {
+    console.log(1);
+  };
   return (
     <div className={cx('related-information-wrapper')}>
       <div className={cx('related-information-header', 'd-flex', 'justify-content-between')}>
@@ -246,7 +255,7 @@ function RelatedInformation({ dataStore, shopID }) {
           {activeTab === 'product' && (
             <div className={cx('product-tab')}>
               <Layout style={{ minHeight: '100vh', position: 'relative' }}>
-                <FilterSearch />
+                <FilterSearch onFilterChange={handleFilterChange} />
                 <Layout className={cx('layout-right')}>
                   <Header>
                     <div className={cx('d-flex', 'align-items-center', 'product-notes')}>
