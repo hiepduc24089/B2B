@@ -9,6 +9,10 @@ import { fetchListOrder } from '~/api/order';
 import routesConfig from '~/config/routes';
 import LoadingIndicator from '~/components/Loading';
 import { API_HOST } from '~/config/host';
+import { cancelOrder, updateOrderStatus } from '~/api/store';
+import Success from '~/components/Layout/Popup/Success';
+import Failed from '~/components/Layout/Popup/Failed';
+import Warning from '~/components/Layout/Popup/Warning';
 
 const cx = classNames.bind(styles);
 
@@ -25,12 +29,11 @@ function Order() {
 
   const statuses = {
     0: 'Chờ xác nhận',
-    1: 'Chờ thanh toán',
-    2: 'Chờ lấy hàng',
-    3: 'Đang giao',
-    4: 'Đã giao',
-    5: 'Đã huỷ',
-    6: 'Hoàn đơn',
+    1: 'Chờ lấy hàng',
+    2: 'Đang giao',
+    3: 'Hoàn thành',
+    4: 'Đã huỷ',
+    5: 'Hoàn đơn',
   };
 
   const listRef = useRef(null);
@@ -124,8 +127,81 @@ function Order() {
     setSearchKey(e.target.value);
   };
 
+  const [loadingFullScreen, setLoadingFullScreen] = useState(false);
+  const [showSuccessCancel, setShowSuccessCancel] = useState(false);
+  const [showFailedCancel, setShowFailedCancel] = useState(false);
+  const [showWarningCancel, setShowWarningCancel] = useState(false);
+  const [orderToCancel, setOrderToCancel] = useState(null);
+
+  // Trigger warning popup when cancel is clicked
+  const handleCancelOrder = (order_id) => {
+    setOrderToCancel(order_id);
+    setShowWarningCancel(true);
+  };
+
+  // Confirm and cancel order
+  const confirmCancelOrder = async () => {
+    setLoadingFullScreen(true);
+    setShowWarningCancel(false);
+    try {
+      const response = await cancelOrder({ order_id: orderToCancel });
+
+      if (response.status) {
+        setShowSuccessCancel(true);
+        const updatedOrders = listOrder.map((order) =>
+          order.order_id === orderToCancel ? { ...order, status: 4 } : order,
+        );
+        setState({ ...state, listOrder: updatedOrders });
+      } else {
+        setShowFailedCancel(true);
+      }
+    } catch (error) {
+      console.error('Failed to cancel order:', error);
+      setShowFailedCancel(true);
+    } finally {
+      setLoadingFullScreen(false);
+    }
+  };
+
+  const [showSuccessReceive, setShowSuccessReceive] = useState(false);
+  const [showFailedReceive, setShowFailedReceive] = useState(false);
+  const [showWarningReceive, setShowWarningReceive] = useState(false);
+  const [orderToReceive, setOrderToReceive] = useState(null);
+
+  const handleReceiveOrder = (order_id) => {
+    setOrderToReceive(order_id);
+    setShowWarningReceive(true);
+  };
+
+  const confirmReceiveOrder = async () => {
+    setLoadingFullScreen(true);
+    setShowWarningReceive(false);
+    try {
+      const response = await updateOrderStatus({ order_id: orderToReceive, status: 1 });
+
+      if (response.status) {
+        setShowSuccessReceive(true);
+        const updatedOrders = listOrder.map((order) =>
+          order.order_id === orderToReceive ? { ...order, status: 1 } : order,
+        );
+        setState({ ...state, listOrder: updatedOrders });
+      } else {
+        setShowFailedReceive(true);
+      }
+    } catch (error) {
+      console.error('Failed to update order status:', error);
+      setShowFailedReceive(true);
+    } finally {
+      setLoadingFullScreen(false);
+    }
+  };
   return (
     <>
+      {loadingFullScreen && (
+        <div className={cx('fullscreen-loading')}>
+          <LoadingIndicator />
+        </div>
+      )}
       <div
         className={cx('list-status')}
         ref={listRef}
@@ -201,7 +277,12 @@ function Order() {
                 <span className={cx('total')}>{formatPrice(order.total_payment)}đ</span>
               </div>
               <div className={cx('button-wrapper')}>
-                <button className={cx('cancel')}>Huỷ đơn</button>
+                <button className={cx('receive')} onClick={() => handleReceiveOrder(order.order_id)}>
+                  Nhận đơn
+                </button>
+                <button className={cx('cancel')} onClick={() => handleCancelOrder(order.order_id)}>
+                  Huỷ đơn
+                </button>
                 <button className={cx('detail')} onClick={() => handleLinkToOrderDetail(order.order_id)}>
                   Xem chi tiết
                 </button>
@@ -211,6 +292,27 @@ function Order() {
         </div>
       ) : (
         <p className={cx('not-found-order')}>Không tìm thấy đơn hàng</p>
+      )}
+      {showSuccessCancel && <Success message="Huỷ đơn hàng thành công" onClose={() => setShowSuccessCancel(false)} />}
+      {showFailedCancel && <Failed message="Huỷ đơn hàng thất bại" onClose={() => setShowFailedCancel(false)} />}
+      {showWarningCancel && (
+        <Warning
+          message="Bạn có muốn huỷ đơn hàng này?"
+          onClose={() => setShowWarningCancel(false)}
+          onOk={confirmCancelOrder}
+        />
+      )}
+
+      {showSuccessReceive && (
+        <Success message="Xác nhận đơn hàng thành công" onClose={() => setShowSuccessReceive(false)} />
+      )}
+      {showFailedReceive && <Failed message="Xác nhận đơn hàng thất bại" onClose={() => setShowFailedReceive(false)} />}
+      {showWarningReceive && (
+        <Warning
+          message="Bạn có muốn xác nhận đơn hàng này?"
+          onClose={() => setShowWarningReceive(false)}
+          onOk={confirmReceiveOrder}
+        />
       )}
     </>
   );

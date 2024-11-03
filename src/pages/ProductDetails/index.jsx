@@ -12,8 +12,16 @@ import { useStoreHeader } from '~/context/StoreHeaderContext';
 const cx = classNames.bind(styles);
 
 function ProductDetails() {
-  const { setStoreHeaderVisibility, setStoreName, setStoreAddress, setStoreAvatar, setStoreID, setStoreIsFollow } =
-    useStoreHeader();
+  const {
+    setStoreHeaderVisibility,
+    setStoreName,
+    setStoreAddress,
+    setStoreAvatar,
+    setStoreID,
+    setStoreIsFollow,
+    setStoreFollowers,
+    setStoreContacts,
+  } = useStoreHeader();
   const [isDesktop, setIsDesktop] = useState(window.innerWidth > 992);
 
   useEffect(() => {
@@ -83,6 +91,8 @@ function ProductDetails() {
         setStoreAvatar(shopDetails.avatar);
         setStoreID(shopDetails.id);
         setStoreIsFollow(shopDetails.is_follow ?? 0);
+        setStoreFollowers(shopDetails.total_followers_shop ?? 0);
+        setStoreContacts(shopDetails.total_contacts ?? 0);
       } else {
         setState({
           loading: false,

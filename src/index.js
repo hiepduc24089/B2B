@@ -4,21 +4,34 @@ import App from '~/App';
 import reportWebVitals from './reportWebVitals';
 import GlobalStyles from '~/components/GlobalStyles';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { AuthProvider } from '~/context/AuthContext';
+import { AuthProvider, useAuth } from '~/context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { StoreHeaderProvider } from './context/StoreHeaderContext';
+import { StoreDataProvider } from './context/StoreDataContext';
+
+const RootApp = () => {
+  const { isAuthenticated } = useAuth();
+
+  return (
+    <StoreHeaderProvider>
+      <CartProvider>
+        {isAuthenticated ? (
+          <StoreDataProvider>
+            <App />
+          </StoreDataProvider>
+        ) : (
+          <App />
+        )}
+      </CartProvider>
+    </StoreHeaderProvider>
+  );
+};
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  // <React.StrictMode>
   <AuthProvider>
-    <StoreHeaderProvider>
-      <CartProvider>
-        <App />
-      </CartProvider>
-    </StoreHeaderProvider>
+    <RootApp />
   </AuthProvider>,
-  // </React.StrictMode>,
 );
 
 // If you want to start measuring performance in your app, pass a function

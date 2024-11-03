@@ -7,10 +7,12 @@ import { postRequestSupplier } from '~/api/requestsupplier';
 import LoadingIndicator from '~/components/Loading';
 import Success from '~/components/Layout/Popup/Success';
 import Failed from '~/components/Layout/Popup/Failed';
+import { useNavigate } from 'react-router-dom';
 
 const cx = classNames.bind(styles);
 
 function PostSupplier() {
+  const navigate = useNavigate();
   const [showSuccess, setShowSuccess] = useState(false);
   const [showError, setShowError] = useState(false);
   const [loadingFullScreen, setLoadingFullScreen] = useState(false);
@@ -83,6 +85,7 @@ function PostSupplier() {
       }
 
       setShowSuccess(true);
+      navigate('/profile', { state: { activeTab: 'PostedRequest' } });
     } catch (error) {
       console.error('Failed to post product:', error);
       setShowError(true);

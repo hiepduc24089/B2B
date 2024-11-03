@@ -61,6 +61,66 @@ export const postUpdateProduct = async (product_id, productData) => {
   }
 };
 
+//Update Remaining
+export const postUpdateRemaining = async (product_id, productData) => {
+  try {
+    const token = localStorage.getItem('token');
+
+    const response = await postData(apiURL.postUpdateRemaining(product_id), productData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return response;
+  } catch (error) {
+    console.error('Failed to post product:', error);
+    throw error;
+  }
+};
+
+//UPdate sale product
+export const postUpdateSale = async (product_id, productData) => {
+  try {
+    const token = localStorage.getItem('token');
+
+    const response = await postData(apiURL.postUpdateSale(product_id), productData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return response;
+  } catch (error) {
+    console.error('Failed to post sale product:', error);
+    throw error;
+  }
+};
+
+export const updateSaleDisplay = async (product_id, display) => {
+  try {
+    const token = localStorage.getItem('token');
+
+    const response = await postData(
+      apiURL.updateSaleDisplay(product_id),
+      { display },
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    return response;
+  } catch (error) {
+    console.error('Failed to update display:', error);
+    throw error;
+  }
+};
+
 export const deleteProductByShop = async (product_id) => {
   try {
     const token = localStorage.getItem('token');

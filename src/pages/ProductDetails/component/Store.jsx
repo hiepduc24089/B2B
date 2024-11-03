@@ -167,12 +167,12 @@ function Store({ seller, product, loading }) {
             </div>
             <div className={cx('d-flex', 'justify-content-between', 'store-number')}>
               <span className={cx('title')}>Lượt liên hệ</span>
-              <span className={cx('number')}>1</span>
+              <span className={cx('number')}>{seller.total_contacts ?? 0}</span>
             </div>
-            <div className={cx('d-flex', 'justify-content-between', 'store-number')}>
+            {/* <div className={cx('d-flex', 'justify-content-between', 'store-number')}>
               <span className={cx('title')}>Tỷ lệ phản hồi</span>
               <span className={cx('number')}>50%</span>
-            </div>
+            </div> */}
             {!isFollowing ? (
               <button className={cx('follow-btn')} onClick={() => handleFollowShop(seller.id)}>
                 Theo dõi

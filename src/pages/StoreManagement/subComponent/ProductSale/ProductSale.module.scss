@@ -149,6 +149,109 @@ td {
   .status-checkbox:checked:before {
     transform: translateX(20px);
   }
+  .set-sale-btn {
+    color: var(--grey-dark);
+    font-size: 14px;
+    font-weight: 500;
+    padding: 4px 8px;
+    border-radius: 8px;
+    border: 1px solid var(--grey-dark);
+    cursor: pointer;
+  }
+}
+
+.sale-modal {
+  .modal-title {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px;
+    border-bottom: 1px solid var(--grey-light);
+    h3 {
+      color: var(--black);
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 0;
+    }
+  }
+  .set-sale-wrapper {
+    padding: 0 5px;
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: 35% 65%;
+    .image-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding-right: 20px;
+      .status-wrapper {
+        font-size: 14px;
+      }
+      .active-sale {
+        color: #0b8c00;
+      }
+      .deactive-sale {
+        color: red;
+      }
+      .image-product {
+        max-height: 400px;
+        height: auto;
+        object-fit: cover;
+      }
+      .product-name {
+        font-size: 14px;
+        color: var(--black);
+        text-align: center;
+      }
+    }
+    .content-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      .input-wrapper {
+        position: relative;
+        display: grid;
+        grid-template-columns: (1fr 3fr);
+        gap: 10px;
+      }
+      .label-field {
+        color: var(--black);
+        font-size: 14px;
+        font-weight: 500;
+      }
+      .input-field {
+        width: 100%;
+        color: var(--black);
+        font-size: 14px;
+        font-weight: 400;
+        padding: 4px 8px;
+        border: 0.5px solid var(--grey-light);
+        border-radius: 5px;
+      }
+      .unit-sale {
+        position: absolute;
+        top: 25%;
+        right: 10px;
+        font-size: 14px;
+        color: var(--grey-dark);
+      }
+    }
+  }
+  .modal-update-sale {
+    color: var(--white);
+    font-size: 14px;
+    padding: 6px 32px;
+    background-color: var(--primary);
+    border-radius: 63px;
+    border: none;
+  }
+  .modal-close-sale {
+    color: var(--white);
+    font-size: 14px;
+    padding: 6px 32px;
+    background-color: var(--grey);
+    border-radius: 63px;
+    border: none;
+  }
 }
 
 button.edit,
@@ -176,6 +279,18 @@ button.delete {
     .search {
       width: 100%;
       margin-top: 20px;
+    }
+  }
+  .sale-modal {
+    .set-sale-wrapper {
+      display: block;
+      .image-wrapper {
+        margin-bottom: 15px;
+        .image-product {
+          width: 40%;
+          margin: auto;
+        }
+      }
     }
   }
 }

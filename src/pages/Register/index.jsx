@@ -7,6 +7,7 @@ import { confirmEmail, verifyEmailCode } from '~/api/loginregister';
 import routesConfig from '~/config/routes';
 import Failed from '~/components/Layout/Popup/Failed';
 import Success from '~/components/Layout/Popup/Success';
+import LoadingIndicator from '~/components/Loading';
 
 const cx = classNames.bind(styles);
 
@@ -28,6 +29,7 @@ function Register() {
   const [showFailed, setShowFailed] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [emailSent, setEmailSent] = useState(false); // New state to track if email has been sent
+  const [loadingFullScreen, setLoadingFullScreen] = useState(false);
 
   // Function to handle input change
   const handleChange = (e) => {
@@ -49,7 +51,7 @@ function Register() {
       setEmailError('Vui lòng nhập Email');
       return;
     }
-
+    setLoadingFullScreen(true);
     try {
       setError('');
       const sendConfirmEmail = await confirmEmail({ email: formData.email });
@@ -66,6 +68,8 @@ function Register() {
       setEmailSent(true);
     } catch (error) {
       setEmailError(error.message);
+    } finally {
+      setLoadingFullScreen(false);
     }
   };
 
@@ -138,6 +142,11 @@ function Register() {
 
   return (
     <>
+      {loadingFullScreen && (
+        <div className={cx('fullscreen-loading')}>
+          <LoadingIndicator />
+        </div>
+      )}
       <div className={cx('login-wrapper')}>
         <img src={images.login_background} alt="Login Background" className={cx('login-background')} />
         <div className={cx('login-details')}>

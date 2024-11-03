@@ -53,6 +53,11 @@ function Payment() {
           loadingAddress: false,
           dataListAddress: getAddressResponse.data,
         });
+
+        const defaultAddress = getAddressResponse.data.find((address) => address.display === 1);
+        if (defaultAddress) {
+          setDeliveryAddress(defaultAddress.id);
+        }
       } catch (error) {
         console.error('Fetch order failed:', error);
         alert('Lấy thông tin địa chỉ thất bại, vui lòng thử lại');
@@ -60,7 +65,6 @@ function Payment() {
     };
     getListAddress();
   }, []);
-
   const [showWarning, setShowWarning] = useState(false);
   const [selectedAddressID, setSelectedAddressID] = useState(null);
 
@@ -81,7 +85,6 @@ function Payment() {
 
   const [successUpdateAddress, setSuccessUpdateAddress] = useState(false);
   const [failedUpdateAddress, setFailedUpdateAddress] = useState(false);
-
   const handleUpdateDefaultAddress = async () => {
     setLoadingFullScreen(true);
     try {
@@ -155,12 +158,18 @@ function Payment() {
 
   const [successPayment, setSuccessPayment] = useState(false);
   const [failedPayment, setFailedPayment] = useState(false);
+  const [note, setNote] = useState('');
+  const [showWarningNoAddress, setShowWarningNoAddress] = useState(false);
 
   const handleSubmitPayment = async () => {
+    if (dataListAddress.length === 0) {
+      setShowWarningNoAddress(true);
+      return;
+    }
     // Construct items payload for API
     const shopItems = checkoutData.map(({ shop_id, products }) => ({
       shop_id,
-      note: 'alo',
+      note,
       shipping_unit: selectedShipping[shop_id] === 23000 ? 'GHN' : 'GHTK',
       shipping_fee: selectedShipping[shop_id] || 0,
       products: products.map(({ product_id, quantity, price }) => ({
@@ -303,7 +312,12 @@ function Payment() {
               </div>
             </div>
             <span className={cx('notes-title')}>Ghi chú</span>
-            <textarea rows={2} className={cx('notes-area')}></textarea>
+            <textarea
+              rows={2}
+              className={cx('notes-area')}
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+            ></textarea>
             <div className={cx('d-flex', 'align-items-center', 'justify-content-between', 'total-each-product')}>
               <span className={cx('title')}>Tổng tiền</span>
               <span className={cx('price')}>{formatPrice(calculateTotalEachStore(shop_id, products))}đ</span>
@@ -454,6 +468,13 @@ function Payment() {
           message="Bạn có muốn xoá địa chỉ này?"
           onClose={() => setShowDeleteWarning(false)}
           onOk={handleConfirmDelete}
+        />
+      )}
+      {showWarningNoAddress && (
+        <Warning
+          message="Vui lòng thêm địa chỉ nhận hàng?"
+          onClose={() => setShowWarningNoAddress(false)}
+          onOk={() => setShowWarningNoAddress(false)}
         />
       )}
       {successUpdateAddress && (

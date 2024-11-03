@@ -1,13 +1,15 @@
 import React, { memo, useState, useEffect } from 'react';
 import classNames from 'classnames/bind';
 import styles from './ProductAdd.module.scss';
-import { imagesHotDeal, imagesStore } from '~/assets/images';
+import { images, imagesHotDeal, imagesStore } from '~/assets/images';
 import { fetchAllListCategory } from '~/api/requestsupplier';
 import { API_HOST } from '~/config/host';
 import LoadingIndicator from '~/components/Loading';
 import { postProduct } from '~/api/product';
 import Success from '~/components/Layout/Popup/Success';
 import Failed from '~/components/Layout/Popup/Failed';
+import { getProfileShop } from '~/api/store';
+import Warning from '~/components/Layout/Popup/Warning';
 
 const cx = classNames.bind(styles);
 
@@ -15,6 +17,7 @@ function ProductAdd({ onSubmitSuccess }) {
   const [loadingFullScreen, setLoadingFullScreen] = useState(false);
   const [showAddSuccess, setShowAddSuccess] = useState(false);
   const [showAddFailed, setShowAddFailed] = useState(false);
+  const [showWarningField, setShowWarningField] = useState(false);
 
   const [state, setState] = useState({
     loading: true,
@@ -70,6 +73,23 @@ function ProductAdd({ onSubmitSuccess }) {
     setPriceTiers(newPriceTiers);
   };
 
+  const handleInputMinQuantityChange = (value) => {
+    setInputMinQuantity(value);
+
+    // Update the first minQuantity in priceTiers
+    setPriceTiers((prevPriceTiers) => {
+      const newPriceTiers = [...prevPriceTiers];
+      if (newPriceTiers.length > 0) {
+        newPriceTiers[0].minQuantity = value; // Set the first minQuantity
+      }
+      return newPriceTiers;
+    });
+  };
+
+  const handleClearPriceTier = (indexToRemove) => {
+    setPriceTiers((prevPriceTiers) => prevPriceTiers.filter((_, index) => index !== indexToRemove));
+  };
+
   const fetchDataListCategoryAPI = async () => {
     try {
       const data = await fetchAllListCategory();
@@ -106,6 +126,28 @@ function ProductAdd({ onSubmitSuccess }) {
   };
 
   const handleSubmit = async () => {
+    const updatedPriceTiers = [...priceTiers];
+    if (updatedPriceTiers.length > 0) {
+      updatedPriceTiers[0].minQuantity = inputMinQuantity;
+    }
+
+    if (
+      !inputName ||
+      !inputDescription ||
+      !selectedCategoryID ||
+      !inputUnit ||
+      !inputContactInfor ||
+      !inputMinQuantity ||
+      !inputRemainingQuantity ||
+      !inputSKU ||
+      updatedPriceTiers.some((tier) => !tier.minQuantity || !tier.price) || // Check if any price tier is incomplete
+      selectedFiles.length === 0 // Check if at least one image is selected
+    ) {
+      setShowWarningField(true);
+      return;
+    }
+
+    // Create FormData after updating priceTiers
     const formData = new FormData();
     formData.append('name', inputName);
     formData.append('describe', inputDescription);
@@ -116,8 +158,8 @@ function ProductAdd({ onSubmitSuccess }) {
     formData.append('quantity', inputRemainingQuantity);
     formData.append('sku', inputSKU);
 
-    // Append price tiers
-    const attributes = priceTiers.map((tier) => ({
+    // Append updated price tiers
+    const attributes = updatedPriceTiers.map((tier) => ({
       quantity: tier.minQuantity,
       price: tier.price,
     }));
@@ -150,6 +192,29 @@ function ProductAdd({ onSubmitSuccess }) {
       setLoadingFullScreen(false);
     }
   };
+
+  const [stateShop, setStateShop] = useState({
+    dataShop: [],
+  });
+  const { dataShop } = stateShop;
+  useEffect(() => {
+    const fetchDataProfileShop = async () => {
+      try {
+        const dataResponse = await getProfileShop();
+        setStateShop((prevState) => ({
+          ...prevState,
+          dataShop: dataResponse.data || [],
+        }));
+      } catch (error) {
+        console.error('Error fetching shop data:', error);
+        setStateShop((prevState) => ({
+          ...prevState,
+        }));
+      }
+    };
+
+    fetchDataProfileShop();
+  }, []);
 
   const renderAllCategory = () => {
     if (loading) {
@@ -294,18 +359,23 @@ function ProductAdd({ onSubmitSuccess }) {
         <h3 className={cx('title', 'mb-0')}>Giá sản phẩm</h3>
 
         {priceTiers.map((tier, index) => (
-          <div key={index} className={cx('w-100', 'double-input')}>
-            <div>
+          <div key={index} className={cx('w-100', 'price-tier')}>
+            <div className={cx('price-tier-item')}>
               <label className={cx('label-field')}>Mua từ</label>
               <input
                 type="number"
                 placeholder="15"
                 className={cx('input-field')}
-                value={tier.minQuantity}
-                onChange={(e) => handlePriceTierChange(index, 'minQuantity', e.target.value)}
+                value={index === 0 ? inputMinQuantity : tier.minQuantity} // Use inputMinQuantity only for the first
+                onChange={(e) =>
+                  index === 0
+                    ? handleInputMinQuantityChange(e.target.value)
+                    : handlePriceTierChange(index, 'minQuantity', e.target.value)
+                }
+                readOnly={index === 0} // Make only the first minQuantity read-only
               />
             </div>
-            <div>
+            <div className={cx('price-tier-item')}>
               <label className={cx('label-field')}>Giá bán</label>
               <input
                 type="number"
@@ -315,6 +385,14 @@ function ProductAdd({ onSubmitSuccess }) {
                 onChange={(e) => handlePriceTierChange(index, 'price', e.target.value)}
               />
             </div>
+            {index > 0 && (
+              <img
+                src={images.minus_icon}
+                alt="minus"
+                className={cx('minus-icon')}
+                onClick={() => handleClearPriceTier(index)}
+              />
+            )}
           </div>
         ))}
 
@@ -340,8 +418,8 @@ function ProductAdd({ onSubmitSuccess }) {
           <h4>Chinh nhánh</h4>
           <div className={cx('details')}>
             <div className={cx('infor')}>
-              <span>trần đình phi</span>
-              <p>Xóm luỹ, Mã Thành, Yên Thành, Nghệ An</p>
+              <span>{dataShop.name}</span>
+              <p>{dataShop.full_address}</p>
             </div>
             <div>
               <label className={cx('label-field')}>Số lượng</label>
@@ -378,6 +456,13 @@ function ProductAdd({ onSubmitSuccess }) {
       )}
       {showAddSuccess && <Success message="Đăng sản phẩm mới thành công" onClose={() => setShowAddSuccess(false)} />}
       {showAddFailed && <Failed message="Đăng sản phẩm thất bại" onClose={() => setShowAddFailed(false)} />}
+      {showWarningField && (
+        <Warning
+          message="Vui lòng điền đủ thông tin"
+          onClose={() => setShowWarningField(false)}
+          onOk={() => setShowWarningField(false)}
+        />
+      )}
     </>
   );
 }

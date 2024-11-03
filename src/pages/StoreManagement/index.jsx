@@ -18,6 +18,7 @@ import SupplierPrice from './subComponent/SupplierPrice';
 import SupplierPost from './subComponent/SupplierPost';
 import ProductEdit from './subComponent/ProductEdit';
 import { useLocation } from 'react-router-dom';
+import EditProfile from './component/EditProfile';
 
 const cx = classNames.bind(styles);
 
@@ -25,8 +26,8 @@ function StoreManagement() {
   const location = useLocation();
   const { activeTab: initialActiveTab } = location.state || {};
 
-  const [activeTab, setActiveTab] = useState(initialActiveTab || 'Create Profile');
-  const [activeSubItem, setActiveSubItem] = useState(initialActiveTab || 'Create Profile');
+  const [activeTab, setActiveTab] = useState('');
+  const [activeSubItem, setActiveSubItem] = useState('');
   const [isProductDropdownOpen, setProductDropdownOpen] = useState(false);
   const [isSupplierDropdownOpen, setSupplierDropdownOpen] = useState(false);
   const [productEditID, setProductEditID] = useState('');
@@ -43,6 +44,8 @@ function StoreManagement() {
         return <Home onAddProductClick={() => handleProductComponentClick('Product-Add')} />;
       case 'Create Profile':
         return <CreateProfile />;
+      case 'Edit Profile':
+        return <EditProfile />;
       case 'Order':
         return <Order />;
       case 'Message':

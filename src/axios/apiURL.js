@@ -51,6 +51,10 @@ export const apiURL = {
   postAskToBuy: '/api/save-ask-buy',
   postFollowShop: '/api/follow-shop',
   checkFollowingShop: '/api/check-follow-shop',
+  postUpdateRemaining: (product_id) => `api/update-quantity-product/${product_id}`,
+  postUpdateSale: (product_id) => `api/set-product-discount/${product_id}`,
+  updateSaleDisplay: (product_id) => `/api/set-display-product-discount/${product_id}`,
+  getShopProfile: 'api/get-shop',
 
   //Payment
   addToCart: '/api/add-to-cart',
@@ -64,8 +68,12 @@ export const apiURL = {
 
   // Store Management
   createShop: '/api/create-shop',
+  updateShop: '/api/update-shop',
   getShopByUser: (shop_id) => `/api/detail-shop/${shop_id}`,
   getProductByShop: (shop_id, user_id, page) => `/api/get-product-shop/${shop_id}?user_id=${user_id}&page=${page}`,
+  cancelOrder: `/api/user-order-cancel`,
+  updateStatusOrder: 'api/shop-order-status',
+  getCustomer: 'api/get-client',
 
   //Render Category Product
   getCategoyProduct: '/api/filter-Product',

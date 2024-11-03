@@ -10,6 +10,7 @@ import LoadingIndicator from '~/components/Loading';
 import Warning from '~/components/Layout/Popup/Warning';
 import Success from '~/components/Layout/Popup/Success';
 import Failed from '~/components/Layout/Popup/Failed';
+import { API_HOST } from '~/config/host';
 
 const cx = classNames.bind(styles);
 
@@ -130,30 +131,27 @@ function ProductAll({ onEditProductClick }) {
           </div>
         </HeadlessTippy>
       </div>
-      <div className={cx('table-container')}>
-        <table className={cx('table', 'table-vcenter', 'text-nowrap')}>
-          <thead>
-            <tr>
-              <th className={cx('border-bottom-0', 'black-text', 'text-start', 'ps-0')}>Sản phẩm</th>
-              <th className={cx('border-bottom-0', 'text-center', 'black-text')}>Mã sản phẩm</th>
-              <th className={cx('border-bottom-0', 'text-center', 'black-text')}>Giá</th>
-              <th className={cx('border-bottom-0', 'text-center', 'black-text')}>Trạng thái</th>
-              <th className={cx('border-bottom-0', 'black-text', 'text-end')}>Sửa xóa</th>
-            </tr>
-          </thead>
-          {loading ? (
-            <LoadingIndicator />
-          ) : (
+      {loading ? (
+        <LoadingIndicator />
+      ) : (
+        <div className={cx('table-container')}>
+          <table className={cx('table', 'table-vcenter', 'text-nowrap')}>
+            <thead>
+              <tr>
+                <th className={cx('border-bottom-0', 'black-text', 'text-start', 'ps-0')}>Sản phẩm</th>
+                <th className={cx('border-bottom-0', 'text-center', 'black-text')}>Mã sản phẩm</th>
+                <th className={cx('border-bottom-0', 'text-center', 'black-text')}>Giá</th>
+                <th className={cx('border-bottom-0', 'text-center', 'black-text')}>Trạng thái</th>
+                <th className={cx('border-bottom-0', 'black-text', 'text-end')}>Sửa xóa</th>
+              </tr>
+            </thead>
+
             <tbody>
               {dataListProduct.map((product, index) => (
                 <tr key={index}>
                   <td className={cx('ps-0')}>
-                    <div className={cx('d-flex')}>
-                      <img
-                        src={imagesHome.image_product}
-                        alt="Tinh Nghệ Nano Curcumin OIC"
-                        className={cx('product-image')}
-                      />
+                    <div className={cx('d-flex', 'align-items-center')}>
+                      <img src={`${API_HOST}${product.src[0]}`} alt={product.name} className={cx('product-image')} />
                       <h5 className={cx('product-name')}>{product.name}</h5>
                     </div>
                   </td>
@@ -182,10 +180,9 @@ function ProductAll({ onEditProductClick }) {
                 </tr>
               ))}
             </tbody>
-          )}
-        </table>
-      </div>
-
+          </table>
+        </div>
+      )}
       {showDeleteWarning && (
         <Warning
           message="Bạn có chắc chắn muốn xóa sản phẩm này không?"
