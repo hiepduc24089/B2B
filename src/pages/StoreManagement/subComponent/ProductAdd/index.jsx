@@ -110,6 +110,29 @@ function ProductAdd({ onSubmitSuccess }) {
     fetchDataListCategoryAPI();
   }, []);
 
+  const [stateShop, setStateShop] = useState({
+    dataShop: [],
+  });
+  const { dataShop } = stateShop;
+  useEffect(() => {
+    const fetchDataProfileShop = async () => {
+      try {
+        const dataResponse = await getProfileShop();
+        setStateShop((prevState) => ({
+          ...prevState,
+          dataShop: dataResponse.data || [],
+        }));
+      } catch (error) {
+        console.error('Error fetching shop data:', error);
+        setStateShop((prevState) => ({
+          ...prevState,
+        }));
+      }
+    };
+
+    fetchDataProfileShop();
+  }, []);
+
   const handleCategorySelect = (categoryName, categoryID) => {
     // Set the selected category and close the category list
     setSelectedCategory(categoryName);
@@ -192,29 +215,6 @@ function ProductAdd({ onSubmitSuccess }) {
       setLoadingFullScreen(false);
     }
   };
-
-  const [stateShop, setStateShop] = useState({
-    dataShop: [],
-  });
-  const { dataShop } = stateShop;
-  useEffect(() => {
-    const fetchDataProfileShop = async () => {
-      try {
-        const dataResponse = await getProfileShop();
-        setStateShop((prevState) => ({
-          ...prevState,
-          dataShop: dataResponse.data || [],
-        }));
-      } catch (error) {
-        console.error('Error fetching shop data:', error);
-        setStateShop((prevState) => ({
-          ...prevState,
-        }));
-      }
-    };
-
-    fetchDataProfileShop();
-  }, []);
 
   const renderAllCategory = () => {
     if (loading) {

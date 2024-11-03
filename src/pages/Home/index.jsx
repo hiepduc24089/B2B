@@ -10,6 +10,7 @@ import classNames from 'classnames/bind';
 import styles from './Home.module.scss';
 import { imagesHome } from '~/assets/images';
 import Success from '~/components/Layout/Popup/Success';
+import New from './component/New';
 
 const cx = classNames.bind(styles);
 
@@ -51,6 +52,9 @@ function Home() {
         </div>
         <div className={cx('for-you')}>
           <ForYou />
+        </div>
+        <div className={cx('for-you')}>
+          <New />
         </div>
       </div>
 

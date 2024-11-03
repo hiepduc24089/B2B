@@ -71,7 +71,7 @@ function StoreManagement() {
       case 'Supplier-Price':
         return <SupplierPrice />;
       case 'Supplier-Post':
-        return <SupplierPost />;
+        return <SupplierPost onSubmitSuccess={() => handleSupplierComponentClick('Supplier-All')} />;
       default:
         return <CreateProfile />;
     }

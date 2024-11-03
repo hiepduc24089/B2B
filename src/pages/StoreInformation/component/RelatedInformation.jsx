@@ -164,7 +164,7 @@ function RelatedInformation({ dataStore, shopID }) {
             Sản phẩm
           </div>
         </div>
-        <HeadlessTippy>
+        {/* <HeadlessTippy>
           <div className={cx('search')}>
             <input
               className={cx('search-field', 'form-control')}
@@ -175,7 +175,7 @@ function RelatedInformation({ dataStore, shopID }) {
               <FontAwesomeIcon icon={faMagnifyingGlass} />
             </button>
           </div>
-        </HeadlessTippy>
+        </HeadlessTippy> */}
       </div>
 
       <div className={cx({ container: isMobile })}>

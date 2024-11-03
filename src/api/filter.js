@@ -48,3 +48,18 @@ export const filterProduct = async (categories = [], cities = [], min_price = ''
     throw error;
   }
 };
+
+export const searchAll = async (search = '', userID) => {
+  try {
+    const params = new URLSearchParams();
+
+    if (search) params.append('search', search);
+    params.append('user_id', userID);
+
+    const response = await getData(`${apiURL.searchAll}?${params.toString()}`);
+    return response;
+  } catch (error) {
+    console.error('Error fetching product:', error);
+    throw error;
+  }
+};

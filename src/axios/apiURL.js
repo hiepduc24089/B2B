@@ -15,6 +15,7 @@ export const apiURL = {
   unfollowShop: '/api/unfollow-shop',
   fetchViewedProduct: '/api/get-viewed-products',
   fetchQuoteSent: '/api/get-quotes-user',
+  cancelOrder: `/api/user-order-cancel`,
 
   //Address
   createAddress: 'api/create-delivery-address',
@@ -32,12 +33,14 @@ export const apiURL = {
   //Home
   dealHotToday: '/api/deal-hot-today',
   productForYou: '/api/product-for-you',
+  productNew: '/api/product-new',
   trademark: '/api/trademark',
   getRequestSupplier: '/api/get-request-supplier',
   category: '/api/category',
   postFavoriteProduct: '/api/favorite-product',
   filterHotDeal: '/api/filter-deal-hot-today',
   filterProduct: '/api/filter-Product',
+  searchAll: '/api/search-product',
 
   // Product and Shop Details
   productDetails: (slug) => `/api/detail-product/${slug}`,
@@ -71,7 +74,6 @@ export const apiURL = {
   updateShop: '/api/update-shop',
   getShopByUser: (shop_id) => `/api/detail-shop/${shop_id}`,
   getProductByShop: (shop_id, user_id, page) => `/api/get-product-shop/${shop_id}?user_id=${user_id}&page=${page}`,
-  cancelOrder: `/api/user-order-cancel`,
   updateStatusOrder: 'api/shop-order-status',
   getCustomer: 'api/get-client',
 

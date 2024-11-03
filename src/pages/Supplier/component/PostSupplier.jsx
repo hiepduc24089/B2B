@@ -85,7 +85,10 @@ function PostSupplier() {
       }
 
       setShowSuccess(true);
-      navigate('/profile', { state: { activeTab: 'PostedRequest' } });
+
+      setTimeout(() => {
+        navigate('/profile', { state: { activeTab: 'PostedRequest' } });
+      }, 1500);
     } catch (error) {
       console.error('Failed to post product:', error);
       setShowError(true);

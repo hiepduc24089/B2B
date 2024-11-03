@@ -56,6 +56,11 @@
       font-size: 24px;
       font-weight: 600;
     }
+    .product-price-origin {
+      font-size: 20px;
+      color: var(--grey-dark);
+      text-decoration: line-through;
+    }
     .negotiate {
       color: var(--primary);
       font-size: 18px;
@@ -64,6 +69,16 @@
       background: rgba(250, 90, 0, 0.1);
       padding: 4px 8px;
       width: fit-content;
+    }
+    .discount-number {
+      color: var(--grey-black);
+      font-size: 18px;
+      font-weight: 400;
+      margin-bottom: 10px;
+      .discount-number-highlight {
+        color: var(--primary);
+        font-weight: 600;
+      }
     }
     .buy-at-least {
       margin-top: 15px;
@@ -362,7 +377,13 @@
       .product-price {
         font-size: 20px;
       }
+      .product-price-origin {
+        font-size: 16px;
+      }
       .negotiate {
+        font-size: 14px;
+      }
+      .discount-number {
         font-size: 14px;
       }
       .product-order {

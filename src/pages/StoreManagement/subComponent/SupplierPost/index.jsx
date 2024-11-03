@@ -7,10 +7,13 @@ import LoadingIndicator from '~/components/Loading';
 import { postRequestSupplier } from '~/api/requestsupplier';
 import Success from '~/components/Layout/Popup/Success';
 import Failed from '~/components/Layout/Popup/Failed';
+import routesConfig from '~/config/routes';
+import { useNavigate } from 'react-router-dom';
 
 const cx = classNames.bind(styles);
 
-function SupplierPost() {
+function SupplierPost({ onSubmitSuccess }) {
+  const navigate = useNavigate();
   const [showSuccess, setShowSuccess] = useState(false);
   const [showError, setShowError] = useState(false);
   const [loadingFullScreen, setLoadingFullScreen] = useState(false);
@@ -83,6 +86,10 @@ function SupplierPost() {
       }
 
       setShowSuccess(true);
+
+      setTimeout(() => {
+        onSubmitSuccess();
+      }, 1500);
     } catch (error) {
       console.error('Failed to post product:', error);
       setShowError(true);
