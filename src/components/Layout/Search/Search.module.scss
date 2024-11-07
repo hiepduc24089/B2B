@@ -38,6 +38,44 @@
   font-size: 12px;
   margin-top: 8px;
 }
+.search-results {
+  padding: 10px;
+  background: var(--white);
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  width: 100%; /* Set the width to match the search field */
+  max-width: 100%; /* Ensures it doesn’t overflow */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.search-src {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.search-result-item {
+  display: flex;
+  gap: 10px;
+  cursor: pointer;
+  align-items: center;
+}
+
+.search-result-name {
+  color: var(--black);
+  font-size: 14px;
+  font-weight: 400;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Limit text to 2 lines */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+  max-width: calc(100% - 50px); /* Account for image width and padding */
+}
 
 @media screen and (max-width: 768px) {
 }

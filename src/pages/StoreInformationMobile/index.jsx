@@ -1,8 +1,8 @@
-import React, { memo, useEffect } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
 import styles from './StoreInformationMobile.module.scss';
 import { getShopByUser } from '~/api/store';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { API_HOST } from '~/config/host';
 import { images } from '~/assets/images';
 import HeadlessTippy from '@tippyjs/react/headless';
@@ -10,6 +10,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import LoadingIndicator from '~/components/Loading';
 import RelatedInformation from '../StoreInformation/component/RelatedInformation';
+import { useAuth } from '~/context/AuthContext';
+import { createConversations } from '~/api/chat';
+import ChatOpen from '~/components/Layout/ChatOpen';
+import Warning from '~/components/Layout/Popup/Warning';
+import Failed from '~/components/Layout/Popup/Failed';
+import routesConfig from '~/config/routes';
+import Chat from '~/components/Layout/Chat';
 
 const cx = classNames.bind(styles);
 
@@ -18,6 +25,9 @@ function StoreInformationMobile() {
   const { id } = useParams();
   const { shop_id } = location.state || {};
   const shopID = shop_id || id;
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   const [state, setState] = React.useState({
     loading: true,
@@ -49,12 +59,47 @@ function StoreInformationMobile() {
     fetchShopData();
   }, []);
 
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [conversation, setConversation] = useState(null);
+  const [showErrorStartChat, setShowErrorStartChat] = useState(false);
+  const [loadingFullScreen, setLoadingFullScreen] = useState(false);
+  const [warningAuthenticate, setWarningAuthenticate] = useState(false);
+
+  const handleChatButtonClick = async () => {
+    if (!isAuthenticated) {
+      setWarningAuthenticate(true);
+      return;
+    }
+    if (user.id === dataStore.user_id) {
+      return;
+    }
+    setLoadingFullScreen(true);
+    try {
+      const response = await createConversations(user.id, dataStore.user_id);
+      if (response && response.status) {
+        setConversation(response.data);
+        setIsChatOpen(true);
+      }
+    } catch (error) {
+      console.error('Error creating conversation:', error);
+      setShowErrorStartChat(true);
+    } finally {
+      setLoadingFullScreen(false);
+    }
+  };
+
   if (loading) {
     return <LoadingIndicator />;
   }
 
   return (
     <>
+      <Chat />
+      {loadingFullScreen && (
+        <div className={cx('fullscreen-loading')}>
+          <LoadingIndicator />
+        </div>
+      )}
       <div className={cx('store-header')}>
         <div className={cx('image-wrapper')}>
           <img src={`${API_HOST}${dataStore.banner}`} alt={dataStore.name} className={cx('store-banner')} />
@@ -96,10 +141,18 @@ function StoreInformationMobile() {
                   <img src={images.follow} alt="Follow" />
                   <button>Theo dõi</button>
                 </div>
-                <div className={cx('see-phone')}>
+                <div className={cx('see-phone')} onClick={handleChatButtonClick}>
                   <img src={images.callIconWhite} alt="Phone" />
-                  <button>Xem SĐT</button>
+                  <button>Nhắn tin</button>
                 </div>
+                {isChatOpen && conversation && (
+                  <ChatOpen
+                    userId={user.id}
+                    receiverId={dataStore.user_id}
+                    conversationId={conversation.id}
+                    onClose={() => setIsChatOpen(false)}
+                  />
+                )}
               </div>
             </div>
           </div>
@@ -124,6 +177,16 @@ function StoreInformationMobile() {
         </div>
         <RelatedInformation dataStore={dataStore} shopID={shopID} />
       </div>
+      {showErrorStartChat && (
+        <Failed message="Không thể bắt đầu cuộc trò chuyện" onClose={() => setShowErrorStartChat(false)} />
+      )}
+      {warningAuthenticate && (
+        <Warning
+          message="Vui lòng đăng nhập để thực hiện chức năng này"
+          onClose={() => setWarningAuthenticate(false)}
+          onOk={() => navigate(routesConfig.login)}
+        />
+      )}
     </>
   );
 }

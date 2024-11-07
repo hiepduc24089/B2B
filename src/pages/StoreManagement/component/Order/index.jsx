@@ -144,7 +144,7 @@ function Order() {
     setLoadingFullScreen(true);
     setShowWarningCancel(false);
     try {
-      const response = await cancelOrder({ order_id: orderToCancel });
+      const response = await updateOrderStatus({ order_id: orderToCancel, status: 4 });
 
       if (response.status) {
         setShowSuccessCancel(true);
@@ -277,12 +277,16 @@ function Order() {
                 <span className={cx('total')}>{formatPrice(order.total_payment)}đ</span>
               </div>
               <div className={cx('button-wrapper')}>
-                <button className={cx('receive')} onClick={() => handleReceiveOrder(order.order_id)}>
-                  Nhận đơn
-                </button>
-                <button className={cx('cancel')} onClick={() => handleCancelOrder(order.order_id)}>
-                  Huỷ đơn
-                </button>
+                {order.status === 0 && (
+                  <button className={cx('receive')} onClick={() => handleReceiveOrder(order.order_id)}>
+                    Nhận đơn
+                  </button>
+                )}
+                {order.status !== 4 && order.status !== 5 && (
+                  <button className={cx('cancel')} onClick={() => handleCancelOrder(order.order_id)}>
+                    Huỷ đơn
+                  </button>
+                )}
                 <button className={cx('detail')} onClick={() => handleLinkToOrderDetail(order.order_id)}>
                   Xem chi tiết
                 </button>

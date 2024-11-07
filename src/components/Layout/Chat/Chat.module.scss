@@ -1,0 +1,43 @@
+.chat-wrapper {
+  position: fixed;
+  bottom: 0;
+  right: 10px;
+  background-color: var(--primary);
+  padding: 5px 15px;
+  border-radius: 5px;
+  z-index: 100;
+  cursor: pointer;
+}
+.chat-box-close {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+.chat-icon {
+  width: 28px;
+  height: 28px;
+  object-fit: cover;
+}
+.chat-name {
+  color: var(--white);
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 0;
+}
+
+@media screen and (max-width: 768px) {
+  .chat-wrapper {
+    right: 0;
+  }
+  .chat-box-close {
+    gap: 8px;
+  }
+  .chat-icon {
+    width: 22px;
+    height: 22px;
+  }
+  .chat-name {
+    font-size: 14px;
+  }
+}

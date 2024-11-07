@@ -7,10 +7,20 @@ import { API_HOST } from '~/config/host';
 import { postCreateQuotesFromUser } from '~/api/requestsupplier';
 import Success from '~/components/Layout/Popup/Success';
 import Failed from '~/components/Layout/Popup/Failed';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '~/context/AuthContext';
+import ChatOpen from '~/components/Layout/ChatOpen';
+import { createConversations } from '~/api/chat';
+import Warning from '~/components/Layout/Popup/Warning';
+import routesConfig from '~/config/routes';
 
 const cx = classNames.bind(styles);
 
 function Store({ requestSupplier, loading, requestSupplierID }) {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { isAuthenticated } = useAuth();
+
   const [showSuccess, setShowSuccess] = useState(false);
   const [showError, setShowError] = useState(false);
   const [loadingFullScreen, setLoadingFullScreen] = useState(false);
@@ -63,6 +73,34 @@ function Store({ requestSupplier, loading, requestSupplierID }) {
     }
   };
 
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [conversation, setConversation] = useState(null);
+  const [showErrorStartChat, setShowErrorStartChat] = useState(false);
+  const [warningAuthenticate, setWarningAuthenticate] = useState(false);
+
+  const handleChatButtonClick = async () => {
+    if (!isAuthenticated) {
+      setWarningAuthenticate(true);
+      return;
+    }
+    if (user.id === requestSupplier.id) {
+      return;
+    }
+    setLoadingFullScreen(true);
+    try {
+      const response = await createConversations(user.id, requestSupplier.id);
+      if (response && response.status) {
+        setConversation(response.data);
+        setIsChatOpen(true);
+      }
+    } catch (error) {
+      console.error('Error creating conversation:', error);
+      setShowErrorStartChat(true);
+    } finally {
+      setLoadingFullScreen(false);
+    }
+  };
+
   const renderContent = () => {
     if (loading) {
       return <LoadingIndicator />;
@@ -79,7 +117,17 @@ function Store({ requestSupplier, loading, requestSupplierID }) {
             <button className={cx('follow-btn')} onClick={handleShowModal}>
               Gửi báo giá
             </button>
-            <button className={cx('phone-btn')}>Xem SĐT</button>
+            <button className={cx('phone-btn')} onClick={handleChatButtonClick}>
+              Nhắn tin
+            </button>
+            {isChatOpen && conversation && (
+              <ChatOpen
+                userId={user.id}
+                receiverId={requestSupplier.id}
+                conversationId={conversation.id}
+                onClose={() => setIsChatOpen(false)}
+              />
+            )}
           </div>
         </div>
       );
@@ -160,6 +208,16 @@ function Store({ requestSupplier, loading, requestSupplierID }) {
 
       {showSuccess && <Success message="Gửi báo giá thành công" onClose={() => setShowSuccess(false)} />}
       {showError && <Failed message="Gửi báo giá thất bại" onClose={() => setShowError(false)} />}
+      {showErrorStartChat && (
+        <Failed message="Không thể bắt đầu cuộc trò chuyện" onClose={() => setShowErrorStartChat(false)} />
+      )}
+      {warningAuthenticate && (
+        <Warning
+          message="Vui lòng đăng nhập để thực hiện chức năng này"
+          onClose={() => setWarningAuthenticate(false)}
+          onOk={() => navigate(routesConfig.login)}
+        />
+      )}
     </>
   );
 }

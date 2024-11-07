@@ -142,7 +142,16 @@ function HotDeal() {
                     <h3>
                       {formatPrice(hotdeal.price)}đ<span>/{hotdeal.unit}</span>
                     </h3>
-                    <h4>{formatPrice(hotdeal.price_original)}đ</h4>
+                    <h4
+                      style={{
+                        opacity:
+                          parseInt(hotdeal.price_original, 10) === parseInt(hotdeal.price.replace(/\./g, ''), 10)
+                            ? 0
+                            : 1,
+                      }}
+                    >
+                      {formatPrice(hotdeal.price_original)}đ
+                    </h4>
                     <h5>
                       Mua sỉ từ{' '}
                       <span>

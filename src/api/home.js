@@ -23,6 +23,17 @@ export const fetchForYou = async (user_id) => {
   }
 };
 
+// Fetch "New" products
+export const fetchNewProduct = async (user_id) => {
+  try {
+    const response = await getData(apiURL.productNew, { params: { user_id } });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching "New" product:', error);
+    throw error;
+  }
+};
+
 // Fetch brands
 export const fetchBrand = async () => {
   try {

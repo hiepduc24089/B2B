@@ -78,6 +78,12 @@ function Details({ product, loading, seller }) {
     }
   };
 
+  const today = new Date();
+  const discountStartDate = product && product.discount_date_start ? new Date(product.discount_date_start) : null;
+  const discountEndDate = product && product.discount_date_end ? new Date(product.discount_date_end) : null;
+  const isDiscountActive =
+    product && discountStartDate && discountEndDate ? today >= discountStartDate && today <= discountEndDate : false;
+
   const renderContent = () => {
     if (loading) {
       return <LoadingIndicator />;
@@ -105,9 +111,31 @@ function Details({ product, loading, seller }) {
                 {product.attributes.map((attribute, index) => {
                   const colClass =
                     product.attributes.length === 2 ? 'col-6' : product.attributes.length === 3 ? 'col-4' : 'col-3'; // Defaults to 'col-3' for 4 or more attributes
+                  const price = parseFloat(attribute.price);
+
+                  // Calculate priceOrigin with the condition for `number_discount`
+                  const priceOrigin =
+                    isDiscountActive && parseFloat(product.number_discount) > attribute.quantity
+                      ? price - (price * parseFloat(product.discount)) / 100
+                      : price;
+
+                  // If `number_discount <= attribute.quantity`, set priceOrigin to price
+                  const displayPrice = parseFloat(product.number_discount) <= attribute.quantity ? price : priceOrigin;
                   return (
                     <div key={index} className={cx(colClass)}>
-                      <h3 className={cx('product-price')}>{formatPrice(attribute.price)}đ</h3>
+                      <h3 className={cx('product-price')}>{formatPrice(priceOrigin)}đ</h3>
+
+                      {isDiscountActive && (
+                        <h3
+                          className={cx('product-price-origin')}
+                          style={{
+                            opacity: parseFloat(product.number_discount) > attribute.quantity ? 1 : 0,
+                          }}
+                        >
+                          {formatPrice(price)}đ
+                        </h3>
+                      )}
+
                       {index === product.attributes.length - 1 ? (
                         <span>
                           {'>'} {attribute.quantity} {product.unit}
@@ -121,6 +149,14 @@ function Details({ product, loading, seller }) {
                   );
                 })}
               </div>
+              {isDiscountActive && (
+                <h5 className={cx('discount-number')}>
+                  Số lượng được giảm giá:{' '}
+                  <span className={cx('discount-number-highlight')}>
+                    {product.number_discount} {product.unit}
+                  </span>
+                </h5>
+              )}
               <span className={cx('negotiate')}>Có thể thương lượng</span>
               <h5 className={cx('buy-at-least')}>
                 Mua ít nhất{' '}
@@ -130,22 +166,30 @@ function Details({ product, loading, seller }) {
               </h5>
             </div>
             <div className={cx('product-order')}>
-              <div className={cx('product-remaining', 'd-flex', 'align-items-center')}>
-                <span>Tồn kho {product.quantity}</span>
-                <CustomInputNumber
-                  min={product.attributes[0].quantity}
-                  max={product.quantity}
-                  onValueChange={setQuantity}
-                />
-              </div>
-              <div className={cx('d-flex', 'justify-content-between', 'product-btn')}>
-                <button className={cx('order')} onClick={handleCheckout}>
-                  Đặt hàng ngay
-                </button>
-                <button className={cx('add-to-cart')} onClick={handleCreateCart}>
-                  Thêm vào giỏ hàng
-                </button>
-              </div>
+              {product.quantity > 0 ? (
+                <>
+                  <div className={cx('product-remaining', 'd-flex', 'align-items-center')}>
+                    <span>Tồn kho {product.quantity}</span>
+                    <CustomInputNumber
+                      min={product.attributes[0].quantity}
+                      max={product.quantity}
+                      onValueChange={setQuantity}
+                    />
+                  </div>
+                  <div className={cx('d-flex', 'justify-content-between', 'product-btn')}>
+                    <button className={cx('order')} onClick={handleCheckout}>
+                      Đặt hàng ngay
+                    </button>
+                    <button className={cx('add-to-cart')} onClick={handleCreateCart}>
+                      Thêm vào giỏ hàng
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <p className={cx('out-of-stock')}>
+                  Sản phẩm tạm thời <span className={cx('out-of-stock-highlight')}>HẾT HÀNG</span>
+                </p>
+              )}
               <div className={cx('d-flex', 'align-items-center', 'product-notes')}>
                 <img src={imagesHotDeal.check} alt="Check" />
                 <span>Chính hãng 100%</span>

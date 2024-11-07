@@ -7,10 +7,19 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
   const isTokenExpired = (token) => {
-    if (!token) return true; // If there is no token, consider it expired
+    if (!token) {
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      return true;
+    }
     const tokenPayload = JSON.parse(atob(token.split('.')[1]));
     const expiryTime = tokenPayload.exp * 1000;
-    return Date.now() > expiryTime;
+    if (Date.now() > expiryTime) {
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      return true;
+    }
+    return false;
   };
 
   const login = (userData) => {
@@ -38,6 +47,8 @@ export const AuthProvider = ({ children }) => {
         setUser(JSON.parse(storedUser));
         setIsAuthenticated(true);
       }
+    } else {
+      logout();
     }
   }, []);
 

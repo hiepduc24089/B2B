@@ -9,6 +9,7 @@ import { getProductDetailAtShop, postUpdateProduct } from '~/api/product';
 import Success from '~/components/Layout/Popup/Success';
 import Failed from '~/components/Layout/Popup/Failed';
 import Warning from '~/components/Layout/Popup/Warning';
+import { getProfileShop } from '~/api/store';
 
 const cx = classNames.bind(styles);
 
@@ -116,6 +117,29 @@ function ProductEdit({ productID, onSubmitSuccess }) {
 
     fetchProductDetail();
   }, [productID]);
+
+  const [stateShop, setStateShop] = useState({
+    dataShop: [],
+  });
+  const { dataShop } = stateShop;
+  useEffect(() => {
+    const fetchDataProfileShop = async () => {
+      try {
+        const dataResponse = await getProfileShop();
+        setStateShop((prevState) => ({
+          ...prevState,
+          dataShop: dataResponse.data || [],
+        }));
+      } catch (error) {
+        console.error('Error fetching shop data:', error);
+        setStateShop((prevState) => ({
+          ...prevState,
+        }));
+      }
+    };
+
+    fetchDataProfileShop();
+  }, []);
 
   useEffect(() => {
     if (dataProductDetail && dataProductDetail.product && dataProductDetail.product.category) {
@@ -405,8 +429,8 @@ function ProductEdit({ productID, onSubmitSuccess }) {
           <h4>Chinh nhánh</h4>
           <div className={cx('details')}>
             <div className={cx('infor')}>
-              <span>trần đình phi</span>
-              <p>Xóm luỹ, Mã Thành, Yên Thành, Nghệ An</p>
+              <span>{dataShop.name}</span>
+              <p>{dataShop.full_address}</p>
             </div>
             <div>
               <label className={cx('label-field')}>Số lượng</label>

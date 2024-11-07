@@ -56,6 +56,11 @@
       font-size: 24px;
       font-weight: 600;
     }
+    .product-price-origin {
+      font-size: 20px;
+      color: var(--grey-dark);
+      text-decoration: line-through;
+    }
     .negotiate {
       color: var(--primary);
       font-size: 18px;
@@ -65,6 +70,16 @@
       padding: 4px 8px;
       width: fit-content;
     }
+    .discount-number {
+      color: var(--grey-black);
+      font-size: 18px;
+      font-weight: 400;
+      margin-bottom: 10px;
+      .discount-number-highlight {
+        color: var(--primary);
+        font-weight: 600;
+      }
+    }
     .buy-at-least {
       margin-top: 15px;
       color: var(--grey-black);
@@ -73,6 +88,17 @@
       span {
         color: var(--black);
         font-weight: 600;
+      }
+    }
+    .out-of-stock {
+      margin-bottom: 15px;
+      color: var(--grey-black);
+      font-size: 18px;
+      font-weight: 400;
+      .out-of-stock-highlight {
+        color: var(--primary);
+        font-weight: 600;
+        text-decoration: underline;
       }
     }
     .product-order {
@@ -362,10 +388,23 @@
       .product-price {
         font-size: 20px;
       }
+      .product-price-origin {
+        font-size: 16px;
+      }
       .negotiate {
         font-size: 14px;
       }
+      .discount-number {
+        font-size: 14px;
+      }
+      .buy-at-least {
+        font-size: 14px;
+      }
+      .out-of-stock {
+        font-size: 14px;
+      }
       .product-order {
+        margin-top: 15px;
         .product-btn {
           gap: 10px;
           .order,

@@ -10,6 +10,10 @@ import classNames from 'classnames/bind';
 import styles from './Home.module.scss';
 import { imagesHome } from '~/assets/images';
 import Success from '~/components/Layout/Popup/Success';
+import New from './component/New';
+import Echo from 'laravel-echo';
+import { useAuth } from '~/context/AuthContext';
+import { API_HOST } from '~/config/host';
 
 const cx = classNames.bind(styles);
 
@@ -17,6 +21,32 @@ function Home() {
   const location = useLocation();
   const navigate = useNavigate();
   const [showSuccess, setShowSuccess] = useState(false);
+  const { user } = useAuth();
+  useEffect(() => {
+    if (!user) return;
+    window.Echo = new Echo({
+      broadcaster: 'pusher',
+      key: 'bd72b2f14ad121b7671a',
+      cluster: 'ap1',
+      forceTLS: true,
+      authEndpoint: `${API_HOST}/broadcasting/auth`,
+      auth: {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      },
+    });
+
+    const channelName = `notifications.${user.id}`;
+    const channel = window.Echo.private(channelName);
+    channel.listen('.user-notification', (data) => {
+      console.log('Received notification:', data);
+    });
+
+    return () => {
+      window.Echo.leaveChannel(channelName);
+    };
+  }, [user]);
 
   useEffect(() => {
     if (location.state?.showSuccessPopup) {
@@ -48,6 +78,9 @@ function Home() {
         </div>
         <div className={cx('brand')}>
           <Brand />
+        </div>
+        <div className={cx('for-you')}>
+          <New />
         </div>
         <div className={cx('for-you')}>
           <ForYou />

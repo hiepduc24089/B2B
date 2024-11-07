@@ -15,6 +15,8 @@ export const apiURL = {
   unfollowShop: '/api/unfollow-shop',
   fetchViewedProduct: '/api/get-viewed-products',
   fetchQuoteSent: '/api/get-quotes-user',
+  cancelOrder: `/api/user-order-cancel`,
+  updateUserOnline: `api/check-online`,
 
   //Address
   createAddress: 'api/create-delivery-address',
@@ -32,12 +34,14 @@ export const apiURL = {
   //Home
   dealHotToday: '/api/deal-hot-today',
   productForYou: '/api/product-for-you',
+  productNew: '/api/product-new',
   trademark: '/api/trademark',
   getRequestSupplier: '/api/get-request-supplier',
   category: '/api/category',
   postFavoriteProduct: '/api/favorite-product',
   filterHotDeal: '/api/filter-deal-hot-today',
   filterProduct: '/api/filter-Product',
+  searchAll: '/api/search-product',
 
   // Product and Shop Details
   productDetails: (slug) => `/api/detail-product/${slug}`,
@@ -71,9 +75,12 @@ export const apiURL = {
   updateShop: '/api/update-shop',
   getShopByUser: (shop_id) => `/api/detail-shop/${shop_id}`,
   getProductByShop: (shop_id, user_id, page) => `/api/get-product-shop/${shop_id}?user_id=${user_id}&page=${page}`,
-  cancelOrder: `/api/user-order-cancel`,
   updateStatusOrder: 'api/shop-order-status',
-  getCustomer: 'api/get-client',
+  getCustomer: '/api/get-client',
+  getAskBuy: '/api/get-ask-buy',
+  getAskBuyDetail: (ask_id) => `/api/detail-ask-buy/${ask_id}`,
+  getProductReport: '/api/get-product-report',
+  getProductReportDetail: (report_id) => `/api/detail-product-report/${report_id}`,
 
   //Render Category Product
   getCategoyProduct: '/api/filter-Product',
@@ -95,10 +102,15 @@ export const apiURL = {
   //Chat
   getMessage: (user_id, receiver_id) => `/api/messages/${user_id}/${receiver_id}`,
   sendMessage: `/api/messages`,
-  getConversations: 'api/conversations',
-  broadCast: 'api/test-chat/broadcast',
-  markReadMessage: (user_id, conversation_id) => `api/messages/mark-as-read/${user_id}/${conversation_id}`,
+  getConversations: '/api/conversations',
+  broadCast: '/api/test-chat/broadcast',
+  markReadMessage: (user_id, conversation_id) => `/api/messages/mark-as-read/${user_id}/${conversation_id}`,
+  createConversations: '/api/create-conversations',
 
   //Statistic
-  getStatistic: 'api/statistical',
+  getStatistic: '/api/statistical',
+
+  //Notification
+  getNotification: '/api/get-notification',
+  markReadNotification: (notification_id) => `/api/read-messages/${notification_id}`,
 };

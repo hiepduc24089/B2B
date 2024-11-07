@@ -176,14 +176,14 @@ function ProductSale() {
       )}
       <div className={cx('sale-product-header')}>
         <h3 className={cx('mb-0')}>Giảm giá</h3>
-        <HeadlessTippy>
+        {/* <HeadlessTippy>
           <div className={cx('search')}>
             <input className={cx('search-field', 'form-control')} placeholder="Tìm kiếm theo tên" spellCheck={false} />
             <button className={cx('search-btn', 'd-flex')}>
               <FontAwesomeIcon icon={faMagnifyingGlass} />
             </button>
           </div>
-        </HeadlessTippy>
+        </HeadlessTippy> */}
       </div>
       {loading ? (
         <LoadingIndicator />

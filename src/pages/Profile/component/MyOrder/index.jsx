@@ -242,9 +242,11 @@ function MyOrder() {
                 <span className={cx('total')}>{formatPrice(order.total_payment)}đ</span>
               </div>
               <div className={cx('button-wrapper')}>
-                <button className={cx('cancel')} onClick={() => handleCancelOrder(order.order_id)}>
-                  Huỷ đơn
-                </button>
+                {order.status === 0 && (
+                  <button className={cx('cancel')} onClick={() => handleCancelOrder(order.order_id)}>
+                    Huỷ đơn
+                  </button>
+                )}
                 <button className={cx('detail')} onClick={() => handleLinkToOrderDetail(order.order_id)}>
                   Xem chi tiết
                 </button>

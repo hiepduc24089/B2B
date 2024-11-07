@@ -53,12 +53,12 @@ function Wrapper({ onLogoutSuccess, onLogoutFailed }) {
             <li className={cx('active')} onClick={() => handleProfileClick('Account')}>
               Thông tin tài khoản
             </li>
-            <li onClick={() => handleStoreManagementClick('Order')}>Đơn hàng</li>
-            <li onClick={() => handleStoreManagementClick('Supplier-All')}>Yêu cầu nhà cung cấp</li>
-            <li onClick={() => handleStoreManagementClick('Message')}>Tin nhắn</li>
-            <li onClick={() => handleStoreManagementClick('Product-All')}>Sản phẩm</li>
-            <li onClick={() => handleStoreManagementClick('Statistics')}>Thống kê</li>
-            <li onClick={() => handleStoreManagementClick('Customer')}>Khách hàng</li>
+            <li onClick={() => handleProfileClick('MyOrder')}>Đơn hàng của tôi</li>
+            <li onClick={() => handleProfileClick('FavProduct')}>Sản phẩm yêu thích</li>
+            <li onClick={() => handleProfileClick('FavSupplier')}>NCC yêu thích</li>
+            <li onClick={() => handleProfileClick('ViewedProduct')}>Sản phẩm đã xem</li>
+            <li onClick={() => handleProfileClick('PostedRequest')}>Yêu cầu đã đăng</li>
+            <li onClick={() => handleProfileClick('QuoteReceive')}>Báo giá đã gửi</li>
             <li onClick={handleLogout}>Đăng xuất</li>
           </>
         ) : isStoreManagementRoute ? (
@@ -72,7 +72,7 @@ function Wrapper({ onLogoutSuccess, onLogoutFailed }) {
             <li onClick={() => handleStoreManagementClick('Supplier-All')}>Yêu cầu nhà cung cấp</li>
             <li onClick={() => handleStoreManagementClick('Message')}>Tin nhắn</li>
             <li onClick={() => handleStoreManagementClick('Product-All')}>Sản phẩm</li>
-            <li onClick={() => handleStoreManagementClick('Statistics')}>Thống kê</li>
+            {/* <li onClick={() => handleStoreManagementClick('Statistics')}>Thống kê</li> */}
             <li onClick={() => handleStoreManagementClick('Customer')}>Khách hàng</li>
             <li onClick={handleLogout}>Đăng xuất</li>
           </>

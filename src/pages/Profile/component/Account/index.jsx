@@ -7,11 +7,13 @@ import { fetchProfile, postUpdateProfile } from '~/api/profile';
 import LoadingIndicator from '~/components/Loading';
 import { API_HOST } from '~/config/host';
 import Success from '~/components/Layout/Popup/Success';
+import Warning from '~/components/Layout/Popup/Warning';
 
 const cx = classNames.bind(styles);
 
 function Account() {
   const [showSuccess, setShowSuccess] = useState(false);
+  const [showWarningField, setShowWarningField] = useState(false);
   //Avatar
   const [avatarImage, setAvatarImage] = useState(imagesStore.new_avatar);
   const [avatarFile, setAvatarFile] = useState(null);
@@ -148,6 +150,19 @@ function Account() {
   }
 
   const handleSubmit = async () => {
+    if (
+      !userName.trim() ||
+      !phone.trim() ||
+      !email.trim() ||
+      !selectedProvince ||
+      !selectedDistrict ||
+      !selectedWard ||
+      !addressDetail.trim()
+    ) {
+      setShowWarningField(true);
+      return;
+    }
+
     const formData = new FormData();
     formData.append('name', userName);
     formData.append('phone', phone);
@@ -166,7 +181,15 @@ function Account() {
         alert('Cập nhật thông tin thất bại.');
         return;
       }
+
+      localStorage.removeItem('user');
+      const formDataObject = Object.fromEntries(formData.entries());
+      localStorage.setItem('user', JSON.stringify(formDataObject));
+
       setShowSuccess(true);
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
     } catch (error) {
       console.error('Failed to post profile:', error);
       alert('Cập nhật thông tin thất bại.');
@@ -296,6 +319,13 @@ function Account() {
       </div>
       {/* Show Success Popup */}
       {showSuccess && <Success message="Cập nhật thành công" onClose={() => setShowSuccess(false)} />}
+      {showWarningField && (
+        <Warning
+          message="Vui lòng điền đủ thông tin"
+          onClose={() => setShowWarningField(false)}
+          onOk={() => setShowWarningField(false)}
+        />
+      )}
     </>
   );
 }
