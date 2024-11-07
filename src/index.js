@@ -8,6 +8,8 @@ import { AuthProvider, useAuth } from '~/context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { StoreHeaderProvider } from './context/StoreHeaderContext';
 import { StoreDataProvider } from './context/StoreDataContext';
+import { NotificationProvider } from './context/NotificationProvider';
+import { CheckOnlineProvider } from './context/CheckOnlineProvider';
 
 const RootApp = () => {
   const { isAuthenticated } = useAuth();
@@ -17,7 +19,11 @@ const RootApp = () => {
       <CartProvider>
         {isAuthenticated ? (
           <StoreDataProvider>
-            <App />
+            <NotificationProvider>
+              <CheckOnlineProvider>
+                <App />
+              </CheckOnlineProvider>
+            </NotificationProvider>
           </StoreDataProvider>
         ) : (
           <App />

@@ -1,0 +1,87 @@
+.notification-wrapper {
+  width: max-content;
+  max-height: 500px;
+  overflow-y: auto;
+  min-height: 100px;
+  background: rgb(255, 255, 255);
+  box-shadow: rgb(0 0 0 / 12%) 0px 2px 12px;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.notification-wrapper::-webkit-scrollbar {
+  width: 6px;
+}
+
+.notification-wrapper::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+}
+
+.notification-wrapper::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+.notification-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid var(--grey-light);
+  cursor: pointer;
+}
+.notification-item:last-child {
+  border-bottom: none;
+}
+.notification-avatar {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.notification-content {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  justify-content: start;
+
+  .sender-name {
+    margin-bottom: 0;
+    text-align: left;
+    font-size: 14px;
+    color: var(--grey-black);
+  }
+  .sender-message {
+    text-align: left;
+    font-size: 12px;
+    color: var(--grey-black);
+  }
+}
+
+.unread-notification {
+  position: relative;
+
+  .sender-name {
+    color: var(--black);
+  }
+  .sender-message {
+    color: var(--black);
+  }
+  .unread-dot {
+    position: absolute;
+    right: -5px;
+    width: 8px;
+    height: 8px;
+    background-color: #0866ff;
+    border-radius: 50%;
+  }
+}
+.load-more,
+.show-less {
+  font-size: 12px;
+  color: var(--black);
+  cursor: pointer;
+  text-decoration: underline;
+}

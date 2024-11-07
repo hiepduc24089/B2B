@@ -73,6 +73,8 @@ import record from './all/record.svg';
 import send_message from './all/send-message-dm.svg';
 import avatar_icon from './all/avatar-icon.png';
 import minus_icon from './all/minus-icon.png';
+import message_icon from './all/message-icon.png';
+import arrow_down from './all/arrown-down.png';
 
 export const images = {
   logo,
@@ -99,6 +101,8 @@ export const images = {
   send_message,
   avatar_icon,
   minus_icon,
+  message_icon,
+  arrow_down,
 };
 
 export const imagesHome = {

@@ -166,22 +166,30 @@ function Details({ product, loading, seller }) {
               </h5>
             </div>
             <div className={cx('product-order')}>
-              <div className={cx('product-remaining', 'd-flex', 'align-items-center')}>
-                <span>Tồn kho {product.quantity}</span>
-                <CustomInputNumber
-                  min={product.attributes[0].quantity}
-                  max={product.quantity}
-                  onValueChange={setQuantity}
-                />
-              </div>
-              <div className={cx('d-flex', 'justify-content-between', 'product-btn')}>
-                <button className={cx('order')} onClick={handleCheckout}>
-                  Đặt hàng ngay
-                </button>
-                <button className={cx('add-to-cart')} onClick={handleCreateCart}>
-                  Thêm vào giỏ hàng
-                </button>
-              </div>
+              {product.quantity > 0 ? (
+                <>
+                  <div className={cx('product-remaining', 'd-flex', 'align-items-center')}>
+                    <span>Tồn kho {product.quantity}</span>
+                    <CustomInputNumber
+                      min={product.attributes[0].quantity}
+                      max={product.quantity}
+                      onValueChange={setQuantity}
+                    />
+                  </div>
+                  <div className={cx('d-flex', 'justify-content-between', 'product-btn')}>
+                    <button className={cx('order')} onClick={handleCheckout}>
+                      Đặt hàng ngay
+                    </button>
+                    <button className={cx('add-to-cart')} onClick={handleCreateCart}>
+                      Thêm vào giỏ hàng
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <p className={cx('out-of-stock')}>
+                  Sản phẩm tạm thời <span className={cx('out-of-stock-highlight')}>HẾT HÀNG</span>
+                </p>
+              )}
               <div className={cx('d-flex', 'align-items-center', 'product-notes')}>
                 <img src={imagesHotDeal.check} alt="Check" />
                 <span>Chính hãng 100%</span>

@@ -1,17 +1,26 @@
-import React, { memo, useState, useEffect, useRef } from 'react';
+import React, { memo, useEffect, useRef, useState } from 'react';
 import classNames from 'classnames/bind';
-import styles from '../Message.module.scss';
-import { images } from '~/assets/images';
-import { broadCast, getMessage, markReadMessage, postSendMessage } from '~/api/chat';
+import styles from '../ChatOpen.module.scss';
 import { API_HOST } from '~/config/host';
-import LoadingIndicator from '~/components/Loading';
-import Pusher from 'pusher-js';
+import { broadCast, getMessage, markReadMessage, postSendMessage } from '~/api/chat';
 import Echo from 'laravel-echo';
+import LoadingIndicator from '~/components/Loading';
+import { images } from '~/assets/images';
 import axios from 'axios';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const cx = classNames.bind(styles);
 
-function CurrentMessage({ userId, receiverId, conversationId, receiverAvatar }) {
+function CurrentBoxChat({
+  userId,
+  receiverId,
+  conversationId,
+  receiverAvatar,
+  receiverName,
+  onBack,
+  clickMarkMessagesAsRead,
+}) {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
@@ -120,7 +129,16 @@ function CurrentMessage({ userId, receiverId, conversationId, receiverAvatar }) 
 
   return (
     <>
-      <div className={cx('box-chat')} ref={chatContainerRef} style={{ overflowY: 'auto', height: '400px' }}>
+      <div className={cx('box-chat-user')}>
+        <FontAwesomeIcon icon={faArrowLeft} alt="arrow right" className={cx('back-box-chat-icon')} onClick={onBack} />
+        <img
+          src={receiverAvatar ? `${API_HOST}${receiverAvatar}` : images.avatar_icon}
+          alt="Avatar"
+          className={cx('avatar-box')}
+        />
+        <span className={cx('box-header-name')}>{receiverName}</span>
+      </div>
+      <div className={cx('box-chat')} ref={chatContainerRef} style={{ overflowY: 'auto' }}>
         {loading ? (
           <LoadingIndicator />
         ) : (
@@ -138,7 +156,6 @@ function CurrentMessage({ userId, receiverId, conversationId, receiverAvatar }) 
           ))
         )}
       </div>
-
       <div className={cx('input-message')}>
         <img src={images.attach_file} alt="attach file" className={cx('attach-file')} />
         <div className={cx('input-wrapper')}>
@@ -148,6 +165,7 @@ function CurrentMessage({ userId, receiverId, conversationId, receiverAvatar }) 
             className={cx('input')}
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
+            onFocus={clickMarkMessagesAsRead}
             onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
           />
           <button className={cx('send-button')} onClick={handleSendMessage}>
@@ -160,4 +178,4 @@ function CurrentMessage({ userId, receiverId, conversationId, receiverAvatar }) 
   );
 }
 
-export default memo(CurrentMessage);
+export default memo(CurrentBoxChat);

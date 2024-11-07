@@ -21,6 +21,7 @@ function ProductDetails() {
     setStoreIsFollow,
     setStoreFollowers,
     setStoreContacts,
+    setStoreUserID,
   } = useStoreHeader();
   const [isDesktop, setIsDesktop] = useState(window.innerWidth > 992);
 
@@ -93,6 +94,7 @@ function ProductDetails() {
         setStoreIsFollow(shopDetails.is_follow ?? 0);
         setStoreFollowers(shopDetails.total_followers_shop ?? 0);
         setStoreContacts(shopDetails.total_contacts ?? 0);
+        setStoreUserID(shopDetails.user_id);
       } else {
         setState({
           loading: false,

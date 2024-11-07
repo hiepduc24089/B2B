@@ -153,3 +153,25 @@ export const fetchQuoteSent = async () => {
     throw error;
   }
 };
+
+export const updateUserOnline = async (is_online) => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await postData(
+      apiURL.updateUserOnline,
+      { is_online },
+      {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    console.log(response);
+    return response;
+  } catch (error) {
+    console.error('Error updating online status:', error);
+    throw error;
+  }
+};

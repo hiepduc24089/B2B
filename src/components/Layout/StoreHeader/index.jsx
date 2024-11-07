@@ -1,22 +1,32 @@
-import React, { memo, useState, useEffect } from 'react';
+import React, { memo, useState, useEffect, useRef } from 'react';
 import classNames from 'classnames/bind';
 import styles from './StoreHeader.module.scss';
 import { images } from '~/assets/images';
 import { useStoreHeader } from '~/context/StoreHeaderContext';
 import { API_HOST } from '~/config/host';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import routesConfig from '~/config/routes';
 import { postCheckFollowShop, postFollowShop } from '~/api/product';
 import { postUnfollowShop } from '~/api/profile';
 import Success from '~/components/Layout/Popup/Success';
 import LoadingIndicator from '~/components/Loading';
 import Failed from '../Popup/Failed';
+import ChatOpen from '../ChatOpen';
+import { useAuth } from '~/context/AuthContext';
+import { createConversations } from '~/api/chat';
+import Warning from '../Popup/Warning';
 
 const cx = classNames.bind(styles);
 
 function StoreHeader() {
-  const { storeName, storeAddress, storeAvatar, storeID, storeIsFollow, storeFollowers, storeContacts } =
+  const { storeName, storeAddress, storeAvatar, storeID, storeIsFollow, storeFollowers, storeContacts, storeUserID } =
     useStoreHeader();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const storeHeaderRef = useRef(null);
+
+  const { user } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   const [loadingFullScreen, setLoadingFullScreen] = useState(false);
   const [showSuccessFollow, setShowSuccessFollow] = useState(false);
@@ -24,8 +34,30 @@ function StoreHeader() {
   const [showErrorFollow, setShowErrorFollow] = useState(false);
   const [showErrorUnfollow, setShowErrorUnfollow] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [warningAuthenticate, setWarningAuthenticate] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [conversation, setConversation] = useState(null);
+  const [showErrorStartChat, setShowErrorStartChat] = useState(false);
 
-  const userID = localStorage.getItem('user_id') || 0;
+  useEffect(() => {
+    if (location.pathname.includes('/product')) {
+      const handleScroll = () => {
+        if (storeHeaderRef.current) {
+          if (window.scrollY > 200) {
+            storeHeaderRef.current.classList.add(cx('visible'));
+          } else {
+            storeHeaderRef.current.classList.remove(cx('visible'));
+          }
+        }
+      };
+
+      window.addEventListener('scroll', handleScroll);
+      return () => {
+        window.removeEventListener('scroll', handleScroll);
+      };
+    }
+  }, [location.pathname]);
+
   useEffect(() => {
     const checkFollowStatus = async () => {
       try {
@@ -43,6 +75,8 @@ function StoreHeader() {
     }
   }, [storeID]);
 
+  const userID = localStorage.getItem('user_id') || 0;
+
   const handleFollowShop = async (shopId) => {
     setLoadingFullScreen(true);
     try {
@@ -56,7 +90,7 @@ function StoreHeader() {
         setShowErrorFollow(true);
       }
     } catch (error) {
-      console.error('Error follow shop:', error);
+      console.error('Error following shop:', error);
       setShowErrorFollow(true);
     } finally {
       setLoadingFullScreen(false);
@@ -83,6 +117,29 @@ function StoreHeader() {
     }
   };
 
+  const handleChatButtonClick = async () => {
+    if (!isAuthenticated) {
+      setWarningAuthenticate(true);
+      return;
+    }
+    if (user.id === storeUserID) {
+      return;
+    }
+    setLoadingFullScreen(true);
+    try {
+      const response = await createConversations(user.id, storeUserID);
+      if (response && response.status) {
+        setConversation(response.data);
+        setIsChatOpen(true);
+      }
+    } catch (error) {
+      console.error('Error creating conversation:', error);
+      setShowErrorStartChat(true);
+    } finally {
+      setLoadingFullScreen(false);
+    }
+  };
+
   return (
     <>
       {loadingFullScreen && (
@@ -90,7 +147,10 @@ function StoreHeader() {
           <LoadingIndicator />
         </div>
       )}
-      <div className={cx('store-header')}>
+      <div
+        className={location.pathname.includes('/product') ? cx('store-header-hide') : cx('store-header-show')}
+        ref={storeHeaderRef}
+      >
         <div className={cx('container')}>
           <div className={cx('store-wrapper')}>
             <div className={cx('store-details')}>
@@ -131,10 +191,18 @@ function StoreHeader() {
                   <button>Bỏ theo dõi</button>
                 </div>
               )}
-              <div className={cx('see-phone')}>
+              <div className={cx('see-phone')} onClick={handleChatButtonClick}>
                 <img src={images.phone} alt="Phone" />
-                <button>Xem SĐT</button>
+                <button>Nhắn tin</button>
               </div>
+              {isChatOpen && conversation && (
+                <ChatOpen
+                  userId={user.id}
+                  receiverId={storeUserID}
+                  conversationId={conversation.id}
+                  onClose={() => setIsChatOpen(false)}
+                />
+              )}
             </div>
           </div>
         </div>
@@ -146,6 +214,16 @@ function StoreHeader() {
       )}
       {showErrorFollow && <Failed message="Theo dõi shop thất bại" onClose={() => setShowErrorFollow(false)} />}
       {showErrorUnfollow && <Failed message="Bỏ theo dõi shop thất bại" onClose={() => setShowErrorUnfollow(false)} />}
+      {showErrorStartChat && (
+        <Failed message="Không thể bắt đầu cuộc trò chuyện" onClose={() => setShowErrorStartChat(false)} />
+      )}
+      {warningAuthenticate && (
+        <Warning
+          message="Vui lòng đăng nhập để thực hiện chức năng này"
+          onClose={() => setWarningAuthenticate(false)}
+          onOk={() => navigate(routesConfig.login)}
+        />
+      )}
     </>
   );
 }

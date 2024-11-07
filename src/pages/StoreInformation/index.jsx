@@ -11,7 +11,17 @@ import LoadingIndicator from '~/components/Loading';
 const cx = classNames.bind(styles);
 
 function StoreInformation() {
-  const { setStoreHeaderVisibility, setStoreName, setStoreAddress, setStoreAvatar, setStoreID } = useStoreHeader();
+  const {
+    setStoreHeaderVisibility,
+    setStoreName,
+    setStoreAddress,
+    setStoreAvatar,
+    setStoreID,
+    setStoreIsFollow,
+    setStoreFollowers,
+    setStoreContacts,
+    setStoreUserID,
+  } = useStoreHeader();
 
   const location = useLocation();
   const { id } = useParams();
@@ -45,6 +55,10 @@ function StoreInformation() {
         setStoreAddress(data.sub_address);
         setStoreAvatar(data.avatar);
         setStoreID(shopID);
+        setStoreIsFollow(data.is_follow ?? 0);
+        setStoreFollowers(data.total_followers_shop ?? 0);
+        setStoreContacts(data.total_contacts ?? 0);
+        setStoreUserID(data.user_id);
       } catch (error) {
         console.error('Failed to fetch store information:', error);
         setState((prevState) => ({

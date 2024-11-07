@@ -19,12 +19,15 @@ import SupplierPost from './subComponent/SupplierPost';
 import ProductEdit from './subComponent/ProductEdit';
 import { useLocation } from 'react-router-dom';
 import EditProfile from './component/EditProfile';
+import ProductAsk from './subComponent/ProductAsk';
+import ProductReported from './subComponent/ProductReported';
 
 const cx = classNames.bind(styles);
 
 function StoreManagement() {
   const location = useLocation();
   const { activeTab: initialActiveTab } = location.state || {};
+  const { activeTabFromNoti: initialActiveTabFromNoti } = location.state || {};
 
   const [activeTab, setActiveTab] = useState('');
   const [activeSubItem, setActiveSubItem] = useState('');
@@ -38,6 +41,21 @@ function StoreManagement() {
       setActiveSubItem(initialActiveTab);
     }
   }, [initialActiveTab]);
+
+  useEffect(() => {
+    if (initialActiveTabFromNoti) {
+      setActiveSubItem(initialActiveTabFromNoti);
+
+      if (initialActiveTabFromNoti.startsWith('Product')) {
+        handleProductComponentClick(initialActiveTabFromNoti);
+      } else if (initialActiveTabFromNoti.startsWith('Supplier')) {
+        handleSupplierComponentClick(initialActiveTabFromNoti);
+      } else {
+        handleMainItemClick(initialActiveTabFromNoti);
+      }
+    }
+  }, [initialActiveTabFromNoti]);
+
   const renderContent = () => {
     switch (activeSubItem) {
       case 'Home':
@@ -66,6 +84,10 @@ function StoreManagement() {
         return <ProductSale />;
       case 'Product-Edit':
         return <ProductEdit productID={productEditID} onSubmitSuccess={handleProductSubmitSuccess} />;
+      case 'Product-Ask':
+        return <ProductAsk />;
+      case 'Product-Reported':
+        return <ProductReported />;
       case 'Supplier-All':
         return <SupplierAll onFindSupplierClick={() => handleSupplierComponentClick('Supplier-Post')} />;
       case 'Supplier-Price':
@@ -219,6 +241,18 @@ function StoreManagement() {
                     onClick={() => handleSubItemClick('Product-Sale')}
                   >
                     Giảm giá
+                  </div>
+                  <div
+                    className={cx('dropdown-item', { 'sub-item-active': activeSubItem === 'Product-Ask' })}
+                    onClick={() => handleSubItemClick('Product-Ask')}
+                  >
+                    Hỏi mua
+                  </div>
+                  <div
+                    className={cx('dropdown-item', { 'sub-item-active': activeSubItem === 'Product-Reported' })}
+                    onClick={() => handleSubItemClick('Product-Reported')}
+                  >
+                    Báo cáo
                   </div>
                 </div>
               )}

@@ -118,7 +118,6 @@ function Home({ onAddProductClick }) {
   if (loading && loadingChart) {
     return <LoadingIndicator />;
   }
-  console.log(pendingOrder);
   return (
     <>
       <div className={cx('list-job-wrapper', 'box-wrapper')}>

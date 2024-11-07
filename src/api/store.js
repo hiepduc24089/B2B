@@ -134,7 +134,77 @@ export const getCustomer = async () => {
 
     return response;
   } catch (error) {
-    console.error('Failed to create shop:', error);
+    console.error('Failed to get customer:', error);
+    throw error;
+  }
+};
+
+export const getAskBuy = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await getData(apiURL.getAskBuy, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error('Failed to get list ask to buy:', error);
+    throw error;
+  }
+};
+
+export const getAskBuyDetail = async (ask_id) => {
+  try {
+    const token = localStorage.getItem('token');
+
+    const response = await getData(apiURL.getAskBuyDetail(ask_id), {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return response;
+  } catch (error) {
+    console.error('Failed to get detail ask to buy:', error);
+    throw error;
+  }
+};
+
+export const getProductReport = async () => {
+  try {
+    const token = localStorage.getItem('token');
+
+    const response = await getData(apiURL.getProductReport, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return response;
+  } catch (error) {
+    console.error('Failed to get list product being reported:', error);
+    throw error;
+  }
+};
+
+export const getProductReportDetail = async (report_id) => {
+  try {
+    const token = localStorage.getItem('token');
+
+    const response = await getData(apiURL.getProductReportDetail(report_id), {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return response;
+  } catch (error) {
+    console.error('Failed to get product being reported::', error);
     throw error;
   }
 };

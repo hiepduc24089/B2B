@@ -4,26 +4,43 @@ import styles from '../ProductDetails.module.scss';
 import { Modal } from 'react-bootstrap';
 import LoadingIndicator from '~/components/Loading';
 import { API_HOST } from '~/config/host';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import routesConfig from '~/config/routes';
 import CustomInputNumber from '~/components/Layout/CustomInputNumber';
 import { postAskToBuyRequest, postCheckFollowShop, postFollowShop } from '~/api/product';
 import { postUnfollowShop } from '~/api/profile';
 import Success from '~/components/Layout/Popup/Success';
 import Failed from '~/components/Layout/Popup/Failed';
+import { createConversations } from '~/api/chat';
+import { useAuth } from '~/context/AuthContext';
+import ChatOpen from '~/components/Layout/ChatOpen';
+import Warning from '~/components/Layout/Popup/Warning';
 
 const cx = classNames.bind(styles);
 
 function Store({ seller, product, loading }) {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { isAuthenticated } = useAuth();
+
   const [loadingFullScreen, setLoadingFullScreen] = useState(false);
   const [showSuccessSendRequest, setShowSuccessSendRequest] = useState(false);
   const [showErrorSendRequest, setShowErrorSendRequest] = useState(false);
+  const [warningAuthenticate, setWarningAuthenticate] = useState(false);
 
   const [showModal, setShowModal] = useState(false);
-  const handleShowModal = () => setShowModal(true);
+
+  const handleShowModal = () => {
+    if (isAuthenticated) {
+      setShowModal(true);
+    } else {
+      setWarningAuthenticate(true);
+    }
+  };
   const handleCloseModal = () => setShowModal(false);
   const [inputProductID, setInputProductID] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const [price, setPrice] = useState(0);
   const [inputContent, setInputContent] = useState('');
   const [inputShopID, setInputShopID] = useState(null);
   const [sellerLoading, setSellerLoading] = useState(true);
@@ -38,6 +55,26 @@ function Store({ seller, product, loading }) {
     }
   }, [product, seller]);
 
+  const updatePriceBasedOnQuantity = (enteredQuantity) => {
+    if (product && product.attributes) {
+      const suitableAttribute = product.attributes.reduce((bestMatch, attr) => {
+        if (enteredQuantity >= attr.quantity && (!bestMatch || attr.quantity > bestMatch.quantity)) {
+          return attr;
+        }
+        return bestMatch;
+      }, null);
+      if (suitableAttribute) {
+        setPrice(suitableAttribute.price);
+      } else {
+        setPrice(product.attributes[0]?.price || 0);
+      }
+    }
+  };
+
+  useEffect(() => {
+    updatePriceBasedOnQuantity(quantity);
+  }, [quantity, product]);
+
   const handleSubmit = async () => {
     const formData = new FormData();
     formData.append('product_id', inputProductID);
@@ -50,6 +87,7 @@ function Store({ seller, product, loading }) {
       const response = await postAskToBuyRequest(formData);
 
       if (!response.status) {
+        handleCloseModal();
         setShowErrorSendRequest(true);
         return;
       }
@@ -138,6 +176,32 @@ function Store({ seller, product, loading }) {
     }
   };
 
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [conversation, setConversation] = useState(null);
+  const [showErrorStartChat, setShowErrorStartChat] = useState(false);
+  const handleChatButtonClick = async () => {
+    if (!isAuthenticated) {
+      setWarningAuthenticate(true);
+      return;
+    }
+    if (user.id === seller.user_id) {
+      return;
+    }
+    setLoadingFullScreen(true);
+    try {
+      const response = await createConversations(user.id, seller.user_id);
+      if (response && response.status) {
+        setConversation(response.data);
+        setIsChatOpen(true);
+      }
+    } catch (error) {
+      console.error('Error creating conversation:', error);
+      setShowErrorStartChat(true);
+    } finally {
+      setLoadingFullScreen(false);
+    }
+  };
+
   const renderContent = () => {
     if (loading || sellerLoading) {
       return <LoadingIndicator />;
@@ -182,7 +246,17 @@ function Store({ seller, product, loading }) {
                 Bỏ theo dõi
               </button>
             )}
-            <button className={cx('phone-btn')}>Xem SĐT</button>
+            <button className={cx('phone-btn')} onClick={handleChatButtonClick}>
+              Nhắn tin
+            </button>
+            {isChatOpen && conversation && (
+              <ChatOpen
+                userId={user.id}
+                receiverId={seller.user_id}
+                conversationId={conversation.id}
+                onClose={() => setIsChatOpen(false)}
+              />
+            )}
           </div>
         </div>
       );
@@ -219,18 +293,21 @@ function Store({ seller, product, loading }) {
                   <CustomInputNumber
                     min={product.attributes[0].quantity}
                     max={product.quantity}
-                    onValueChange={setQuantity}
+                    onValueChange={(newQuantity) => {
+                      setQuantity(newQuantity);
+                      updatePriceBasedOnQuantity(newQuantity);
+                    }}
                   />
                 </div>
                 <div className={cx('item')}>
                   <span className={cx('label-field')}>Đơn giá: </span>
                   <h5 className={cx('input-field')}>
-                    {formatPrice(120000)}đ / {product.unit}
+                    {formatPrice(price)}đ / {product.unit}
                   </h5>
                 </div>
                 <div className={cx('item')}>
                   <span className={cx('label-field')}>Thành tiền: </span>
-                  <h5 className={cx('input-field', 'text-primary')}>{formatPrice(120000)}đ</h5>
+                  <h5 className={cx('input-field', 'text-primary')}>{formatPrice(price * quantity)}đ</h5>
                 </div>
               </div>
               <div className={cx('list-infor-wrapper')}>
@@ -268,6 +345,16 @@ function Store({ seller, product, loading }) {
       )}
       {showErrorSendRequest && (
         <Failed message="Gửi yêu cầu mua hàng thất bại" onClose={() => setShowErrorSendRequest(false)} />
+      )}
+      {showErrorStartChat && (
+        <Failed message="Không thể bắt đầu cuộc trò chuyện" onClose={() => setShowErrorStartChat(false)} />
+      )}
+      {warningAuthenticate && (
+        <Warning
+          message="Vui lòng đăng nhập để thực hiện chức năng này"
+          onClose={() => setWarningAuthenticate(false)}
+          onOk={() => navigate(routesConfig.login)}
+        />
       )}
     </>
   );

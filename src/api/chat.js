@@ -109,3 +109,28 @@ export const markReadMessage = async (receiver_id, conversation_id) => {
     throw error;
   }
 };
+
+export const createConversations = async (sender_id, user_id) => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await postData(
+      apiURL.createConversations,
+      {
+        user1_id: sender_id,
+        user2_id: user_id,
+      },
+      {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    return response;
+  } catch (error) {
+    console.error('Error creating conversation:', error);
+    throw error;
+  }
+};

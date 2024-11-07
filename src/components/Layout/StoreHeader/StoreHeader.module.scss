@@ -1,10 +1,31 @@
-.store-header {
+.store-header-show {
   margin-top: 120px;
   margin-bottom: -120px;
   background: var(--white);
   box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
   border-top: 1px solid rgba(0, 0, 0, 0.25);
 }
+
+.store-header-hide {
+  position: fixed;
+  top: 0px;
+  width: 100%;
+  z-index: 100;
+  margin-top: 120px;
+  margin-bottom: -120px;
+  background: var(--white);
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  border-top: 1px solid rgba(0, 0, 0, 0.25);
+  opacity: 0; /* Initially hidden */
+  transform: translateY(-20px); /* Initial upward shift */
+  transition: opacity 0.3s ease, transform 0.3s ease; /* Add transition */
+}
+
+.store-header-hide.visible {
+  opacity: 1; /* Fully visible */
+  transform: translateY(0); /* Reset position */
+}
+
 .store-wrapper {
   display: flex;
   justify-content: space-between;

@@ -9,6 +9,7 @@ import Success from '~/components/Layout/Popup/Success';
 import Failed from '~/components/Layout/Popup/Failed';
 import routesConfig from '~/config/routes';
 import { useNavigate } from 'react-router-dom';
+import Warning from '~/components/Layout/Popup/Warning';
 
 const cx = classNames.bind(styles);
 
@@ -16,6 +17,7 @@ function SupplierPost({ onSubmitSuccess }) {
   const navigate = useNavigate();
   const [showSuccess, setShowSuccess] = useState(false);
   const [showError, setShowError] = useState(false);
+  const [showWarningField, setShowWarningField] = useState(false);
   const [loadingFullScreen, setLoadingFullScreen] = useState(false);
 
   const [state, setState] = React.useState({
@@ -64,6 +66,17 @@ function SupplierPost({ onSubmitSuccess }) {
   };
 
   const handleSubmit = async () => {
+    if (
+      !inputCity ||
+      !inputDate ||
+      !inputInformation.trim() ||
+      !inputQuantity ||
+      !inputTitle.trim() ||
+      !inputContent.trim()
+    ) {
+      setShowWarningField(true);
+      return;
+    }
     const formData = new FormData();
     formData.append('scope', inputCity);
     formData.append('date_end', inputDate);
@@ -214,6 +227,13 @@ function SupplierPost({ onSubmitSuccess }) {
 
       {showSuccess && <Success message="Yêu cầu được đăng thành công" onClose={() => setShowSuccess(false)} />}
       {showError && <Failed message="Yêu cầu đăng thất bại" onClose={() => setShowError(false)} />}
+      {showWarningField && (
+        <Warning
+          message="Vui lòng điền đủ thông tin"
+          onClose={() => setShowWarningField(false)}
+          onOk={() => setShowWarningField(false)}
+        />
+      )}
     </>
   );
 }

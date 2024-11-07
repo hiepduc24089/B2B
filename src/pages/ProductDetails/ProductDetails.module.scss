@@ -90,6 +90,17 @@
         font-weight: 600;
       }
     }
+    .out-of-stock {
+      margin-bottom: 15px;
+      color: var(--grey-black);
+      font-size: 18px;
+      font-weight: 400;
+      .out-of-stock-highlight {
+        color: var(--primary);
+        font-weight: 600;
+        text-decoration: underline;
+      }
+    }
     .product-order {
       margin-top: 25px;
       .product-remaining {
@@ -386,7 +397,14 @@
       .discount-number {
         font-size: 14px;
       }
+      .buy-at-least {
+        font-size: 14px;
+      }
+      .out-of-stock {
+        font-size: 14px;
+      }
       .product-order {
+        margin-top: 15px;
         .product-btn {
           gap: 10px;
           .order,

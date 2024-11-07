@@ -42,9 +42,11 @@ function ShoppingCart() {
 
   // Debounce timeout ref to store the timer
   const debounceTimeout = useRef(null);
-
   // Handle quantity change with debouncing
   const handleQuantityChange = (storeId, productId, newQuantity) => {
+    if (quantities[productId] === newQuantity) {
+      return;
+    }
     // Update the local state first
     setQuantities((prevQuantities) => ({
       ...prevQuantities,
@@ -69,6 +71,7 @@ function ShoppingCart() {
 
     // Set a new timeout to call the API after 1 second
     debounceTimeout.current = setTimeout(async () => {
+      setLoadingFullScreen(true);
       try {
         const response = await updateCart({
           shop_id: storeId,
@@ -93,6 +96,9 @@ function ShoppingCart() {
             revertedGroupedProducts[storeId].products = revertedProducts;
             return { ...prevState, groupedProducts: revertedGroupedProducts };
           });
+        } else {
+          setSuccessUpdateQuantity(true);
+          await fetchDataProduct();
         }
       } catch (error) {
         setFailedUpdateQuantity(true);
@@ -112,8 +118,10 @@ function ShoppingCart() {
           revertedGroupedProducts[storeId].products = revertedProducts;
           return { ...prevState, groupedProducts: revertedGroupedProducts };
         });
+      } finally {
+        setLoadingFullScreen(false);
       }
-    }, 1000);
+    }, 500);
   };
 
   const [productToDelete, setProductToDelete] = useState({ storeId: null, productId: null, quantity: null });
@@ -412,11 +420,15 @@ function ShoppingCart() {
                 </div>
                 <div className={cx('text-right', 'quantity-trash')}>
                   <CustomInputNumber
-                    min={1}
+                    min={product.minimum_quantity}
                     max={product.inventory_quantity}
                     initialValue={product.quantity || 1}
                     className={cx('custom-number')}
-                    onValueChange={(newQuantity) => handleQuantityChange(storeId, product.product_id, newQuantity)}
+                    onValueChange={(newQuantity) => {
+                      if (newQuantity !== product.quantity) {
+                        handleQuantityChange(storeId, product.product_id, newQuantity);
+                      }
+                    }}
                   />
                   <img
                     src={imagesCart.trash_icon}
