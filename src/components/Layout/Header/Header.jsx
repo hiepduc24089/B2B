@@ -14,10 +14,11 @@ import Success from '~/components/Layout/Popup/Success';
 import Failed from '../Popup/Failed';
 import NotificationPropper from '../NotificationPropper';
 import LoadingIndicator from '~/components/Loading';
+import { API_HOST } from '~/config/host';
 
 const cx = classNames.bind(styles);
 
-function Header() {
+function Header({ setting }) {
   const { isAuthenticated, user } = useAuth();
   const { isStoreHeaderVisible } = useStoreHeader();
   const { dataShop } = useStoreData(); // Access dataShop from StoreDataContext
@@ -47,7 +48,7 @@ function Header() {
           <div className={cx('row', 'align-items-center', 'justify-content-between')}>
             <div className={cx('col-2')}>
               <Link to={routesConfig.home} className={cx('logo-link')}>
-                <img src={images.logo} alt="B2B" />
+                <img src={setting ? `${API_HOST}${setting.logo}` : images.logo} alt="B2B" />
               </Link>
             </div>
             <div className={cx('col-6', 'search-form')}>

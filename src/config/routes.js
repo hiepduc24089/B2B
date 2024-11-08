@@ -18,6 +18,7 @@ const routes = {
   order_detail: '/order/:id',
   supplier_detail: '/supplier/:id',
   supplier_post: '/supplier/post',
+  footer_blog: '/blog/:slug',
 };
 
 export default routes;

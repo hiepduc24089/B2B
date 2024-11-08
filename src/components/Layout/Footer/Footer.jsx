@@ -4,12 +4,13 @@ import { Layout, Row, Col, Typography, Space } from 'antd';
 import classNames from 'classnames/bind';
 import styles from './Footer.module.scss';
 import { imagesFooter } from '~/assets/images';
+import routesConfig from '~/config/routes';
 
 const { Footer: AntFooter } = Layout;
 const { Title, Text } = Typography;
 const cx = classNames.bind(styles);
 
-function Footer() {
+function Footer({ setting, clientSupport, aboutUs, cooperationAsociation }) {
   return (
     <div className={cx('container')}>
       <AntFooter className={cx('footer')}>
@@ -18,41 +19,44 @@ function Footer() {
             <Title className={cx('title')} level={3}>
               Hỗ trợ khách hàng
             </Title>
-            <Text className={cx('hotline')}>Hotline: 1900-6074 (1.000đ/phút, 8h-17h30 trừ T7, CN)</Text>
-            <Link to="#">Các câu hỏi thường gặp</Link>
-            <Link to="#">Gửi yêu cầu hỗ trợ</Link>
-            <Link to="#">Hướng dẫn đặt hàng</Link>
-            <Link to="#">Hướng dẫn hủy đơn hàng</Link>
-            <Link to="#">Phương thức vận chuyển</Link>
-            <Link to="#">Chính sách đổi trả</Link>
+            <Text className={cx('hotline')}>{setting.hotline}</Text>
+            {clientSupport.map((item) => (
+              <Link key={item.id} to={routesConfig.footer_blog.replace(':slug', item.slug)}>
+                {item.name}
+              </Link>
+            ))}
             <Text className={cx('support')}>
-              Hỗ trợ khách hàng: <a href="mailto:lienhe@krmedi.com">lienhe@krmedi.com</a>
+              Hỗ trợ khách hàng:
+              <a href={`mailto:${setting.customer_support_email || 'lienhe@krmedi.com'}`}>
+                {setting.customer_support_email || 'lienhe@krmedi.com'}
+              </a>
             </Text>
             <Text className={cx('privacy')}>
-              Báo lỗi bảo mật: <a href="mailto:technical@krmedi.com">technical@krmedi.com</a>
+              Báo lỗi bảo mật:{' '}
+              <a href={`mailto:${setting.technical_support_email || 'technical@krmedi.com'}`}>
+                {setting.technical_support_email || 'technical@krmedi.com'}
+              </a>
             </Text>
           </Col>
           <Col xs={24} sm={12} md={6} className={cx('footer-column')}>
             <Title className={cx('title')} level={3}>
               Về Krmedi
             </Title>
-            <Link to="#">Giới thiệu</Link>
-            <Link to="#">Blog Kinh Doanh</Link>
-            <Link to="#">Tuyển dụng</Link>
-            <Link to="#">Điều khoản sử dụng</Link>
-            <Link to="#">Tiếp thị thanh toán</Link>
-            <Link to="#">Chế tài nhà cung cấp</Link>
-            <Link to="#">Chính sách bảo mật thanh toán</Link>
-            <Link to="#">Chính sách bảo mật thông tin cá nhân</Link>
-            <Link to="#">Chính sách giải quyết khiếu nại</Link>
-            <Link to="#">Chính sách giao nhận hàng hóa</Link>
+            {aboutUs.map((item) => (
+              <Link key={item.id} to={routesConfig.footer_blog.replace(':slug', item.slug)}>
+                {item.name}
+              </Link>
+            ))}
           </Col>
           <Col xs={24} sm={12} md={6} className={cx('footer-column')}>
             <Title className={cx('title')} level={3}>
               Hợp tác và liên kết
             </Title>
-            <Link to="#">Quy chế hoạt động sàn TMDT</Link>
-            <Link to="#">Bán hàng cùng krmedi</Link>
+            {cooperationAsociation.map((item) => (
+              <Link key={item.id} to={routesConfig.footer_blog.replace(':slug', item.slug)}>
+                {item.name}
+              </Link>
+            ))}
             <Title level={3} className={cx('payment-title')}>
               Payment
             </Title>
@@ -69,18 +73,18 @@ function Footer() {
               Kết nối với chúng tôi
             </Title>
             <Space className={cx('social-media')}>
-              <Link to="#">
+              <Link to={`mailto:${setting.email || 'lienhe@krmedi.com'}`}>
                 <img src={imagesFooter.google} alt="Google" />
               </Link>
-              <Link to="#">
+              <a href={setting.facebook || '#'} target="_blank" rel="noopener noreferrer">
                 <img src={imagesFooter.facebook} alt="Facebook" />
-              </Link>
-              <Link to="#">
+              </a>
+              <a href={setting.twitter || '#'} target="_blank" rel="noopener noreferrer">
                 <img src={imagesFooter.twitter} alt="Twitter" />
-              </Link>
-              <Link to="#">
-                <img src={imagesFooter.apple} alt="Apple" />
-              </Link>
+              </a>
+              <a href={`https://zalo.me/${setting.zalo || '#'}`} target="_blank" rel="noopener noreferrer">
+                <img src={imagesFooter.zalo_icon} alt="Zalo" />
+              </a>
             </Space>
           </Col>
         </Row>

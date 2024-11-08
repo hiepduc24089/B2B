@@ -32,6 +32,7 @@ export const apiURL = {
   wards: (district_id) => `/api/wards/${district_id}`,
 
   //Home
+  getBanner: '/api/banner',
   dealHotToday: '/api/deal-hot-today',
   productForYou: '/api/product-for-you',
   productNew: '/api/product-new',
@@ -113,4 +114,8 @@ export const apiURL = {
   //Notification
   getNotification: '/api/get-notification',
   markReadNotification: (notification_id) => `/api/read-messages/${notification_id}`,
+
+  //Setting
+  getSetting: '/api/setting',
+  getDetailPostFooter: (slug) => `api/detail-post-footer/${slug}`,
 };

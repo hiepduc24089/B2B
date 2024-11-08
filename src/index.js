@@ -10,6 +10,7 @@ import { StoreHeaderProvider } from './context/StoreHeaderContext';
 import { StoreDataProvider } from './context/StoreDataContext';
 import { NotificationProvider } from './context/NotificationProvider';
 import { CheckOnlineProvider } from './context/CheckOnlineProvider';
+import AnalyticsComponent from './components/GA4';
 
 const RootApp = () => {
   const { isAuthenticated } = useAuth();
@@ -17,6 +18,7 @@ const RootApp = () => {
   return (
     <StoreHeaderProvider>
       <CartProvider>
+        <AnalyticsComponent />
         {isAuthenticated ? (
           <StoreDataProvider>
             <NotificationProvider>
