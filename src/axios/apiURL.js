@@ -59,7 +59,8 @@ export const apiURL = {
   postUpdateRemaining: (product_id) => `api/update-quantity-product/${product_id}`,
   postUpdateSale: (product_id) => `api/set-product-discount/${product_id}`,
   updateSaleDisplay: (product_id) => `/api/set-display-product-discount/${product_id}`,
-  getShopProfile: 'api/get-shop',
+  getShopProfile: '/api/get-shop',
+  deleteImage: (product_id) => `/api/delete-product-image/${product_id}`,
 
   //Payment
   addToCart: '/api/add-to-cart',

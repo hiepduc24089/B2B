@@ -5,7 +5,7 @@ import { images, imagesHotDeal, imagesStore } from '~/assets/images';
 import { fetchAllListCategory } from '~/api/requestsupplier';
 import { API_HOST } from '~/config/host';
 import LoadingIndicator from '~/components/Loading';
-import { getProductDetailAtShop, postUpdateProduct } from '~/api/product';
+import { getProductDetailAtShop, postDeleteImage, postUpdateProduct } from '~/api/product';
 import Success from '~/components/Layout/Popup/Success';
 import Failed from '~/components/Layout/Popup/Failed';
 import Warning from '~/components/Layout/Popup/Warning';
@@ -18,6 +18,9 @@ function ProductEdit({ productID, onSubmitSuccess }) {
   const [showUpdateSuccess, setShowUpdateSuccess] = useState(false);
   const [showUpdateFailed, setShowUpdateFailed] = useState(false);
   const [showWarningField, setShowWarningField] = useState(false);
+  const [showSuccessDelete, setShowSuccessDelete] = useState(false);
+  const [showFailedDelete, setShowFailedDelete] = useState(false);
+  const [showWarningDelete, setShowWarningDelete] = useState(false);
 
   const [state, setState] = useState({
     loadingCategory: true,
@@ -48,12 +51,52 @@ function ProductEdit({ productID, onSubmitSuccess }) {
     setSelectedFiles([...selectedFiles, ...files]);
   };
 
-  const handleRemoveImage = (indexToRemove) => {
-    const updatedImages = selectedImages.filter((_, index) => index !== indexToRemove);
-    setSelectedImages(updatedImages);
+  const [deleteIndex, setDeleteIndex] = useState(null);
+  const [deleteProductID, setDeleteProductID] = useState(null);
+  const [deleteSrc, setDeleteSrc] = useState(null);
 
-    const updatedFiles = selectedFiles.filter((_, index) => index !== indexToRemove);
-    setSelectedFiles(updatedFiles);
+  const handleDeleteButtonClick = (index, productID, src) => {
+    const relativeSrc = new URL(src).pathname;
+    setDeleteIndex(index);
+    setDeleteProductID(productID);
+    setDeleteSrc(relativeSrc);
+    setShowWarningDelete(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    setShowWarningDelete(false);
+    if (deleteIndex !== null && deleteProductID !== null && deleteSrc !== null) {
+      const updatedImages = selectedImages.filter((_, index) => index !== deleteIndex);
+      setSelectedImages(updatedImages);
+
+      const updatedFiles = selectedFiles.filter((_, index) => index !== deleteIndex);
+      setSelectedFiles(updatedFiles);
+
+      setLoadingFullScreen(true);
+      try {
+        const formData = new FormData();
+        formData.append('src', JSON.stringify([deleteSrc]));
+
+        const response = await postDeleteImage(deleteProductID, formData);
+        if (!response.status) {
+          setShowFailedDelete(true);
+          return;
+        } else {
+          setShowSuccessDelete(true);
+          setTimeout(() => {
+            setShowSuccessDelete(false);
+          }, 1500);
+        }
+      } catch (error) {
+        console.error('Failed to delete Image');
+        setShowFailedDelete(true);
+      } finally {
+        setLoadingFullScreen(false);
+        setDeleteIndex(null);
+        setDeleteProductID(null);
+        setDeleteSrc(null);
+      }
+    }
   };
 
   const handleAddPriceTier = () => {
@@ -353,7 +396,10 @@ function ProductEdit({ productID, onSubmitSuccess }) {
           {selectedImages.map((image, index) => (
             <div key={index} className={cx('image-preview-wrapper')}>
               <img src={image} alt={`Preview ${index}`} className={cx('image-preview')} />
-              <button className={cx('remove-image-button')} onClick={() => handleRemoveImage(index)}>
+              <button
+                className={cx('remove-image-button')}
+                onClick={() => handleDeleteButtonClick(index, productID, image)}
+              >
                 X
               </button>
             </div>
@@ -477,6 +523,17 @@ function ProductEdit({ productID, onSubmitSuccess }) {
           message="Vui lòng điền đủ thông tin"
           onClose={() => setShowWarningField(false)}
           onOk={() => setShowWarningField(false)}
+        />
+      )}
+      {showFailedDelete && <Failed message="Xoá ảnh sản phẩm thất bại" onClose={() => setShowFailedDelete(false)} />}
+      {showSuccessDelete && (
+        <Success message="Xoá ảnh sản phẩm thành công" onClose={() => setShowSuccessDelete(false)} />
+      )}
+      {showWarningDelete && (
+        <Warning
+          message="Bạn có chắc muốn xoá ảnh này?"
+          onClose={() => setShowWarningDelete(false)}
+          onOk={handleConfirmDelete}
         />
       )}
     </>

@@ -280,3 +280,21 @@ export const postCheckFollowShop = async (shop_id, user_id) => {
     throw error;
   }
 };
+
+//Delete product
+export const postDeleteImage = async (product_id, src) => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await postData(apiURL.deleteImage(product_id), src, {
+      withCredentials: true,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error('Error delete image', error);
+    throw error;
+  }
+};
