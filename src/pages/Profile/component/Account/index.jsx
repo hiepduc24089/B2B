@@ -30,6 +30,69 @@ function Account() {
     }
   };
 
+  const [state, setState] = useState({
+    loadingProfile: true,
+    dataProfile: null,
+  });
+
+  const { loadingProfile, dataProfile } = state;
+
+  useEffect(() => {
+    const fetchUserProfileAndData = async () => {
+      try {
+        const getProfileResponse = await fetchProfile();
+        if (!getProfileResponse.status) {
+          alert('Lấy thông tin profile thất bại, vui lòng thử lại');
+          setState({ loadingProfile: false, dataProfile: null });
+          return;
+        }
+
+        setState({
+          loadingProfile: false,
+          dataProfile: getProfileResponse.data,
+        });
+
+        const provincesData = await fetchProvinces();
+        setProvinces(provincesData);
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
+        if (getProfileResponse.data.province_id) {
+          const districtsData = await fetchDistricts(getProfileResponse.data.province_id);
+          setDistricts(districtsData);
+          await new Promise((resolve) => setTimeout(resolve, 500));
+        }
+
+        if (getProfileResponse.data.district_id) {
+          const wardsData = await fetchWards(getProfileResponse.data.district_id);
+          setWards(wardsData);
+          await new Promise((resolve) => setTimeout(resolve, 500));
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        alert('Lấy thông tin thất bại, vui lòng thử lại');
+      }
+    };
+
+    fetchUserProfileAndData();
+  }, []);
+
+  useEffect(() => {
+    if (dataProfile) {
+      setUserName(dataProfile.name || '');
+      setPhone(dataProfile.phone || '');
+      setEmail(dataProfile.email || '');
+      setAddressDetail(dataProfile.address_detail || '');
+      setSelectedProvince(dataProfile.province_id || '');
+      setSelectedDistrict(dataProfile.district_id || '');
+      setSelectedWard(dataProfile.ward_id || '');
+      if (dataProfile.avatar && !dataProfile.avatar.startsWith('data:')) {
+        setAvatarImage(`${API_HOST}${dataProfile.avatar}`);
+      } else {
+        setAvatarImage(dataProfile.avatar || imagesStore.new_avatar);
+      }
+    }
+  }, [dataProfile]);
+
   //Submit form
   const [userName, setUserName] = useState('');
   const [phone, setPhone] = useState('');
@@ -44,6 +107,7 @@ function Account() {
       try {
         const data = await fetchProvinces();
         setProvinces(data);
+        await new Promise((resolve) => setTimeout(resolve, 500));
       } catch (error) {
         console.error('Failed to load provinces:', error);
       }
@@ -67,6 +131,7 @@ function Account() {
         try {
           const data = await fetchDistricts(selectedProvince);
           setDistricts(data);
+          await new Promise((resolve) => setTimeout(resolve, 500));
         } catch (error) {
           console.error('Failed to load districts:', error);
         }
@@ -90,6 +155,7 @@ function Account() {
         try {
           const data = await fetchWards(selectedDistrict);
           setWards(data);
+          await new Promise((resolve) => setTimeout(resolve, 500));
         } catch (error) {
           console.error('Failed to load wards:', error);
         }
@@ -97,53 +163,6 @@ function Account() {
       loadWards();
     }
   }, [selectedDistrict]);
-
-  //Get profile
-  const [state, setState] = useState({
-    loadingProfile: true,
-    dataProfile: null,
-  });
-
-  const { loadingProfile, dataProfile } = state;
-
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        const getProfileResponse = await fetchProfile();
-
-        if (!getProfileResponse.status) {
-          alert('Lấy thông tin profile thất bại, vui lòng thử lại');
-          return;
-        }
-
-        setState({
-          loadingProfile: false,
-          dataProfile: getProfileResponse.data,
-        });
-      } catch (error) {
-        console.error('Fetch profile failed:', error);
-        alert('Lấy thông tin profile thất bại, vui lòng thử lại');
-      }
-    };
-    fetchUserProfile();
-  }, []);
-
-  useEffect(() => {
-    if (dataProfile) {
-      setUserName(dataProfile.name || '');
-      setPhone(dataProfile.phone || '');
-      setEmail(dataProfile.email || '');
-      setAddressDetail(dataProfile.address_detail || '');
-      setSelectedProvince(dataProfile.province_id || '');
-      setSelectedDistrict(dataProfile.district_id || '');
-      setSelectedWard(dataProfile.ward_id || '');
-      if (dataProfile.avatar && !dataProfile.avatar.startsWith('data:')) {
-        setAvatarImage(`${API_HOST}${dataProfile.avatar}`);
-      } else {
-        setAvatarImage(dataProfile.avatar || imagesStore.new_avatar);
-      }
-    }
-  }, [dataProfile]);
 
   if (loadingProfile || !dataProfile) {
     return <LoadingIndicator />;

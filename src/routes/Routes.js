@@ -20,6 +20,7 @@ import StoreInformationMobile from '~/pages/StoreInformationMobile';
 import OrderDetail from '~/pages/OrderDetail';
 import SupplierDetail from '~/pages/SupplierDetail';
 import PostSupplier from '~/pages/Supplier/component/PostSupplier';
+import FooterBlog from '~/pages/FooterBlog';
 
 const useViewport = () => {
   const [width, setWidth] = useState(window.innerWidth);
@@ -56,6 +57,7 @@ const publicRoutes = [
   { path: routesConfig.store_information, component: StoreInformationWrapper },
   { path: routesConfig.order_detail, component: OrderDetail },
   { path: routesConfig.supplier_detail, component: SupplierDetail },
+  { path: routesConfig.footer_blog, component: FooterBlog },
 ];
 
 // Routes accessible only after login

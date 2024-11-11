@@ -75,6 +75,7 @@ import avatar_icon from './all/avatar-icon.png';
 import minus_icon from './all/minus-icon.png';
 import message_icon from './all/message-icon.png';
 import arrow_down from './all/arrown-down.png';
+import zalo_icon from './footer/zalo_icon.png';
 
 export const images = {
   logo,
@@ -135,6 +136,7 @@ export const imagesFooter = {
   facebook,
   twitter,
   masterCart,
+  zalo_icon,
 };
 
 export const imagesHotDeal = {

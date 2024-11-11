@@ -16,6 +16,7 @@ function SubTitle({ title }) {
     [routesConfig.supplier]: 'Tìm nhà cung cấp',
     [routesConfig.shopping_cart]: 'Giỏ hàng',
     [routesConfig.store_management]: 'Quản lý gian hàng',
+    [routesConfig.footer_blog]: 'Chi tiết bài viết',
   };
 
   const subtitle = pathToSubTitleMap[location.pathname] || title;

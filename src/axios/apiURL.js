@@ -32,6 +32,7 @@ export const apiURL = {
   wards: (district_id) => `/api/wards/${district_id}`,
 
   //Home
+  getBanner: '/api/banner',
   dealHotToday: '/api/deal-hot-today',
   productForYou: '/api/product-for-you',
   productNew: '/api/product-new',
@@ -58,7 +59,8 @@ export const apiURL = {
   postUpdateRemaining: (product_id) => `api/update-quantity-product/${product_id}`,
   postUpdateSale: (product_id) => `api/set-product-discount/${product_id}`,
   updateSaleDisplay: (product_id) => `/api/set-display-product-discount/${product_id}`,
-  getShopProfile: 'api/get-shop',
+  getShopProfile: '/api/get-shop',
+  deleteImage: (product_id) => `/api/delete-product-image/${product_id}`,
 
   //Payment
   addToCart: '/api/add-to-cart',
@@ -113,4 +115,8 @@ export const apiURL = {
   //Notification
   getNotification: '/api/get-notification',
   markReadNotification: (notification_id) => `/api/read-messages/${notification_id}`,
+
+  //Setting
+  getSetting: '/api/setting',
+  getDetailPostFooter: (slug) => `api/detail-post-footer/${slug}`,
 };

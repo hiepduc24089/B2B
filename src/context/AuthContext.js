@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import { fetchProfile } from '~/api/profile';
 
 const AuthContext = createContext();
 
@@ -37,19 +38,29 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    const storedToken = localStorage.getItem('token');
+    const checkTokenValidity = async () => {
+      const storedUser = localStorage.getItem('user');
+      const storedToken = localStorage.getItem('token');
 
-    if (storedUser && storedToken) {
-      if (isTokenExpired(storedToken)) {
-        logout();
+      if (storedUser && storedToken) {
+        try {
+          const response = await fetchProfile();
+          if (isTokenExpired(storedToken) || response.data.token !== storedToken) {
+            logout();
+          } else {
+            setUser(JSON.parse(storedUser));
+            setIsAuthenticated(true);
+          }
+        } catch (error) {
+          console.error('Error validating token with API:', error);
+          logout();
+        }
       } else {
-        setUser(JSON.parse(storedUser));
-        setIsAuthenticated(true);
+        logout();
       }
-    } else {
-      logout();
-    }
+    };
+
+    checkTokenValidity();
   }, []);
 
   return <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>{children}</AuthContext.Provider>;

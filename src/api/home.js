@@ -1,6 +1,17 @@
 import { getData, postData } from '~/axios/config';
 import { apiURL } from '~/axios/apiURL';
 
+//Fetch banner
+export const fetchBanner = async () => {
+  try {
+    const response = await getData(apiURL.getBanner);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching banner:', error);
+    throw error;
+  }
+};
+
 // Fetch hot deal products
 export const fetchHotDeal = async (user_id, page = 1) => {
   try {
@@ -85,6 +96,26 @@ export const postFavoriteProduct = async (product_id) => {
     return response;
   } catch (error) {
     console.error('Error update favorite:', error);
+    throw error;
+  }
+};
+
+export const getSettingPage = async () => {
+  try {
+    const response = await getData(apiURL.getSetting);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching setting:', error);
+    throw error;
+  }
+};
+
+export const getDetailPostFooter = async (slug) => {
+  try {
+    const response = await getData(apiURL.getDetailPostFooter(slug));
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching setting:', error);
     throw error;
   }
 };
